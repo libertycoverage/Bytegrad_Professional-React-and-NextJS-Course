@@ -1,3 +1,15 @@
+# This project covers topics from V32 to V48 (Word-analytics project V32 to V48)
+
+To run project execute in terminal:
+$ npm install
+
+it creates node_modules
+
+then
+
+$ npm run dev
+http://localhost:5173
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

@@ -1,3 +1,15 @@
+# This project covers topics from V116 to V146 (Rmtdev project V116 to V187)
+
+To run project execute in terminal:
+$ npm install
+
+it creates node_modules
+
+then
+
+$ npm run dev
+http://localhost:5173
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
