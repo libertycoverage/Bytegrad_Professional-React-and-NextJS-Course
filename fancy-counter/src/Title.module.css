@@ -1,0 +1,11 @@
+.title {
+  color: green;
+  font-size: 20px;
+}
+// one of the downside of this is that it is in a global scope
+
+// className="title"> one of the downside of this is that it (.title in CSS file) is in a global scope, we do not want that
+// to address this problem we can use css modules
+// we rename Title.css as Title.module.css and we add
+// import styles from "./Title.module.css";
+// we change className="title"> to className={styles.title}>

@@ -1,0 +1,25 @@
+//in css you can select by tag name, generally it's a bad practice
+//usage of class names
+
+// you can also select by id using hash e.g. #heading
+
+.heading {
+  font-size: 10px;
+}
+
+.heading2 {
+  font-size: 15px;
+}
+
+//tag name
+h2 {
+  font-size: 10px;
+}
+
+#byid {
+  font-size: 10px;
+}
+
+.heading--big {
+  font-size: 55px;
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" style="font-family: 'Inter', sans-serif">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="traditional-then-syntax-script.js" defer></script> <!-- get request  -->
+    <script src="async-await-new-syntax-get-request-script.js" defer></script>
+    <script src="async-await-new-syntax-post-request-script.js" defer></script>
+
+    <!-- more common version in javascript files ./script.js -->
+
+    <title>Fetch API Tutorial - Fetch API with Async/Await</title>
+
+
+    <style>
+        /* CSS for stacking buttons vertically */
+        .button-container {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            align-items: center; /* Center buttons horizontally */
+            margin-top: 20px; /* Add some margin between buttons */
+        }
+
+        /* Add margin to each button */
+        .button-container button {
+            margin-bottom: 10px;
+        }
+    </style>
+
+  
+  </head>
+  <!-- <body style="display: flex; justify-content: center"></body> -->
+  <body >
+    <div class="button-container"></div>
+    <button
+      class="btn-trad"
+      style="
+        border: none;
+        background: #0071e3;
+        color: #fff;
+        font: inherit;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+      "
+    >
+      Get Users Traditional Syntax
+    </button>
+   
+    <button
+      class="btn-async-await-get"
+      style="
+        border: none;
+        background: #0071e3;
+        color: #fff;
+        font: inherit;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+      "
+    >
+      Get Users Async Await Syntax
+    </button>
+
+    <button
+    class="btn-async-await-post"
+    style="
+      border: none;
+      background: #0071e3;
+      color: #fff;
+      font: inherit;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    "
+  >
+    Submit Users Async Await Syntax
+  </button>
+
+    </div>
+  </body>
+</html>
