@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { JobItemExpanded, jobItem } from "./types";
 import { BASE_API_URL } from "./constants";
+import { useQuery } from "@tanstack/react-query";
 
 // custom hooks are basically utility functions
 
@@ -85,7 +86,7 @@ export function useActiveJobItemId() {
 
 ///-------------------------------------------------------------------------------
 
-export function useJobItem(id: number | null) {
+export function useJobItem2(id: number | null) {
   const [jobItem, setJobItem] = useState<JobItemExpanded | null>(null);
   //loading spinner for details of offer
   const [isLoading, setIsLoading] = useState(false);
@@ -303,3 +304,70 @@ export const useDebounce = <T>(value: T, delay = 250): T => {
 
   return debouncedValue; // debounced value initially is gonna return null when useState(null);
 };
+
+///-------------------------------------------------------------------------------
+/// useJobItemUsingReactQueryForCache
+
+export function useJobItem(id: number | null) {
+  // useQuery hook will do all of that for us with caching and things like that
+  // hook will give us data of data fetching, and will tell us the loading state,
+  // inside we need to specify 3 arguments, array - so called queryKeys,
+  // we sort of label this query, we pass the string e.g. job-item, we also wanna pass id as well, id also uniqally describes this query,
+  // this is similar to the dependency array in useEffect, in useEffect to the dependency array we add id, whenever the id changes it will re-run useEffect
+  // in useQuery when the id change, it will re-run the query, unless we have already fetched the data for the particular id, in that case it will use the cache,
+  // we can also remove that cache, maybe for some reason we want fetch every time, you can bust that cache these using this way of labelling query, e.g. "job-item", id
+  // typically is that you have own word, and sort of a variable on which this query depends
+
+  // the second part needs to be a function, this is where we fetch the data,
+  // we will have to fetch the data ourselves, React-Query will not fetch the data for us,
+  // it will only handle things as caching the data, and all those side issues,
+  // here we need to use Fetch API or Axios or other library, we still have to do data fetching ourselves
+  const { data, isLoading } = useQuery(
+    ["job-item", id],
+    async () => {
+      const response = await fetch(`${BASE_API_URL}/${id}`);
+      const data = await response.json();
+      return data; //React Query will automatically put that in the cache, it can do refetching automatically after some time, it can refetch when we make the window active again (open tab)
+    },
+    // the third argument is going to be options, it can determine how long we should cache the result
+    // staleTime - after how long should we consider data outdated and make new network request
+    // -> staleTime: 1000 * 60, - after a minute we should make a network request
+    // -> staleTime: 1000 * 60, - after an hour we should make a network request
+    // -> refetchOnWindowFocus: false, - during development this is going to be annoying, we are often switching around during development, we do not want to refetch every time we are going there
+    // -> retry: false - retry after there was an error
+    // -> enabled: true - this is important one, it means when the component using this hook first mounts, should this useQuery also run immediately after component using it mounts
+    // that should only be the case if there is id in the URL, there shouldn't be any data fetching without id,
+    // enabled: !id ? false : true, (if there is no id do not automatically data fetch on the first mount, but if there is an id fetch on the first mount),
+    // it depends whether the is is null or not, enabled: !!id , we convert that to boolean, double negation, if id is truthy this (!!id) will become true, if is is falsy it will become false,
+    // you can be more specific, be  more explicit and cast the id to boolean -> enabled: Boolean(id) - you can use this constructive function, pass some value (id) an it convert that
+    // -> onError: () => {}, - we can also specify what if there is an error, what if fetching the data will throw the error, e.g. if the internet goes out during the fetching data, or during this fetch call
+    // the browser will throw an error, and maybe we want to throw the error ourselves, maybe the status code is 404, the browser will not throw an error if the status code is 404,
+    // onError: (error) => {},
+    {
+      staleTime: 1000 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: !id ? false : true,
+      onError: () => {},
+    }
+  );
+
+  console.log(data);
+  // variable in between to get the jobItem out of data
+  // const jobItem = data?.jobItem; // we can have the optional chaining, but here it is not required
+  const jobItem = data?.jobItem;
+  // here we need to make sure the objects holds the jobItem property in this exact name "jobItem", because we destructure that later using that
+  return { jobItem, isLoading } as const;
+  // we do not want the whole data, we want data.jobItem
+}
+
+// React-Query requires QueryClientProvider that wraps the app, what the React Query wants to do is essentially the same as what we would do with Context API Provider,
+// we would wrap the part of the app that needs access to the Context with the Context Provider, React Query does something similar
+// in main.tsx we add -> new QueryClient();
+
+/// now we see a a loading spinner all the time (when we first load the app),
+// everything is working as expected because we do not have any id in the URL, we do not have any data to fetch, we do not have any id
+// we see a a strange loading spinner because a React-Query actually deals with loading state isLoading a little bit different,
+// we see undefined because there is no data yet
+// now when we click on the jobItem offer and then again, on the same offer, we have an instant reaction without loading spinner (during the fetch), we do not do the fetch,
+// using back and forth buttons in the browser we do not fetch the data again, it is instant in the cache
