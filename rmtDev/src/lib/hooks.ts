@@ -348,7 +348,10 @@ export function useJobItem(id: number | null) {
   // we will have to fetch the data ourselves, React-Query will not fetch the data for us,
   // it will only handle things as caching the data, and all those side issues,
   // here we need to use Fetch API or Axios or other library, we still have to do data fetching ourselves
-  const { data, isLoading } = useQuery(
+
+  // const { data, isLoading } = useQuery(
+  // **** solution to error as below
+  const { data, isInitialLoading } = useQuery(
     ["job-item", id],
 
     // moved up to utility function
@@ -382,6 +385,12 @@ export function useJobItem(id: number | null) {
       retry: false,
       enabled: !id ? false : true,
       onError: () => {},
+      // **** Going to the http://localhost:5173/ we have an error, loading spinner is all the time, and that is not what we intend to have,
+      // we have the error despite the data being fetched, we even do not have id in the URL
+      // It is simply because how Tanstack React-Query works, we use the "enabled: Boolean(id)" option and that what has an impact on the error,
+      // basically it comes down to isLoading will also be true here initially, because there is no data, so from the perspective of React-Query there is no data,
+      // so we basically waiting for the data, loading the data,
+      // is Loading is not what we gonna use here, we can use isInitialLoading
     }
   );
 
@@ -394,6 +403,9 @@ export function useJobItem(id: number | null) {
   /// what we return from the hook (jobItem) is some type any, so wherever you use that hook e.g. in JobItemContent component, when you get the jobItem it has type "any", this is also not ideal.
   /// React-Query recommends is that you type the return value of fetching function, the function that implements the fetching, we can specify the return type
   /// "data" can be null or undefined, our application crashes, we want Typescript to warn us, we do not get a warning because of "data" is typed as any
+
+  // **** solution to error as above
+  const isLoading = isInitialLoading;
 
   // here we need to make sure the objects holds the jobItem property in this exact name "jobItem", because we destructure that later using that
   return { jobItem, isLoading } as const;
