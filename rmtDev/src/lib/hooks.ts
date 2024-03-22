@@ -308,7 +308,23 @@ export const useDebounce = <T>(value: T, delay = 250): T => {
 ///-------------------------------------------------------------------------------
 /// useJobItemUsingReactQueryForCache
 
+// utility function as an arrow function, so we have a contrast between the hooks and utility functions
+const fetchJobItem = async (id: number) => {
+// const fetchJobItem = async (id: number | null) => {
+  // if (!id) return null;  // using that clutters up the function
+  // *** sometimes it is a little bit tricky to work with null
+
+  const response = await fetch(`${BASE_API_URL}/${id}`);
+  const data = await response.json();
+  return data; //React Query will automatically put that in the cache, it can do refetching automatically after some time, it can refetch when we make the window active again (open tab)
+
 export function useJobItem(id: number | null) {
+
+ // *** sometimes it is a little bit tricky to work with null
+ // *** you could technically check if there is no id, but this won't work in React hook, you cannot call the hook conditionally, after, or as a part of a if statement
+ // *** that is not allowed according to the rules of hook in React, you have to always call it unconditionally
+ // *** if (!id) return;
+
   // useQuery hook will do all of that for us with caching and things like that
   // hook will give us data of data fetching, and will tell us the loading state,
   // inside we need to specify 3 arguments, array - so called queryKeys,
@@ -324,11 +340,19 @@ export function useJobItem(id: number | null) {
   // here we need to use Fetch API or Axios or other library, we still have to do data fetching ourselves
   const { data, isLoading } = useQuery(
     ["job-item", id],
-    async () => {
-      const response = await fetch(`${BASE_API_URL}/${id}`);
-      const data = await response.json();
-      return data; //React Query will automatically put that in the cache, it can do refetching automatically after some time, it can refetch when we make the window active again (open tab)
-    },
+
+// moved up to utility function
+    // async () => {
+    //   const response = await fetch(`${BASE_API_URL}/${id}`);
+    //   const data = await response.json();
+    //   return data; //React Query will automatically put that in the cache, it can do refetching automatically after some time, it can refetch when we make the window active again (open tab)
+    // }
+// moved up to utility function
+
+    // () => fetchJobItem(id) // moved up to utility function, we need to pass the id, arrow function here <- so we will not run the function immediately, it is similar with the event handlers
+    () => (id ? fetchJobItem(id) : null) // if id we want to run the function
+    // *** sometimes it is a little bit tricky to work with null
+    ,
     // the third argument is going to be options, it can determine how long we should cache the result
     // staleTime - after how long should we consider data outdated and make new network request
     // -> staleTime: 1000 * 60, - after a minute we should make a network request
