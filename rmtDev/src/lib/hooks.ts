@@ -306,24 +306,34 @@ export const useDebounce = <T>(value: T, delay = 250): T => {
 };
 
 ///-------------------------------------------------------------------------------
-/// useJobItemUsingReactQueryForCache
+
+type JobItemApiResponse = {
+  public: boolean;
+  jobItem: JobItemExpanded;
+};
 
 // utility function as an arrow function, so we have a contrast between the hooks and utility functions
-const fetchJobItem = async (id: number) => {
-// const fetchJobItem = async (id: number | null) => {
+// const fetchJobItem = async (id: number): JobItemApiResponse => {
+// error with red underline JobItemApiResponse here (intellisense) -> The return type of an async function or method must be the global Promise<t> type. Did you mean to write Promise<JobItemApiResponse>
+// if you have async it will give you the promise, but what we see in console log is object, not a promise, the way it works is it returns a promise, but resolve in object
+/// here we can specify the return type after colon -> const fetchJobItem = async (id: number): => { -> it will specify the type of "data" returned by the function
+const fetchJobItem = async (id: number): Promise<JobItemApiResponse> => {
+  // const fetchJobItem = async (id: number | null) => {
   // if (!id) return null;  // using that clutters up the function
   // *** sometimes it is a little bit tricky to work with null
 
   const response = await fetch(`${BASE_API_URL}/${id}`);
   const data = await response.json();
+  console.log(data);
   return data; //React Query will automatically put that in the cache, it can do refetching automatically after some time, it can refetch when we make the window active again (open tab)
+};
 
+/// useJobItemUsingReactQueryForCache
 export function useJobItem(id: number | null) {
-
- // *** sometimes it is a little bit tricky to work with null
- // *** you could technically check if there is no id, but this won't work in React hook, you cannot call the hook conditionally, after, or as a part of a if statement
- // *** that is not allowed according to the rules of hook in React, you have to always call it unconditionally
- // *** if (!id) return;
+  // *** sometimes it is a little bit tricky to work with null
+  // *** you could technically check if there is no id, but this won't work in React hook, you cannot call the hook conditionally, after, or as a part of a if statement
+  // *** that is not allowed according to the rules of hook in React, you have to always call it unconditionally
+  // *** if (!id) return;
 
   // useQuery hook will do all of that for us with caching and things like that
   // hook will give us data of data fetching, and will tell us the loading state,
@@ -341,18 +351,17 @@ export function useJobItem(id: number | null) {
   const { data, isLoading } = useQuery(
     ["job-item", id],
 
-// moved up to utility function
+    // moved up to utility function
     // async () => {
     //   const response = await fetch(`${BASE_API_URL}/${id}`);
     //   const data = await response.json();
     //   return data; //React Query will automatically put that in the cache, it can do refetching automatically after some time, it can refetch when we make the window active again (open tab)
     // }
-// moved up to utility function
+    // moved up to utility function
 
     // () => fetchJobItem(id) // moved up to utility function, we need to pass the id, arrow function here <- so we will not run the function immediately, it is similar with the event handlers
-    () => (id ? fetchJobItem(id) : null) // if id we want to run the function
+    () => (id ? fetchJobItem(id) : null), // if id we want to run the function
     // *** sometimes it is a little bit tricky to work with null
-    ,
     // the third argument is going to be options, it can determine how long we should cache the result
     // staleTime - after how long should we consider data outdated and make new network request
     // -> staleTime: 1000 * 60, - after a minute we should make a network request
@@ -379,7 +388,13 @@ export function useJobItem(id: number | null) {
   console.log(data);
   // variable in between to get the jobItem out of data
   // const jobItem = data?.jobItem; // we can have the optional chaining, but here it is not required
-  const jobItem = data?.jobItem;
+  const jobItem = data?.jobItem; // if the data is undefined, whole thing becomes undefined (instead of crashing the app), we see that in consol.log(data)
+  /// we can use optional chaining to get rid of the problem below
+  /// Another common problem is the types actually, when we hover over "data" used by that useQuery it is of type "any" (intellisense). jobItem pulled from data.jobItem is also typed as "any",
+  /// what we return from the hook (jobItem) is some type any, so wherever you use that hook e.g. in JobItemContent component, when you get the jobItem it has type "any", this is also not ideal.
+  /// React-Query recommends is that you type the return value of fetching function, the function that implements the fetching, we can specify the return type
+  /// "data" can be null or undefined, our application crashes, we want Typescript to warn us, we do not get a warning because of "data" is typed as any
+
   // here we need to make sure the objects holds the jobItem property in this exact name "jobItem", because we destructure that later using that
   return { jobItem, isLoading } as const;
   // we do not want the whole data, we want data.jobItem
