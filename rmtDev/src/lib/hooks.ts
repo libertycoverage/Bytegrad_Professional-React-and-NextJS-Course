@@ -323,6 +323,35 @@ const fetchJobItem = async (id: number): Promise<JobItemApiResponse> => {
   // *** sometimes it is a little bit tricky to work with null
 
   const response = await fetch(`${BASE_API_URL}/${id}`);
+
+  // There is one more part of dealing with fetching data - error handling
+  // e.g. when we fetch data, when we use Fetch API the browser will send the network request for us, but what if during the request-response cycle, an error occurs, internet goes out,
+  // if the request-response cycle cannot be completed, the browser will actually throw an error, it will do something like this behind the scenes "throw new Error()"
+  // Since we are using utility function in here -> () => (id ? fetchJobItem(id) : null), with React-Query, React-Query will catch that error for us
+  // Sometimes things go wrong,  but the request-response cycle is still completed
+  // e.g. 404 e.g. ID cannot be found, the browser will not throw an error (request-response cycle is still complete). Typically we want to throw the error ourselves
+
+  // Something else can go wrong, maybe the server doesn't want you to use special symbols
+  // e.g. using @ in search, this will give 400 Bad Request status code with response: {"description":"Search query may not contain special symbols"},
+  // but the request-response cycle is still complete, we got response here, browser will not throw an error, but we want an error
+
+  // 4XX or 5XX
+  // if the response is not okay we want to throw an error ourselves, browser in this case won't throw an error because request-response cycle is completed, ok would be if the response is in 200 range
+  if (!response.ok) {
+    const errorData = await response.json();
+    // throw new Error(errorData.message);
+
+    //throw 404; // you can technically throw anything you want
+
+    // typically people will throw an object with message property
+    // throw {
+    //   message: errorData.message,
+    //   status: response.status,
+    // }
+
+    //we will not create object ourselves, we are going to use so called constructor
+    throw new Error(errorData.description);
+  }
   const data = await response.json();
   console.log(data);
   return data; //React Query will automatically put that in the cache, it can do refetching automatically after some time, it can refetch when we make the window active again (open tab)
@@ -384,7 +413,9 @@ export function useJobItem(id: number | null) {
       refetchOnWindowFocus: false,
       retry: false,
       enabled: !id ? false : true,
-      onError: () => {},
+      onError: (error) => {
+        console.log(error);
+      },
       // **** Going to the http://localhost:5173/ we have an error, loading spinner is all the time, and that is not what we intend to have,
       // we have the error despite the data being fetched, we even do not have id in the URL
       // It is simply because how Tanstack React-Query works, we use the "enabled: Boolean(id)" option and that what has an impact on the error,
