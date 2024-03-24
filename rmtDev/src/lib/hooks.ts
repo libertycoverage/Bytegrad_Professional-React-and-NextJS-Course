@@ -178,10 +178,11 @@ export function useJobItems(searchText: string) {
   //   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // derived state
-  const totalNumberOfResults = jobItems.length;
+  // const totalNumberOfResults = jobItems.length; //  "Purify Custom Hook(No derived state)" -> moved to App.tsx
   // derived state
   // we want only first 7 elements of the array displayed
-  const jobItemsSliced = jobItems.slice(0, 7);
+
+  //const jobItemsSliced = jobItems.slice(0, 7); //  "Purify Custom Hook(No derived state)" -> moved to App.tsx
   //7 is not included it will stop on index 6
 
   // on every onChange of input we want a query, here query parameters
@@ -261,7 +262,10 @@ export function useJobItems(searchText: string) {
   // renaming in App.tsx   const { jobItemsSliced: jobItems, isLoading } = useJobItems(searchText); easier way you can return the array here
   // and destructure from the array
   // return [jobItemsSliced, isLoading, totalNumberOfResults] as const;
-  return { jobItemsSliced, isLoading, totalNumberOfResults } as const;
+  //return { jobItemsSliced, isLoading, totalNumberOfResults } as const;
+  // "Purify Custom Hook(No derived state)" -
+  // for purifying reasons we want to return whole jobItems in the list (not the 7 jobItemsSliced ), also get rid of derived state with totalNumberOfResults for a moment
+  return { jobItems, isLoading } as const;
 }
 
 /// classic style generic function ///
@@ -306,6 +310,7 @@ export const useDebounce = <T>(value: T, delay = 250): T => {
 };
 
 ///-------------------------------------------------------------------------------
+// useJobItem using Tanstack React-Query caching
 
 type JobItemApiResponse = {
   public: boolean;
@@ -453,3 +458,6 @@ export function useJobItem(id: number | null) {
 // we see undefined because there is no data yet
 // now when we click on the jobItem offer and then again, on the same offer, we have an instant reaction without loading spinner (during the fetch), we do not do the fetch,
 // using back and forth buttons in the browser we do not fetch the data again, it is instant in the cache
+
+///-------------------------------------------------------------------------------
+/// useJobItems using Tanstack React-Query caching

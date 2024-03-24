@@ -77,9 +77,18 @@ function App() {
   // debouncedSearchText is a slowed down version of the searchText, we need to find way to update debouncedSearchText variable
 
   const debouncedSearchText = useDebounce(searchText, 250);
-  const { totalNumberOfResults, jobItemsSliced, isLoading } =
-    // useJobItems(searchText);
-    useJobItems(debouncedSearchText);
+  // const { totalNumberOfResults, jobItemsSliced, isLoading } = useJobItems(debouncedSearchText);
+  // = useJobItems(searchText);
+
+  const { jobItems, isLoading } = useJobItems(debouncedSearchText); //  "Purify Custom Hook(No derived state)"
+
+  // "Purify Custom Hook(No derived state)" before we use Tanstack React-Query for caching of the the search with text query in useJobItems
+  // What we are returning from this hook useJobItems() is too processed, we have a processed version with jobItemsSliced (derived state).
+  // We are returning first 7 jobItems and that is opinionated (we assume we need only 7 due to visuals of the app), but we can imagine a different project or a different component you may actually need all of them
+  // - it is too processed. useJobItems probably should be more general, not opinionated about what the hook returns. We should return the entire array of jobItems, in this case 45 results (server limitations)
+
+  const totalNumberOfResults = jobItems.length; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
+  const jobItemsSliced = jobItems.slice(0, 7); //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
 
   // we migrated implementation form Vid 136 to custom hook in hooks.ts for ActiveJobItemId
   //MOVED to JobItemContent.tsx//  const activeJobItemId = useActiveJobItemId();
