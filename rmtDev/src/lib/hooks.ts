@@ -85,7 +85,7 @@ export function useActiveJobItemId() {
 }
 
 ///-------------------------------------------------------------------------------
-
+//this is previous version, new version using Tanstack React-Query (Caching) was introduced below
 export function useJobItem2(id: number | null) {
   const [jobItem, setJobItem] = useState<JobItemExpanded | null>(null);
   //loading spinner for details of offer
@@ -154,9 +154,10 @@ export function useJobItem2(id: number | null) {
 // }
 
 ///-------------------------------------------------------------------------------
+// this version of useJobItems does not use Tanstack React-Query
 
 // searchText is a normal input of the function not a props (without curly braces)
-export function useJobItems(searchText: string) {
+export function useJobItems2(searchText: string) {
   // it does not have sense that we are having a jobItems in a component SearchForm
   // we are not using jobItems in this form (in the SearchForm in the Header component), we want to have jobItems in the Container component in the sidebar on the left
   // SearchForm is int the Header component, we are lifting the state up the component tree to the App.tsx
@@ -460,4 +461,78 @@ export function useJobItem(id: number | null) {
 // using back and forth buttons in the browser we do not fetch the data again, it is instant in the cache
 
 ///-------------------------------------------------------------------------------
-/// useJobItems using Tanstack React-Query caching
+///this version of  useJobItems is using Tanstack React-Query caching
+
+// We want to use Tanstack React-Query for caching of the the search with text query in useJobItems,
+// this will be also useful with back and forth buttons in the browser,
+// also to not to use fetch request every time we modify the search query text
+
+type JobItemsApiResponse = {
+  public: boolean; // we are not interested in that
+  sorted: boolean; // we are not interested in that
+  jobItems: jobItem[]; // these jobItems are the shorted version, specific for the list on the left, based on query text search
+};
+
+// we are not returning an object strictly speaking, we are returning a promise with async function
+// you are always returning a promise but it will resolve in an object
+const fetchJobItems = async (
+  searchText: string
+): Promise<JobItemsApiResponse> => {
+  const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
+  const data = await response.json();
+  return data; // we are returning an object which will have some other things like sorted or public is true
+  // data is typed as JobItemsApiResponse | undefined
+};
+
+// searchText is a normal input of the function not a props (without curly braces)
+export function useJobItems(searchText: string) {
+  // const { data, isLoading } = useQuery(
+  const { data, isInitialLoading } = useQuery(
+    // isLoading issue with constant loading animation
+    //
+    ["job-items", searchText], // array of query keys, how to identify this particular query, and if it depends on some variable you add that here too (searchText)
+    () => fetchJobItems(searchText), // we specify the function that will do the data fetching
+    {
+      staleTime: 1000 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: Boolean(searchText), // do we want to run this when the component first mounts
+      onError: (error) => {
+        console.log(error);
+      },
+    } // options
+  );
+
+  //--> const jobItems = data?.jobItems; // red underline, initially data is undefined
+  // you do not have to create separate variable for that
+
+  // initially data is undefined -> to prevent app from crashing we want to use "?"
+  // instead of crashing the app, data will become undefined
+
+  // data typed as any, error trying to read jobItems, it is not possible because data initially is null or undefined
+  // we do not get a warning from TypeScript, because data has been typed as any
+  // we need to specify the output JobItemsApiResponse
+
+  // isLoading issue with constant loading animation
+  //--> const isLoading = isInitialLoading;
+  // you do not have to create separate variable for that
+
+  return { jobItems: data?.jobItems, isLoading: isInitialLoading } as const;
+  // you can do it inline without creating separate variables as above (-->)
+}
+
+// Uncaught TypeError: Cannot read properties of undefined (reading 'length')
+// we can access something that could be undefined in App.tsx -> totalNumberOfResults = jobItems.length
+// we need to add optional chaining -> (?)
+
+// now the caching of a search text works instantly
+
+// JobList.tsx:28 Uncaught TypeError: Cannot read properties of undefined (reading 'map'),
+// it is because we do with optional chaining (?), in App.tsx totalNumberOfResults: number | undefined has a red underline
+// optional chaining (?), if the jobItem is undefined totalNumberOfResults is going to be undefined
+// we are going to set "initial value" with jobItems?.length || 0 -> in case it is undefined it is gonna take zero,
+// it is also short circuiting if jobItems?.length  is truthy it will not evaluate the second part with zero
+// it the first is falsy it will immediately give zero
+
+// we add empty array in -> jobItemsSliced = jobItems?.slice(0, 7 ) || [];
+// if it is undefined it will be empty array, it will map over empty array, no problem

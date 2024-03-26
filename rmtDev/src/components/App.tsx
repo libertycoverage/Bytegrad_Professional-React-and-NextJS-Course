@@ -87,8 +87,9 @@ function App() {
   // We are returning first 7 jobItems and that is opinionated (we assume we need only 7 due to visuals of the app), but we can imagine a different project or a different component you may actually need all of them
   // - it is too processed. useJobItems probably should be more general, not opinionated about what the hook returns. We should return the entire array of jobItems, in this case 45 results (server limitations)
 
-  const totalNumberOfResults = jobItems.length; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
-  const jobItemsSliced = jobItems.slice(0, 7); //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
+  const totalNumberOfResults = jobItems?.length || 0; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
+  const jobItemsSliced = jobItems?.slice(0, 7) || []; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
+  // we need to add optional chaining -> (?)
 
   // we migrated implementation form Vid 136 to custom hook in hooks.ts for ActiveJobItemId
   //MOVED to JobItemContent.tsx//  const activeJobItemId = useActiveJobItemId();
