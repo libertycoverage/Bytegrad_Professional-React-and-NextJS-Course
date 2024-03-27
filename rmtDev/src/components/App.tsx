@@ -181,6 +181,7 @@ function App() {
           <PaginationControls
             previousPage={currentPage - 1}
             nextPage={currentPage + 1}
+            currentPage={currentPage}
             onClick={handleChangePage}
           />
         </Sidebar>
