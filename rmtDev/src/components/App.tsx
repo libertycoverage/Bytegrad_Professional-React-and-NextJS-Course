@@ -25,6 +25,7 @@ function App() {
   // useState searchText, jobItems and useEffect with fetch moved up the component tree to App.tsx from SearchForm component
   // useState initially is an empty string
 
+  // state
   const [searchText, setSearchText] = useState("");
 
   // Hook rules
@@ -83,14 +84,35 @@ function App() {
 
   const { jobItems, isLoading } = useJobItems(debouncedSearchText); //  "Purify Custom Hook(No derived state)"
 
+  // pagination control state moved up here, because of the slicing per page
+  const [currentPage, setCurrentPage] = useState(1);
+  console.log(currentPage);
+
   // "Purify Custom Hook(No derived state)" before we use Tanstack React-Query for caching of the the search with text query in useJobItems
   // What we are returning from this hook useJobItems() is too processed, we have a processed version with jobItemsSliced (derived state).
   // We are returning first 7 jobItems and that is opinionated (we assume we need only 7 due to visuals of the app), but we can imagine a different project or a different component you may actually need all of them
   // - it is too processed. useJobItems probably should be more general, not opinionated about what the hook returns. We should return the entire array of jobItems, in this case 45 results (server limitations)
 
+  // derived / computed state
   const totalNumberOfResults = jobItems?.length || 0; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
   const jobItemsSliced = jobItems?.slice(0, 7) || []; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
   // we need to add optional chaining -> (?)
+
+  // event handlers / actions
+  const handleChangePage = (direction: "next" | "previous") => {
+    // here we should know whether we want to go to the next one or previous one
+    // based on the direction we want to increase or decrease currentPage useState (1)
+    if (direction === "next") {
+      setCurrentPage((prev) => prev + 1);
+    } else if (direction === "previous") {
+      // we want to be more specific, more strict with previous
+      setCurrentPage((prev) => prev - 1); // we will get zero, but we will prevent that situation to occur
+    }
+  };
+
+  //handleChangePage("nextt"); // if you pass the mistake you do not go to the previous one
+  // to prevent this mistake in the first place we can actually type d, this can simply be the union type -> handleChangePage = (direction: 'next' | 'previous')
+  // now you get a red underline for a "nextt" mistake
 
   // we migrated implementation form Vid 136 to custom hook in hooks.ts for ActiveJobItemId
   //MOVED to JobItemContent.tsx//  const activeJobItemId = useActiveJobItemId();
@@ -155,7 +177,12 @@ function App() {
            now jobItems and isLoading is not underlined here in App.tsx -> <JobList jobItems={jobItems} isLoading={isLoading} />
            */}
 
-          <PaginationControls />
+          {/* <PaginationControls setCurrentPage={} /> */}
+          <PaginationControls
+            previousPage={currentPage - 1}
+            nextPage={currentPage + 1}
+            onClick={handleChangePage}
+          />
         </Sidebar>
         {/* MOVED to so you do not have to pass a prop anymore <JobItemContent jobItem={jobItem} /> */}
         <JobItemContent />
