@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { JobItemExpanded, jobItem } from "./types";
 import { BASE_API_URL } from "./constants";
 import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 // custom hooks are basically utility functions
 
@@ -479,6 +480,21 @@ const fetchJobItems = async (
   searchText: string
 ): Promise<JobItemsApiResponse> => {
   const response = await fetch(`${BASE_API_URL}?search=${searchText}`);
+  // 4XX or 5XX
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.description);
+
+    //what we get here is an object
+    // {
+    //   message : 'description'
+    // }
+  }
+  // when we use "@" symbol when searching we receive in log -> Error: Search query may not contain special symbols at fetchJobItems
+  // we are logging the error here but in the real world we would like to have a toast message displayed to the user
+  // Probably the most popular library is https://react-hot-toast.com
+  // $ npm i react-hot-toast@2.4.1
+  // then edit in package.json "dependencies": {"react-hot-toast": "2.4.1"} // we remove ^ sign from version
   const data = await response.json();
   return data; // we are returning an object which will have some other things like sorted or public is true
   // data is typed as JobItemsApiResponse | undefined
@@ -499,6 +515,29 @@ export function useJobItems(searchText: string) {
       enabled: Boolean(searchText), // do we want to run this when the component first mounts
       onError: (error) => {
         console.log(error);
+        //alert(error); // unesthetic but it works as a poor-man's toast message
+
+        // when we use "@" symbol when searching we receive in log -> Error: Search query may not contain special symbols at fetchJobItems
+        // we are logging the error here but in the real world we would like to have a toast message displayed to the user
+        // Probably the most popular library is https://react-hot-toast.com
+        // $ npm i react-hot-toast@2.4.1
+        // then edit in package.json "dependencies": {"react-hot-toast": "2.4.1"} // we remove ^ sign from version
+
+        // we want tot implement toast message handling here
+        // we add <Toaster /> to App.tsx
+
+        //toast.error(error);
+        // we cannot pass the error like that because it is an object throw new Error - new Error will create an object, application crashes
+        toast.error(error.message);
+
+        // In the real wold besides toast message you want to have client-side validation,
+        // before you even send the "@" symbol to server we want to already validate that,
+        // but even with client-side validation, some problems can sneak-through,
+        // even on the server you wanna have validation, people can always circumvent client side validation,
+        // take the hack way around it, so you want validation on the server no matter what,
+        //if there is a problem you still want to send the message to the frontend, if there is an issue we (user) know how to fix it
+
+        // here an error message is obviously strictly for "@" symbol, there is no regex rule on the server
       },
     } // options
   );

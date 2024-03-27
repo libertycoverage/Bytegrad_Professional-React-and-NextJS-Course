@@ -19,6 +19,7 @@ import {
   useJobItems,
 } from "../lib/hooks";
 import { BASE_API_URL } from "../lib/constants";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   // useState searchText, jobItems and useEffect with fetch moved up the component tree to App.tsx from SearchForm component
@@ -161,6 +162,8 @@ function App() {
       </Container>
 
       <Footer />
+      {/* Added React-Hot-Toast */}
+      <Toaster position="top-right" />
     </>
   );
 }
