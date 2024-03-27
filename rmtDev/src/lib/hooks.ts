@@ -3,6 +3,7 @@ import { JobItemExpanded, jobItem } from "./types";
 import { BASE_API_URL } from "./constants";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { handleError } from "./utils";
 
 // custom hooks are basically utility functions
 
@@ -420,9 +421,10 @@ export function useJobItem(id: number | null) {
       refetchOnWindowFocus: false,
       retry: false,
       enabled: !id ? false : true,
-      onError: (error) => {
-        console.log(error);
-      },
+      // onError: (error) => {
+      //   console.log(error);
+      // },
+      onError: handleError, // usage of utility function
       // **** Going to the http://localhost:5173/ we have an error, loading spinner is all the time, and that is not what we intend to have,
       // we have the error despite the data being fetched, we even do not have id in the URL
       // It is simply because how Tanstack React-Query works, we use the "enabled: Boolean(id)" option and that what has an impact on the error,
@@ -476,6 +478,11 @@ type JobItemsApiResponse = {
 
 // we are not returning an object strictly speaking, we are returning a promise with async function
 // you are always returning a promise but it will resolve in an object
+
+// technically you can put these fetch functions in utils.ts file as well,
+// cause these are also utility functions, they are also typically called not fetchJobItem but getJobItem
+// you can rename them that way
+
 const fetchJobItems = async (
   searchText: string
 ): Promise<JobItemsApiResponse> => {
@@ -513,32 +520,126 @@ export function useJobItems(searchText: string) {
       refetchOnWindowFocus: false,
       retry: false,
       enabled: Boolean(searchText), // do we want to run this when the component first mounts
-      onError: (error) => {
-        console.log(error);
-        //alert(error); // unesthetic but it works as a poor-man's toast message
+      // onError: (error) => {
+      // onError: (error: any) => {
 
-        // when we use "@" symbol when searching we receive in log -> Error: Search query may not contain special symbols at fetchJobItems
-        // we are logging the error here but in the real world we would like to have a toast message displayed to the user
-        // Probably the most popular library is https://react-hot-toast.com
-        // $ npm i react-hot-toast@2.4.1
-        // then edit in package.json "dependencies": {"react-hot-toast": "2.4.1"} // we remove ^ sign from version
+      //-> moved to utility function / onError: (error: unknown) => {
+      ///   let message;
+      ///   if (error instanceof Error) {
+      ///     message = error.message;
+      ///   } else if (typeof error === "string") {
+      ///     message = error;
+      ///   } else {
+      ///     message = "An error occurred.";
+      ///   } // if the type of a throwing message is not a string but a boolean or a number etc.
 
-        // we want tot implement toast message handling here
-        // we add <Toaster /> to App.tsx
+      /// error.message; // you cannot do that red underline, error could be anything and you do not know if there is a message
 
-        //toast.error(error);
-        // we cannot pass the error like that because it is an object throw new Error - new Error will create an object, application crashes
-        toast.error(error.message);
+      //-> moved to utility function / console.log(error);
 
-        // In the real wold besides toast message you want to have client-side validation,
-        // before you even send the "@" symbol to server we want to already validate that,
-        // but even with client-side validation, some problems can sneak-through,
-        // even on the server you wanna have validation, people can always circumvent client side validation,
-        // take the hack way around it, so you want validation on the server no matter what,
-        //if there is a problem you still want to send the message to the frontend, if there is an issue we (user) know how to fix it
+      onError: handleError, // usage of utility function
 
-        // here an error message is obviously strictly for "@" symbol, there is no regex rule on the server
-      },
+      //alert(error); // unesthetic but it works as a poor-man's toast message
+
+      // when we use "@" symbol when searching we receive in log -> Error: Search query may not contain special symbols at fetchJobItems
+      // we are logging the error here but in the real world we would like to have a toast message displayed to the user
+      // Probably the most popular library is https://react-hot-toast.com
+      // $ npm i react-hot-toast@2.4.1
+      // then edit in package.json "dependencies": {"react-hot-toast": "2.4.1"} // we remove ^ sign from version
+
+      // we want tot implement toast message handling here
+      // we add <Toaster /> to App.tsx
+
+      //toast.error(error);
+      // we cannot pass the error like that because it is an object throw new Error - new Error will create an object, application crashes
+
+      /// toast.error(error.message);
+      //-> moved to utility function / toast.error(message);
+      /// red underline for error here, error is of the type unknown (intellisense)
+      /// unknown type is the opposite of any
+
+      // In the real wold besides toast message you want to have client-side validation,
+      // before you even send the "@" symbol to server we want to already validate that,
+      // but even with client-side validation, some problems can sneak-through,
+      // even on the server you wanna have validation, people can always circumvent client side validation,
+      // take the hack way around it, so you want validation on the server no matter what,
+      //if there is a problem you still want to send the message to the frontend, if there is an issue we (user) know how to fix it
+
+      // here an error message is obviously strictly for "@" symbol, there is no regex rule on the server
+
+      /// toast.error(error.message); in hooks.ts
+      /// red underline for error here, error is of the type unknown (intellisense)
+      /// unknown type is the opposite of any
+      /// if we do -> onError: (error: any) => {
+      /// we can type
+      /// toast.error(error.message.aezakmi())
+      /// here anything goes, any is very unsafe actually, if you do that, that may crash the application because this method does not exist
+
+      /// if we do -> onError: (error: unknown) => {
+      /// error.blahblah() // you get a warning, we do not know anything about error, so you cannot try access something
+      /// unknown type is the opposite of any
+
+      /// why there is red underline for error here, error is of the type unknown (intellisense)?
+      /// why does this makes sense?
+      /// error is coming from the React fetch API (await fetch) if the network round trip cannot be completed,
+      /// but we can also throw error ourselves (we do that above), and maybe we are using third-part library in here,
+      /// third-party library can also throw errors, or could be throwing anything actually
+
+      /// here we are throwing an error object, this is typical -> throw new Error(errorData.description)
+      /// here ypu could technically throw the number 5, or a string, or a boolean, or an error object,
+      /// meaning it was created with a new error constructor in javascript
+      /// throw 5;
+      /// throw 'something in string';
+      /// throw false;
+      /// throw {} //
+
+      /// fetch API here if the network round trip cannot be completed will also do something like a new Error under the hood,
+      /// most third party libraries if there is an error will also do new Error,
+      /// the vast majority of the time it will actually be a new Error, so it will actually be new error object,
+      /// however it is technically possible that it is something else, and therefore we do not know what it is gonna be, therefore we have the unknown type
+
+      /// this is the most specific way we can describe the type of this-> onError: (error: unknown) => {
+      /// since it is unknown
+      /// when we intellisense (hover on) on error in toast.error the method expects the certain type,
+      /// toast.error(error) here we are passing something of type unknown, you cannot pass something of type unknown to this method,
+      /// it needs to be something else, it needs to be some message
+
+      /// ideally we want to pass a string here -> toast.error(error);
+      /// Typically what you wanna do when you ale dealing with errors, and you have the unknown type,
+      /// is you want to extract the string from here -> onError: (error: unknown) => {
+      /// then we will pass the string to the actual error method -> toast.error(error);
+
+      /// How do you extract message from there?
+      /// We can simply check an error is actually created with that throw new Error,
+      /// we can check for that //if error is the instance of Error constructor function//
+      /// -> if (error instanceof Error)
+      /// an object like that will have a message property with the string, it mays have the other things as well
+      ///{
+      ///  message: "string",
+      ///}
+      /// an error created with new Error will be an object with message property,
+      /// then we can extract message from there using error.message
+
+      /// Most of the time error will actually be an instance of that Error constructor function,
+      /// however it is technically possible that you may throw something else like a boolean or a number
+      /// or what is also possible is that you do not throw an object  but you throw an error description immediately as a string
+      /// -> throw "something went wrong";
+      /// we check an option if the error is string
+
+      /// It is also good to mention that in latest (above 4) Tanstack React-Query they have decided
+      /// to not make this error of type unknown but just of this Error type, because that is what you get the vast majority of the time,
+      /// and that will make it a little bit easier for most people to work with it
+
+      /// however we are in version 4 of React-Query and error is typed as unknown,
+      /// error type unknown is technically a little bit safer, a little bit more precise,
+      /// technically it could be something else, but in the latest React-Query it makes a little cumbersome to work with it,
+      /// because if you want to do something with it TypeScript will complain, will tell you that technically it is unknown,
+      /// you cannot just pass it to some method, you cannot do something like -> error.message, it will red underline error in this case,
+      /// you cannot do that because you do not know what the error is gonna be,
+      /// if it is an instance of Error, you can do that as in (above)-> message = error.message;
+
+      /// we make utility function for error handling
+      //-> moved to utility function / },
     } // options
   );
 
