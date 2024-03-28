@@ -99,9 +99,12 @@ function App() {
   //const jobItemsSliced = jobItems?.slice(0, 7) || []; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
   // we need to add optional chaining -> (?)
   const jobItemsSliced =
-    jobItems?.slice(currentPage * 7 - 7, currentPage * 7) || [];
+    jobItems?.slice(
+      currentPage * RESULTS_PER_PAGE - RESULTS_PER_PAGE,
+      currentPage * RESULTS_PER_PAGE
+    ) || [];
 
-  const totalNumberOfPages = totalNumberOfResults / 7;
+  const totalNumberOfPages = totalNumberOfResults / RESULTS_PER_PAGE;
 
   // event handlers / actions
   const handleChangePage = (direction: "next" | "previous") => {
