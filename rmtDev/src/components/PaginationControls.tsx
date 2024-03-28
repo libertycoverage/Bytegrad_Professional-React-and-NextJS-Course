@@ -1,6 +1,10 @@
 import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 
 type PaginationControlsProps = {
+  currentPage: number;
+  totalNumberOfPages: number;
+  nextPage: number;
+  previousPage: number;
   onClick: (direction: "next" | "previous") => void; // function has one parameter, either, and function does not return anything
 };
 
@@ -8,6 +12,7 @@ export default function PaginationControls({
   currentPage,
   nextPage,
   previousPage,
+  totalNumberOfPages,
   onClick,
 }: PaginationControlsProps) {
   // export default function PaginationControls({ onChangePage }) {
@@ -20,6 +25,13 @@ export default function PaginationControls({
           onClick={() => onClick("previous")}
         />
       )}
+      {currentPage < totalNumberOfPages && (
+        <PaginationButton
+          direction="next"
+          nextPage={nextPage}
+          onClick={() => onClick("next")}
+        />
+      )}
       {/* <PaginationButton direction="previous" previousPage={previousPage} /> */}
       {/* <PaginationButton
         direction="previous"
@@ -27,11 +39,15 @@ export default function PaginationControls({
         onClick={() => onClick("previous")}
       /> */}
       {/* <PaginationButton direction="next" nextPage={nextPage} /> */}
-      <PaginationButton
+
+      {/* migrated for totalNumberOfPages */}
+      {/* <PaginationButton
         direction="next"
         nextPage={nextPage}
         onClick={() => onClick("next")}
-      />
+      /> */}
+      {/* migrated for totalNumberOfPages */}
+
       {/* <button onClick={onClick('previous')} // if you would call this like this you will call it whenever this component is rendering, so you want an arrow function to wait */}
       {/* <button
         onClick={() => onClick("previous")}
@@ -67,7 +83,23 @@ function PaginationButton({
   return (
     // <button onClick={onClick} className="pagination__button">
     <button
-      onClick={onClick}
+      onClick={(e) => {
+        onClick();
+        e.currentTarget.blur(); // blurring is the opposite of focus for button,
+        //we want to defocus button of pagination after click, so the button do not appear constantly clicked (dark)
+        // e.target.blur() would be the actual element that you click, if you happen to click on the icon (arrow here), that is e.target
+        // we do not wanna blur the icon, we want to blur this button, we want to blur the actual element that has this event handler (e) running on that click event
+        // remember a click event in a DOM it starts at the element you actually click, so if you click it on the icon,
+        // the icon here <ArrowLeftIcon /> is a child element here, the event target will be this icon,
+        // then in the DOM the event stay bubble up it will go from React Fragment one level up which is a button> element here,
+        // and here we have attached event handle (e) - onClick with the click event, this event handler will run,
+        // after this one it will continue bubbling up through out the DOM
+        // whenever the element has some onClick event handler ti will also run
+        // here if you run that -> onClick={(e) => { onClick(); and you actually want to target the element that is currently running that event handler
+        // you have to use currentTarget
+        // we do not have the focus anymore, but if we do tabbing here, also for accessibility, it is still in the focus state, that is what we want
+        // now when we click we do not have annoying lingering focus state
+      }}
       className={`pagination__button pagination__button--${direction}`}
     >
       {/* this is interpolation -> ${} ; additional styling to display single button Page 2 on the right side, not on the left (without that additional class)  */}
