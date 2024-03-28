@@ -137,3 +137,13 @@ function PaginationButton({
 // we could put the state in PaginationControls() component but we will need to know about the page up higher in hierarchy
 // in App.tsx as well, based on the current page we are going to slice off the necessary part (7 in the list),
 // when we are on Page 2 we are going to slice a different part of the list 8 + 7 (14), etc.
+
+/// DESCRIPTION Client-Side Pagination Vs Server-Side Pagination
+/// We have implemented client-side pagination,
+/// we fetch all of the data, we store all of that in the browser, then we paginate through it,
+/// we can do client-side pagination, when a number of results is still quite limited for performance reasons,
+/// what if we have thousands, millions of results, we want to reduce number of stored number of objects in memory
+
+/// Server-side pagination is when we do not get all of the data we make a network request for a limited list
+/// e.g. 7, server will get back 7, then we make a request for a next 7 and server responds adequately,
+/// each time we make a network request for a limited number from the range of a total number search results
