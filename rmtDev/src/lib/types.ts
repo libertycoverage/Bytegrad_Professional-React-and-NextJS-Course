@@ -25,3 +25,5 @@ export type JobItemExpanded = JobItem & {
 };
 
 //there are two ways of writing string array as above
+
+export type SortBy = "relevant" | "recent";

@@ -18,8 +18,11 @@ import {
   useJobItem,
   useJobItems,
 } from "../lib/hooks";
-import { BASE_API_URL } from "../lib/constants";
+import { BASE_API_URL, RESULTS_PER_PAGE } from "../lib/constants";
 import { Toaster } from "react-hot-toast";
+import { SortBy } from "../lib/types";
+
+// type SortBy = "relevant" | "recent";
 
 function App() {
   // useState searchText, jobItems and useEffect with fetch moved up the component tree to App.tsx from SearchForm component
@@ -88,6 +91,10 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   console.log(currentPage);
 
+  // const [sortBy, setSortBy] = useState<"relevant" | "recent">("relevant"); // we want this string to be exactly type relevant, not any other string
+  const [sortBy, setSortBy] = useState<SortBy>("relevant");
+  console.log(sortBy);
+
   // "Purify Custom Hook(No derived state)" before we use Tanstack React-Query for caching of the the search with text query in useJobItems
   // What we are returning from this hook useJobItems() is too processed, we have a processed version with jobItemsSliced (derived state).
   // We are returning first 7 jobItems and that is opinionated (we assume we need only 7 due to visuals of the app), but we can imagine a different project or a different component you may actually need all of them
@@ -98,8 +105,34 @@ function App() {
   // 0 to 7 (7 not included)
   //const jobItemsSliced = jobItems?.slice(0, 7) || []; //  "Purify Custom Hook(No derived state)" -> moved from hooks.tsx
   // we need to add optional chaining -> (?)
-  const jobItemsSliced =
-    jobItems?.slice(
+
+  const jobItemsSorted =
+    jobItems?.sort((a, b) => {
+      if (sortBy == "relevant") {
+        return b.relevanceScore - a.relevanceScore;
+      } // it will go over the jobItems in the array and will go over each one in pairs
+      // if the b is greater than a it will produce the positive number, positive number means b will be sorted higher
+      // and negative number if the a is greater than b, negative number means a should be sorted higher
+
+      // else if (sortBy === "recent") {
+      else {
+        return a.daysAgo - b.daysAgo; // if the b is higher number, it should go lower, (we want most recent up, less number of days upper)
+      } // if the b is greater than a it will produce a negative number
+      //return; // we need to stop the function, return nothing (return undefined basically here), we cannot return nothing
+
+      //return 0; // we need to return something, zero means it will keep the order
+
+      //WE NEED TO RETURN 0 even if we type as the exact strings -> useState<"relevant" | "recent">("relevant")
+
+      // when we do "else" without any specifics (sortBy === "recent") we do not get a warning type,
+      // because we we handle all other conditions, (previously return 0; for other conditions),
+      // we remain exact strings as types here -> useState<"relevant" | "recent">("relevant")
+    }) || []; // before we make a sliced version, we need to sort the items
+
+  // const jobItemsSliced =
+  const jobItemsSortedAndSliced =
+    // jobItems?.slice( // here with jobItemsSorted we do not need ? because if jobItems is undefined we will have an empty array, it always is going to be some array
+    jobItemsSorted.slice(
       currentPage * RESULTS_PER_PAGE - RESULTS_PER_PAGE,
       currentPage * RESULTS_PER_PAGE
     ) || [];
@@ -138,6 +171,17 @@ function App() {
   // and also this -> const activeJobItemId = useActiveJobItemId();
   // replacing them with this -> const jobItem = useActiveJobItem();
 
+  // we need to pass in what the new one should be
+  // const handleChangeSortBy = (newSortBy: "relevant" | "recent") => {
+  const handleChangeSortBy = (newSortBy: SortBy) => {
+    setCurrentPage(1); // <- added only this single line to implement automatic teleport user to Page 1 if he chooses other option (relevant or recent)
+    setSortBy(newSortBy);
+  };
+  // Last feature we want to add, we go to e.g. "sorted" on Page 4,
+  // when we click the other option "relevant" we want to automatically teleport user
+  // to Page 1 of the this other option --  dealing with that is implemented here -> setSortBy(newSortBy); just above
+  // we add setCurrentPage(1);
+
   return (
     <>
       <Background />
@@ -161,13 +205,16 @@ function App() {
         <Sidebar>
           <SidebarTop>
             <ResultsCount totalNumberOfResults={totalNumberOfResults} />
-            <SortingControls />
+            <SortingControls sortBy={sortBy} onClick={handleChangeSortBy} />
           </SidebarTop>
           {/* <JobList jobItems={jobItems} isLoading={isLoading} /> */}
           {/* <JobList jobItems={jobItemsSliced} isLoading={isLoading} />  */}
           {/* after renaming that jobItemsSliced to jobItems in place in this file */}
           {/* <JobList jobItems={jobItems} isLoading={isLoading} /> */}
-          <JobList jobItems={jobItemsSliced} isLoading={isLoading} />
+
+          {/* <JobList jobItems={jobItemsSliced} isLoading={isLoading} />  change jobItemsSliced to jobItemsSorted*/}
+          {/* <JobList jobItems={jobItemsSorted} isLoading={isLoading} /> we replace -> jobItems?.slice( with -> jobItemsSorted?.slice */}
+          <JobList jobItems={jobItemsSortedAndSliced} isLoading={isLoading} />
 
           {/* //an error with types boolean | never[] after destructuring as an array from the custom hook with that above: const [jobItems, isLoading] = useJobItems(searchText); */}
           {/* jobItems cannot be a boolean, it is an array, there are two issues here, first, JobItems is not a correct type, when you fetch the data TypeScript by default types that as any type,
