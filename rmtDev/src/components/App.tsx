@@ -20,7 +20,7 @@ import {
 } from "../lib/hooks";
 import { BASE_API_URL, RESULTS_PER_PAGE } from "../lib/constants";
 import { Toaster } from "react-hot-toast";
-import { SortBy } from "../lib/types";
+import { PageDirection, SortBy } from "../lib/types";
 
 // type SortBy = "relevant" | "recent";
 
@@ -140,7 +140,8 @@ function App() {
   const totalNumberOfPages = totalNumberOfResults / RESULTS_PER_PAGE;
 
   // event handlers / actions
-  const handleChangePage = (direction: "next" | "previous") => {
+  // const handleChangePage = (direction: "next" | "previous") => { // replaced with a separate type
+  const handleChangePage = (direction: PageDirection) => {
     // here we should know whether we want to go to the next one or previous one
     // based on the direction we want to increase or decrease currentPage useState (1)
     if (direction === "next") {
