@@ -107,7 +107,33 @@ function App() {
   // we need to add optional chaining -> (?)
 
   const jobItemsSorted =
-    jobItems?.sort((a, b) => {
+    ///jobItems?.sort((a, b) => {
+    /// The way this sort method works is it takes this array of jobItems and it sorts it in place
+    /// (Sorts an array in place. This method mutates the array and returns a reference to the same array)
+    /// We are not creating a new array
+
+    /// This is considered a bad practice
+
+    /// because, what if we also use jobItems somewhere else?
+    /// What if we actually do wanna slice it with jobItems array -> const jobItemsSortedAndSliced = jobItems.slice(
+    /// now we are mutating it so jobItems.slice( also will be affected
+
+    /// What if we use jobItems somewhere else on some event handlers?
+    /// So now if I have changed it here jobItems?.sort it is also gonna be effected when using jobItems somewhere else.
+    /// It is possible that sorting of that will be a problem somewhere else.
+
+    /// When you change arrays and objects in React you do not wanna mutate the array or object, you wanna create a new one
+
+    /// We want to create a new one array out of this sort jobItems?.sort
+
+    /// we can put jobItems in the new array, we can spread all of those jobItems in that new array ->  [...jobItems]?.sort
+    /// then we will create new array first, and that is the one we wanna sort,
+    /// in terms of performance that is a little bit worse, we will create a whole new array
+    /// here our jobItems could be undefined, you would be spreading undefined, that is not allowed,
+    /// we can do something like this, OR an empty array -> [...(jobItems || [])]?.sort
+    /// now you can remove the empty array in the end -> //}) || [];
+
+    [...(jobItems || [])].sort((a, b) => {
       if (sortBy == "relevant") {
         return b.relevanceScore - a.relevanceScore;
       } // it will go over the jobItems in the array and will go over each one in pairs
@@ -127,7 +153,9 @@ function App() {
       // when we do "else" without any specifics (sortBy === "recent") we do not get a warning type,
       // because we we handle all other conditions, (previously return 0; for other conditions),
       // we remain exact strings as types here -> useState<"relevant" | "recent">("relevant")
-    }) || []; // before we make a sliced version, we need to sort the items
+
+      /// }) || []; // before we make a sliced version, we need to sort the items /// <- removed an empty array here because we created a new array above and spreading with || [] -> [...(jobItems || [])]?.sort
+    });
 
   // const jobItemsSliced =
   const jobItemsSortedAndSliced =
