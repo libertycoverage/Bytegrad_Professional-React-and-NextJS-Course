@@ -95,6 +95,10 @@ function App() {
   const [sortBy, setSortBy] = useState<SortBy>("relevant");
   console.log(sortBy);
 
+  //const [bookmarkedIds, setBookmarkedIds] = useState<number[]>([]);
+  //moved to BookmarksContextProvider
+  // when we click a bookmark we want to add ID to the array, when we click again it should be removed, toggling
+
   // "Purify Custom Hook(No derived state)" before we use Tanstack React-Query for caching of the the search with text query in useJobItems
   // What we are returning from this hook useJobItems() is too processed, we have a processed version with jobItemsSliced (derived state).
   // We are returning first 7 jobItems and that is opinionated (we assume we need only 7 due to visuals of the app), but we can imagine a different project or a different component you may actually need all of them
@@ -168,6 +172,20 @@ function App() {
   const totalNumberOfPages = totalNumberOfResults / RESULTS_PER_PAGE;
 
   // event handlers / actions
+
+  // const handleToggleBookmark = (id: number) => {
+  //   if (bookmarkedIds.includes(id)) {
+  //     setBookmarkedIds((prev) => prev.filter((item) => item !== id));
+  //     // here substract id from the array
+  //     // we take a previous array, then return a new array with only the items that are not the id you passed in , with filter we create a new array
+  //     // practically it will filter out the one id we passed in
+  //   } else {
+  //     setBookmarkedIds((prev) => [...prev, id]);
+  //     // here add id to the array of ids
+  //   }
+  // };
+  // Moved to BookmarksContextProvider.tsx
+
   // const handleChangePage = (direction: "next" | "previous") => { // replaced with a separate type
   const handleChangePage = (direction: PageDirection) => {
     // here we should know whether we want to go to the next one or previous one
