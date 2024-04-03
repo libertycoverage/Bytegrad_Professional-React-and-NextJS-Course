@@ -1,0 +1,7 @@
+# This file shouldn't ne uploaded to repo, this is only for demonstration purposes
+
+# This file contains secrets normally
+
+# This file should be named .env.local not _env_local 
+
+# _env_local is used purely that it won't be affected by .gitignore file
