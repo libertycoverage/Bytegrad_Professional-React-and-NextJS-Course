@@ -676,3 +676,35 @@ export function useJobItems(searchText: string) {
 
 // we add empty array in -> jobItemsSliced = jobItems?.slice(0, 7 ) || [];
 // if it is undefined it will be empty array, it will map over empty array, no problem
+
+///-------------------------------------------------------------------------------
+
+export function useLocalStorage(key: string, initialValue: any) {
+  // key is a prop it is a parameter of the function
+  // const [bookmarkedIds, setBookmarkedIds] = useState<number[]>(() =>
+  const [value, setValue] = useState(
+    () =>
+      // JSON.parse(localStorage.getItem("bookmarkedIds") || "[]")
+      // JSON.parse(localStorage.getItem(key) || String(initialValue)) // you cannot do String(initialValue), what you get is an empty string, you cannot parse an empty string to JSON.parse
+      JSON.parse(localStorage.getItem(key) || JSON.stringify(initialValue)) // this will work JSON.stringify
+    // if we do this, this will be a string initialValue  -> .getItem((key) || "initialValue")
+    // we need to stringify whatever the initial value is, when we pass an empty array as initial value [] this will eventually become this "[]", everything works
+    // we do not know what the user of this hook is gonna put in there, we cannot assume that initially it should be an empty array
+    // we need to specify any as the initial value -> initialValue: any
+  );
+
+  useEffect(() => {
+    // localStorage.setItem("bookmarkedIds", JSON.stringify(bookmarkedIds));
+    localStorage.setItem(key, JSON.stringify(value));
+    // }, [bookmarkedIds]);
+    // }, [value]); //green underline  React Hook useEffect has a missing dependency: 'key'. Either include it or remove the dependency array.
+    // whenever you use variable inside useEffect, if it is not a stable value, key can change, you need to add key to the dependency array
+    // if it was a stable value, something that cannot change e.g. const count = 'test';, if you put count instead of a key, you won't get a warning, count will always be the same, stable value
+  }, [value, key]);
+
+  // "as const" is more strict, a narrower type, you cannot add something else to that array
+  return [value, setValue] as const; // when you use array, when you use this hook and you destructure on the outputs,
+  // you can use names as you want, but you need to use the correct order when destructuring
+  // if you return an object, names on destructuring have to be the exact same,
+  // on destructuring you can alias -> const {value: bookmarkedIds, setValue: setBookmarkedIds} = useLocalStorage("bookmarkedIds",[])
+}

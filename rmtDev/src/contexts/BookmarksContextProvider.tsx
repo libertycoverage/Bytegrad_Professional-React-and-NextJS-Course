@@ -1,4 +1,5 @@
 import React, { useState, createContext, useEffect } from "react";
+import { useLocalStorage } from "../lib/hooks";
 
 export const BookmarksContext = createContext(null);
 
@@ -25,8 +26,16 @@ export default function BookmarksContextProvider({ children }) {
   // const [bookmarkedIds, setBookmarkedIds] = useState<number[]>(
   //   () => bookmarkedIdsFromLocalStorage
   // );
-  const [bookmarkedIds, setBookmarkedIds] = useState<number[]>(() =>
-    JSON.parse(localStorage.getItem("bookmarkedIds") || "[]")
+
+  //MOVED TO CUSTOM HOOK
+  // const [bookmarkedIds, setBookmarkedIds] = useState<number[]>(() =>
+  //   JSON.parse(localStorage.getItem("bookmarkedIds") || "[]")
+  // );
+  //MOVED TO CUSTOM HOOK
+  //THIS IS USAGE OF THIS CUSTOM HOOK
+  const [bookmarkedIds, setBookmarkedIds] = useLocalStorage(
+    "bookmarkedIds",
+    [] // here also "[]" would work the same as giving [] without quotation mark
   );
 
   console.log(bookmarkedIds);
@@ -47,9 +56,11 @@ export default function BookmarksContextProvider({ children }) {
   // Browser > DevTools > Application > Storage
   // we use useEffect to put in localStorage, whenever this bookmarkedIds changes, we add something or remove that, we also add that to localStorage
   // in localStorage this needs to be JSON format, we need to convert Javascript array to JSON format
-  useEffect(() => {
-    localStorage.setItem("bookmarkedIds", JSON.stringify(bookmarkedIds)); // ("bookmarkedIds" - this is a key, in what name you wanna store that
-  }, [bookmarkedIds]); // useEffect accepts two things, function, and array that determines how often function should run; how often, whenever bookmarks change
+  //MOVED TO CUSTOM HOOK
+  // useEffect(() => {
+  //   localStorage.setItem("bookmarkedIds", JSON.stringify(bookmarkedIds)); // ("bookmarkedIds" - this is a key, in what name you wanna store that
+  // }, [bookmarkedIds]); // useEffect accepts two things, function, and array that determines how often function should run; how often, whenever bookmarks change
+  //MOVED TO CUSTOM HOOK
 
   // with value we specify what we transport around, typically it is a javascript object,
   //return (<BookmarksContext.Provider value={{bookmarkedIds: bookmarkedIds, handleToggleBookmark: handleToggleBookmark}}>{children}</BookmarksContext.Provider>);
