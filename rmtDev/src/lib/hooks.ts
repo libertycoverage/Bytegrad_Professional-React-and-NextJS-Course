@@ -708,3 +708,21 @@ export function useLocalStorage(key: string, initialValue: any) {
   // if you return an object, names on destructuring have to be the exact same,
   // on destructuring you can alias -> const {value: bookmarkedIds, setValue: setBookmarkedIds} = useLocalStorage("bookmarkedIds",[])
 }
+
+// V168 supplement
+// We have implemented usage of local storage with useEffect and useState,
+// in real world you may consider using custom hook, that other people have already created, that has already been battle tested, and takes care of some edge cases as well. For a lot of features there is a bunch of custom hooks.
+
+// https://usehooks-ts.com/react-hook/use-local-storage
+
+// https://usehooks-ts.com/react-hook/use-event-listener
+
+// https://usehooks-ts.com/react-hook/use-interval
+
+// https://usehooks-ts.com/react-hook/use-intersection-observer - this is what you gonna use if you want to know if some element is in the view, helpful sore some animations for example
+
+// https://usehooks-ts.com/react-hook/use-on-click-outside - we will use that later
+
+// https://usehooks-ts.com/react-hook/use-session-storage - this is also common
+
+///-------------------------------------------------------------------------------
