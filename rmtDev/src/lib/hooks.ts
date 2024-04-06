@@ -679,7 +679,12 @@ export function useJobItems(searchText: string) {
 
 ///-------------------------------------------------------------------------------
 
-export function useLocalStorage(key: string, initialValue: any) {
+// this hook is essentially the same as useState, but persists the data in localStorage
+//**
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T
+): [T, React.Dispatch<React.SetStateAction<T>>] {
   // key is a prop it is a parameter of the function
   // const [bookmarkedIds, setBookmarkedIds] = useState<number[]>(() =>
   const [value, setValue] = useState(
@@ -724,5 +729,60 @@ export function useLocalStorage(key: string, initialValue: any) {
 // https://usehooks-ts.com/react-hook/use-on-click-outside - we will use that later
 
 // https://usehooks-ts.com/react-hook/use-session-storage - this is also common
+
+//** ------------------------------------------------------------------
+
+// useLocalStorage hook is essentially the same as useState, but persists the data in localStorage
+// if we want we can store different values in local storage e.g. -> const [searchText, setSearchText] = LocalStorage("searchText", "") -> key and default value -> "searchText", ""
+// something like this could be helpful to persist the history of users searches
+// maybe better to persist list of searches in the array, not like this above but to use [ ] array as initial value
+// useLocalStorage is basically a utility function
+
+// we do not want the initial value to be of type any, we still want wanna get correct types
+// we want to make sure types are right, to be warned by TypeScript,
+// BookmarksContextProvider.tsx ->
+// const [bookmarkedIds, setBookmarkedIds] = useLocalStorage(
+// "bookmarkedIds",
+// [] // here also "[]" would work the same as giving [] without quotation mark
+// );
+//  BookmarksContextProvider.tsx <-
+// for the second argument of useLocalStorage() we can pass anything (it can be anything, also empty array or object {}), that does not mean we should type that as any
+// type any does not provide any protection, it does not have type safety, not to mention the intellisense does not work
+
+// we should type it only by looking at useLocalStorage hook implementation
+
+// we want to type the return value of a function (custom hook, basically a utility function), we used that in useDebounce
+// we want to type the return value, it will always be an array with two value in there
+// the return array with any amount of numbers: -> number[] -> export function useLocalStorage(key: string, initialValue: any): number[] {
+
+// the return tuple (in TypeScript, in Javascript you never hear about tuple) -> export function useLocalStorage(key: string, initialValue: any): [number]
+// this will return the array with one value in there of type number ->
+// tuple is the array with fixed amount of in there
+// this is tuple -> return [value, setValue] as const;
+
+// this is only for the visualization, you do not want to use type any in tuple -> export function useLocalStorage(key: string, initialValue: any): [any, any]
+// When you have a situation where you could pass in anything, an array or object, or numbers or boolean, very often you wanna use "type parameter"
+// you wanna see if there is an relationship between what you pass in, and what you get out
+// in this case we have a relationship between what is passed in and what is getting out
+// whatever we pass in is the same type as what we get back as first part [any, any]
+
+// -> export function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>]
+// we specify relationship with type parameter in TypeScript, the fancy word for that is generics, this function is now a generic function
+// when you hover on setValue intellisense only is giving the type of it as -> React.Dispatch<any>
+// React.Dispatch is how the setter function of useState is typed
+// when you hover on searchText in App.tsx you get -> const setSearchText: React.Dispatch<React.SetStateAction<string>>
+// this is similar to what we have with type parameter above
+
+// we need to specify we will use "type parameter" -> useLocalStorage<T>()
+
+// whatever we passed it it will be inferred by TypeScript, at least for primitive values,
+// if you pass object or an array [] as initial value, just like with useState you get array of type never[], setter function also React.Dispatch<React.SetStateAction<never[]>>
+
+// to get rid of type never[] e.g. -> const [test, setTest] = useState<number[]>([]);
+
+// we should implement this <number[]> where we use the function, so, the hooks implementation is reusable ->
+// -> const [bookmarkedIds, setBookmarkedIds] = useLocalStorage<number[]>("bookmarkedIds",[]);
+
+//** ------------------------------------------------------------------
 
 ///-------------------------------------------------------------------------------
