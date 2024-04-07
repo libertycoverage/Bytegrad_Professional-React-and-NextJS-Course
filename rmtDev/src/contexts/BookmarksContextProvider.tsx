@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from "react";
+import React, { useState, createContext, useEffect, useContext } from "react";
 import { useLocalStorage } from "../lib/hooks";
 
 // ****
@@ -8,7 +8,8 @@ type BookmarksContext = {
 };
 
 // export const BookmarksContext = createContext(null);
-export const BookmarksContext = createContext<BookmarksContext | null>(null); // it can be used outside the context provider, so it can be null
+// export const BookmarksContext = createContext<BookmarksContext | null>(null); // it can be used outside the context provider, so it can be null
+export const BookmarksContext = createContext<BookmarksContext | null>(null);
 
 // ****
 
@@ -94,3 +95,14 @@ export default function BookmarksContextProvider({
 // We want to pass handleToggleBookmark to BookmarkIcon.tsx
 
 // React Context API is really handy for transporting around values without prop drilling
+
+// **** EXPORTED TO CUSTOM HOOK
+export function useBookmarksContext() {
+  const context = useContext(BookmarksContext);
+  if (!context) {
+    throw new Error(
+      "useBookmarksContext -> useContext(BookmarksContext) must be within a BookmarksContextProvider"
+    );
+  }
+  return context;
+}

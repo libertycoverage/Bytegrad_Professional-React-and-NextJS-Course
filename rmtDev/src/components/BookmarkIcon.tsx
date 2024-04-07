@@ -1,6 +1,9 @@
 import { BookmarkFilledIcon } from "@radix-ui/react-icons";
 import { useContext } from "react";
-import { BookmarksContext } from "../contexts/BookmarksContextProvider";
+import {
+  BookmarksContext,
+  useBookmarksContext,
+} from "../contexts/BookmarksContextProvider";
 
 type BookmarkIconProps = {
   id: number;
@@ -11,19 +14,22 @@ export default function BookmarkIcon({ id }: BookmarkIconProps) {
   //const context = useContext(BookmarksContext);
   //console.log(context);
 
-  // ****
-  const context = useContext(BookmarksContext);
-  if (!context) {
-    throw new Error(
-      "useContext(BookmarksContext) must be used within a BookmarksContextProvider"
-    );
-  }
+  // **** EXPORTED TO CUSTOM HOOK
+  // const context = useContext(BookmarksContext);
+  // if (!context) {
+  //   throw new Error(
+  //     "useContext(BookmarksContext) must be used within a BookmarksContextProvider"
+  //   );
+  // }
   //*****^^
 
   // const { bookmarkedIds, handleToggleBookmark } = useContext(BookmarksContext); // we can destructure immediately from the object
   // red underline for bookmarkedIds, handleToggleBookmark, we cannot destructure from something that could be null
   // ^^ we cannot destructure from something that could be null, to prevent that we need to check if used context could be null and throw an error in that case ^^
-  const { bookmarkedIds, handleToggleBookmark } = context;
+  // const { bookmarkedIds, handleToggleBookmark } = context;
+
+  // **** CUSTOM HOOK
+  const { bookmarkedIds, handleToggleBookmark } = useBookmarksContext(); // here is value={} -> useBookmarksContext -> we can destructure from that
 
   // ****
   // BookmarksContextProvider.tsx -> return ( <BookmarksContext.Provider value={{ bookmarkedIds, handleToggleBookmark }}> <- value is prop, value can be typed, red underline -> value is inferred as null
