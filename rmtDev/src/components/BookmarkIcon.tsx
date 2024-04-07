@@ -10,7 +10,39 @@ type BookmarkIconProps = {
 export default function BookmarkIcon({ id }: BookmarkIconProps) {
   //const context = useContext(BookmarksContext);
   //console.log(context);
-  const { bookmarkedIds, handleToggleBookmark } = useContext(BookmarksContext); // we can destructure immediately from the object
+
+  // ****
+  const context = useContext(BookmarksContext);
+  if (!context) {
+    throw new Error(
+      "useContext(BookmarksContext) must be used within a BookmarksContextProvider"
+    );
+  }
+  //*****^^
+
+  // const { bookmarkedIds, handleToggleBookmark } = useContext(BookmarksContext); // we can destructure immediately from the object
+  // red underline for bookmarkedIds, handleToggleBookmark, we cannot destructure from something that could be null
+  // ^^ we cannot destructure from something that could be null, to prevent that we need to check if used context could be null and throw an error in that case ^^
+  const { bookmarkedIds, handleToggleBookmark } = context;
+
+  // ****
+  // BookmarksContextProvider.tsx -> return ( <BookmarksContext.Provider value={{ bookmarkedIds, handleToggleBookmark }}> <- value is prop, value can be typed, red underline -> value is inferred as null
+  // value is inferred on what you pass here -> export const BookmarksContext = createContext(null);
+  // intellisense -> const BookmarksContext: React.Context<null>
+  // -> createContext(null) <- this is just a default value, this is what will be used if you try to consume the context outside BookmarksContextProvider ->
+  // <Test />  <BookmarksContextProvider> </BookmarksContextProvider> // if you try to use the context off the Bookmarks here you would get a null value, of course it needs to be in the App component as a default main component constructing the App
+  // we should type Context value -> createContext(null);
+  // it can be used outside the context provider, so it can be null
+  // BookmarksContextProvider.tsx -> type BookmarksContext = { bookmarkedIds: number[]; handleToggleBookmark: (id: number) => void; }; // takes id of type number, does something and does not return anything
+  // BookmarksContextProvider.tsx -> export const BookmarksContext = createContext<BookmarksContext | null>(null); // it can be used outside the context provider, so it can be null
+  // we use that context here -> const { bookmarkedIds, handleToggleBookmark } = useContext(BookmarksContext); // red underline for bookmarkedIds, handleToggleBookmark,
+  // *****^^ we cannot destructure from something that could be null, to prevent that we need to check if used context could be null and throw an error in that case
+  // value here is an object -> BookmarksContextProvider.tsx -> <BookmarksContext.Provider value={{ bookmarkedIds, handleToggleBookmark }}>
+  // when you use the const context it is gonna be an object
+  // ----
+  // Whenever you use any kind of context, we have to check if it is null, if it is true we have to throw an error, and only then we can destructure it,
+  // And also whenever we use useContext() hook we need to specify which context we are gonna use e.g. useContext(BookmarksContext);
+  // this is not great, we are going to make a custom hook implementation useBookmarksContext in BookmarksContextProvider.tsx
 
   return (
     <button

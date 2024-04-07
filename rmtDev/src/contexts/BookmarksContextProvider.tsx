@@ -1,9 +1,22 @@
 import React, { useState, createContext, useEffect } from "react";
 import { useLocalStorage } from "../lib/hooks";
 
-export const BookmarksContext = createContext(null);
+// ****
+type BookmarksContext = {
+  bookmarkedIds: number[];
+  handleToggleBookmark: (id: number) => void; // takes id of type number, does something and does not return anything
+};
 
-export default function BookmarksContextProvider({ children }) {
+// export const BookmarksContext = createContext(null);
+export const BookmarksContext = createContext<BookmarksContext | null>(null); // it can be used outside the context provider, so it can be null
+
+// ****
+
+export default function BookmarksContextProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   // if you put read from localStorage in BookmarksContextProvider component,
   // it means it is gonna run this every time we render and re-render this component,
   // rendering essentially means it gonna run all the lines within function body in curly braces
@@ -33,7 +46,7 @@ export default function BookmarksContextProvider({ children }) {
   // );
   //MOVED TO CUSTOM HOOK
   //THIS IS USAGE OF THIS CUSTOM HOOK
-  const [bookmarkedIds, setBookmarkedIds] = useLocalStorage(
+  const [bookmarkedIds, setBookmarkedIds] = useLocalStorage<number[]>(
     "bookmarkedIds",
     [] // here also "[]" would work the same as giving [] without quotation mark
   );
@@ -67,6 +80,7 @@ export default function BookmarksContextProvider({ children }) {
   // if you have the same key as the value you can use single name only
   return (
     <BookmarksContext.Provider value={{ bookmarkedIds, handleToggleBookmark }}>
+      {/* value is prop, value can be typed, red underline -> value is inferred as null */}
       {children}
     </BookmarksContext.Provider>
   );
