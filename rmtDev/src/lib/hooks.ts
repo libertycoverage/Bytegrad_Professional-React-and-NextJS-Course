@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { JobItemExpanded, jobItem } from "./types";
 import { BASE_API_URL } from "./constants";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { handleError } from "./utils";
 
@@ -366,6 +366,7 @@ const fetchJobItem = async (id: number): Promise<JobItemApiResponse> => {
 };
 
 /// useJobItemUsingReactQueryForCache
+// *****
 export function useJobItem(id: number | null) {
   // *** sometimes it is a little bit tricky to work with null
   // *** you could technically check if there is no id, but this won't work in React hook, you cannot call the hook conditionally, after, or as a part of a if statement
@@ -464,7 +465,58 @@ export function useJobItem(id: number | null) {
 // using back and forth buttons in the browser we do not fetch the data again, it is instant in the cache
 
 ///-------------------------------------------------------------------------------
-///this version of  useJobItems is using Tanstack React-Query caching
+
+// This is new useJobItems which is doing a totally different thing than previously named useJobItems (now useSearchQueryJobItems)
+// This is returning objects based on array of IDs (not a search text), it is used mostly in the bookmarks popup to populate that popup with JobItems
+
+// with useJobItem you create one query request, for this below we make multiple network requests in parallel to get all of job items
+
+// useQueries hook given by Tanstack React-Query, to get multiple parallel results
+
+export function useJobItems(ids: number[]) {
+  const results = useQueries({
+    //queries: [], // here is array with objects for each query, we map over, for every id we create an object
+    queries: ids.map((id) => ({
+      queryKey: ["job-item", id],
+      queryFn: () => fetchJobItem(id), // we use our fetchJobItem implementation from above ("fetchJobItem" is completely different from "fetchJobItems")
+      staleTime: 1000 * 60 * 60,
+      refetchOnWindowFocus: false,
+      retry: false,
+      enabled: Boolean(id),
+      onError: handleError,
+    })),
+  }); // we are passing an object
+
+  console.log(results); // results is an array with N objects for each query, for each query it is an object
+  //const jobItems = [] this is an array, so we can immediately filter out things in line
+  const jobItems = results
+    .map((result) => result.data?.jobItem) // if that is not defined (is undefined) result.data, for this result.data.jobItem you get undefined, to prevent app from crashing we need question mark - ?
+    .filter((jobItem) => jobItem !== undefined); // what we also want, after doing map we want to filter out undefined if there is such
+  // it is going over each one, if you return a truthy value it will put it in the new array, if you return falsy value it will be removed
+
+  // we are dealing with an array of results, if at least one of them is still loading when we consider the entire thing to still be loading
+  // at least one in the array -> method some
+  const isLoading = results.some((result) => result.isLoading); //  if at least one of them is still loading
+
+  return {
+    jobItems,
+    isLoading,
+  };
+}
+
+// ***** since useJobItem ^^  we are using in there, this has also been marked with the id
+// once a particular id has been fetched which is what we are doing in useJobItems (useQueries hook given by Tanstack React-Query, to get multiple parallel results),
+// React-Query will make sure that if after that there is another query for that particular id, there is no new network request, it is going to put that in a cache.
+// Event thought we are using different hooks in different functions, as long as we marked these queries with the particular id,
+// React-Query will make sure it will be cached
+
+// It is also good to know,
+// if you have a lot of bookmarks in our app, in Chrome at least, there can be only 6 requests in parallel,
+// the 7th one can start only when the first 6 network requests complete, there is a waterfall, it is Browser limitation
+
+///-------------------------------------------------------------------------------
+
+///this version of  useJobItems (later renamed to useSearchQueryJobItems) is using Tanstack React-Query caching
 
 // We want to use Tanstack React-Query for caching of the the search with text query in useJobItems,
 // this will be also useful with back and forth buttons in the browser,
@@ -508,7 +560,9 @@ const fetchJobItems = async (
 };
 
 // searchText is a normal input of the function not a props (without curly braces)
-export function useJobItems(searchText: string) {
+
+//export function useJobItems(searchText: string) { //useJobItems name is too tightly coupled with search of text, rename to useSearchQueryJobItems
+export function useSearchQueryJobItems(searchText: string) {
   // const { data, isLoading } = useQuery(
   const { data, isInitialLoading } = useQuery(
     // isLoading issue with constant loading animation

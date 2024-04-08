@@ -1,5 +1,5 @@
 import React, { useState, createContext, useEffect, useContext } from "react";
-import { useLocalStorage } from "../lib/hooks";
+import { useJobItem, useJobItems, useLocalStorage } from "../lib/hooks";
 
 // ****
 type BookmarksContext = {
@@ -54,6 +54,10 @@ export default function BookmarksContextProvider({
 
   console.log(bookmarkedIds);
 
+  //V171 we want to obtain bookmarks objects for popover
+  const { jobItems: bookmarkedJobItems, isLoading } =
+    useJobItems(bookmarkedIds);
+
   const handleToggleBookmark = (id: number) => {
     if (bookmarkedIds.includes(id)) {
       setBookmarkedIds((prev) => prev.filter((item) => item !== id));
@@ -80,7 +84,15 @@ export default function BookmarksContextProvider({
   //return (<BookmarksContext.Provider value={{bookmarkedIds: bookmarkedIds, handleToggleBookmark: handleToggleBookmark}}>{children}</BookmarksContext.Provider>);
   // if you have the same key as the value you can use single name only
   return (
-    <BookmarksContext.Provider value={{ bookmarkedIds, handleToggleBookmark }}>
+    // <BookmarksContext.Provider value={{ bookmarkedIds, handleToggleBookmark }}>
+    <BookmarksContext.Provider
+      value={{
+        bookmarkedIds,
+        handleToggleBookmark,
+        bookmarkedJobItems,
+        isLoading,
+      }}
+    >
       {/* value is prop, value can be typed, red underline -> value is inferred as null */}
       {children}
     </BookmarksContext.Provider>

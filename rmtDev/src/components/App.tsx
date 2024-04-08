@@ -17,6 +17,7 @@ import {
   useDebounce,
   useJobItem,
   useJobItems,
+  useSearchQueryJobItems,
 } from "../lib/hooks";
 import { BASE_API_URL, RESULTS_PER_PAGE } from "../lib/constants";
 import { Toaster } from "react-hot-toast";
@@ -85,7 +86,9 @@ function App() {
   // const { totalNumberOfResults, jobItemsSliced, isLoading } = useJobItems(debouncedSearchText);
   // = useJobItems(searchText);
 
-  const { jobItems, isLoading } = useJobItems(debouncedSearchText); //  "Purify Custom Hook(No derived state)"
+  //const { jobItems, isLoading } = useJobItems(debouncedSearchText); //  "Purify Custom Hook(No derived state)"
+  // just rename useJobItems to useSearchQuery, because name is misleading due to function being tightly coupled with search query itself
+  const { jobItems, isLoading } = useSearchQueryJobItems(debouncedSearchText);
 
   // pagination control state moved up here, because of the slicing per page
   const [currentPage, setCurrentPage] = useState(1);
