@@ -1,10 +1,13 @@
 import React, { useState, createContext, useEffect, useContext } from "react";
 import { useJobItem, useJobItems, useLocalStorage } from "../lib/hooks";
+import { JobItemExpanded } from "../lib/types";
 
 // ****
 type BookmarksContext = {
   bookmarkedIds: number[];
   handleToggleBookmark: (id: number) => void; // takes id of type number, does something and does not return anything
+  bookmarkedJobItems: JobItemExpanded[];
+  isLoading: boolean;
 };
 
 // export const BookmarksContext = createContext(null);
@@ -89,7 +92,7 @@ export default function BookmarksContextProvider({
       value={{
         bookmarkedIds,
         handleToggleBookmark,
-        bookmarkedJobItems,
+        bookmarkedJobItems, // <- V173 Error with red underline for bookmarkedJobItems here // *******
         isLoading,
       }}
     >
@@ -98,6 +101,26 @@ export default function BookmarksContextProvider({
     </BookmarksContext.Provider>
   );
 }
+
+// *******
+// V173
+
+// hooks.ts
+// ```ts
+// export function useJobItems(ids: number[]) {
+// ...
+// const jobItems = results
+// .map((result) => result.data?.jobItem) // if that is not defined (is undefined) result.data, for this result.data.jobItem you get undefined, to prevent app from crashing we need question mark - ?
+// .filter((jobItem) => jobItem !== undefined);
+// ```
+
+// Error with red underline for bookmarkedJobItems -> Reason ->
+// ->  TypeScript has not picked up on that (.filter((jobItem) => jobItem !== undefined);),
+// this is actually a common issue with TypeScript, if you try to filter out undefined or null, TypeScript for some reason cannot follow that logic
+
+// *8 People will use different ways of filtering out undefined or null
+
+// *******
 
 // App.tsx is a child here, belongs to children prop
 

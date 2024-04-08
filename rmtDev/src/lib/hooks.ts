@@ -490,9 +490,30 @@ export function useJobItems(ids: number[]) {
   console.log(results); // results is an array with N objects for each query, for each query it is an object
   //const jobItems = [] this is an array, so we can immediately filter out things in line
   const jobItems = results
+    //const jobItems : JobItemExpanded[] = results // we can force type like this -> : JobItemExpanded[], this will not work
     .map((result) => result.data?.jobItem) // if that is not defined (is undefined) result.data, for this result.data.jobItem you get undefined, to prevent app from crashing we need question mark - ?
-    .filter((jobItem) => jobItem !== undefined); // what we also want, after doing map we want to filter out undefined if there is such
-  // it is going over each one, if you return a truthy value it will put it in the new array, if you return falsy value it will be removed
+    // .filter((jobItem) => jobItem !== undefined); // what we also want, after doing map we want to filter out undefined if there is such
+    // it is going over each one, if you return a truthy value it will put it in the new array, if you return falsy value it will be removed
+
+    // *8 People will use different ways of filtering out undefined or null -> .filter((jobItem) => jobItem !== undefined);
+    // if it is undefined we want ot remove it, you can make it boolean with double negation (that element will not be included)
+    // if we have one negation !jobItem this become true
+    //.filter((jobItem) => !!jobItem);  // this will work at least in the world of runtime code, not in the world of types,
+    //TypeScript is still not picking up on this
+    // .filter((jobItem) => Boolean(jobItem)); // in the world of runtime this would work, in the world of types it still does not work
+    .filter((jobItem) => Boolean(jobItem)) as JobItemExpanded[]; // what you can do, this is something you rarely want to do ->
+  // -> you wanna cast this whole results.map().filter(), cast - force TypeScript to view that as type JobItemExpanded[] and not JobItemExpanded[] || undefined
+  // this is rare situation when we know better than TypeScript, most times you do not know better than TypeScript
+
+  // THESE SOLUTIONS ABOVE SHOULD WORK, TypeScript just does not pick up correct type on that
+  // There is a solution for this -> This is so annoying that there is a library ts-reset (https://github.com/total-typescript/ts-reset) created by Matt Pocock
+  // https://www.youtube.com/@mattpocockuk
+  // https://github.com/mattpocock
+  // https://www.mattpocock.com
+  // https://www.totaltypescript.com
+  // Without `ts-reset`
+  // ...
+  // - 🤦 `.filter(Boolean)` doesn't behave how you expect
 
   // we are dealing with an array of results, if at least one of them is still loading when we consider the entire thing to still be loading
   // at least one in the array -> method some
