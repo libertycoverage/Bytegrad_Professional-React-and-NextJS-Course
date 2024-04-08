@@ -246,6 +246,7 @@ body::-webkit-scrollbar {
 .job-list {
   background-color: #fff;
   position: relative;
+  min-height: 140px; /* V175 Loading spinner in bookmarks popup is not positioned nicely, we can increase the size of the area of that initial popup before loading bookmarks */
   /* height: 100%; */
   flex: 1;
   display: flex;
