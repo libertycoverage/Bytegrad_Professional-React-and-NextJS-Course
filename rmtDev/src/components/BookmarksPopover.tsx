@@ -1,16 +1,33 @@
+import { forwardRef } from "react";
 import { useBookmarksContext } from "../contexts/BookmarksContextProvider";
 import JobList from "./JobList";
 
-export default function BookmarksPopover() {
-  const { bookmarkedJobItems, isLoading } = useBookmarksContext();
-  // bookmarkedJobItems is an object or an array of objects
+// this is only for syntax demonstration purposes
+type BookmarksPopoverProps = {
+  isOpen: boolean;
+};
 
-  return (
-    <div className="bookmarks-popover">
-      <JobList jobItems={bookmarkedJobItems} isLoading={isLoading} />
-    </div>
-  );
-}
+// export default function BookmarksPopover() {
+// arrow function
+// HTMLDivElement is typed Ref here (first type parameter), optionally when we want to pass props also, the second typed is props e.g. BookmarksPopoverProps
+// you first type the Ref, but you get as the second argument; props is the second type parameter, but is the first
+const BookmarksPopover = forwardRef<HTMLDivElement, BookmarksPopoverProps>(
+  // function (props, ref) {
+  // function ({ isOpen }, ref) {
+  function (_, ref) {
+    // if you never gonna use props you can write _ underscore
+    const { bookmarkedJobItems, isLoading } = useBookmarksContext();
+    // bookmarkedJobItems is an object or an array of objects
+
+    return (
+      <div ref={ref} className="bookmarks-popover">
+        <JobList jobItems={bookmarkedJobItems} isLoading={isLoading} />
+      </div>
+    );
+  }
+);
+
+export default BookmarksPopover;
 
 // We want also a function that when we open the popover, we can close that popover clicking anywhere, not only on the same button "Bookmarks"
 

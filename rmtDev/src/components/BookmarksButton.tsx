@@ -1,8 +1,18 @@
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import BookmarksPopover from "./BookmarksPopover";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function BookmarksButton() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // ****12
+  // Below we used the CSS class of the button and bookmarks-popover to detect there was a click inside of them,
+  // this is not the React way of doing it, you could do it and it is the easiest way of doing that,
+  // the downside is overtime could could change the name of classNames, code can depend of className that could be broken by that
+  // we are going to create Ref that we can attach to button in the DOM
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     // const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     const handleClick = (e: MouseEvent) => {
@@ -13,11 +23,20 @@ export default function BookmarksButton() {
       if (
         // You can prove the TypeScript to get rid of red underline for closest() -> e.target instanceof HTMLElement &&
         e.target instanceof HTMLElement && // if this is false you immediately return from if statement (short circuiting), if this is true you can access e.target.closest
-        !e.target.closest(".bookmarks-btn") && // if we click not inside bookmarks-btn (CSS selector)
+        // !e.target.closest(".bookmarks-btn") && // if we click not inside bookmarks-btn (CSS selector)
         // if we click in the bookmarks-btn we do not wanna run above, bookmarks-btn should only be governed by // ***10
-        !e.target.closest(".bookmarks-popover") // We also want to exclude this code setIsOpen(false); from running when we click on any bookmarked jobItem offer in popup
+
+        // !e.target.closest(".bookmarks-popover") // We also want to exclude this code setIsOpen(false); from running when we click on any bookmarked jobItem offer in popup
         // When we click on the offer on the popup, popup will close automatically, why is is that? (we do not wanna this behavior)
         // Because now (only with !e.target.closest(".bookmarks-btn")) every click now in the document will run this -> setIsOpen(false); except when you click the bookmarks button
+
+        // ****12
+        // Using Ref this is essentially the same as document.querySelector(".bookmarks-popover") <- this is how you would do that in vanilla.js perhaps
+        !buttonRef.current?.contains(e.target) && // the actual element is stored in current (that can be null - optional chaining -> ?), we can check if that contains thing that we clicked
+        // -> buttonRef.current is underlying DOM Node and we check if that contains the target of a click
+        // we check if what we clicked is inside the button, if it was inside the button we do not want to run this code
+        // We want do the same for bookmarks popover
+        !popoverRef.current?.contains(e.target) // we check if the click was inside popover or not, if that popover contains the target of a click, we do not wanna run that
       ) {
         setIsOpen(false);
       } // we have information in the browser from the event object,
@@ -34,11 +53,11 @@ export default function BookmarksButton() {
   // we do not wanna have lingering event listeners, we return the clean up function -> in there we remove that event listener
   // -> here we need to reference that function that is used here -> document.removeEventListener('click', )
 
-  const [isOpen, setIsOpen] = useState(false);
   return (
     <section>
       {/* // ***10 */}
       <button
+        ref={buttonRef} // when you attach ref you do not have to work with className
         onClick={() => setIsOpen((prev) => !prev)}
         //onClick={(e) => setIsOpen((prev) => !prev)} // ***11 <- this is also a trick to get ot know the type of e in intellisense when you hover on e
         className="bookmarks-btn"
@@ -47,7 +66,8 @@ export default function BookmarksButton() {
         Bookmarks <TriangleDownIcon />
       </button>
 
-      {isOpen && <BookmarksPopover />}
+      {isOpen && <BookmarksPopover ref={popoverRef} isOpen={true} />}
+      {/* isOpen={true} is never user, only for demonstrations purposes for Ref in BookmarksPopover.tsx */}
       {/* conditional rendering ^^ */}
     </section>
   );
