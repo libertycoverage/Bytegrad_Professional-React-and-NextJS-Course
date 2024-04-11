@@ -861,3 +861,33 @@ export function useLocalStorage<T>(
 //** ------------------------------------------------------------------
 
 ///-------------------------------------------------------------------------------
+
+// this is a custom hook for a closing a popover or other element with clicking outside
+// Refs, handler is gonna be the function, another name for function like this is also callback function or event handler
+// handler type, no input, does not return anything
+export function useOnClickOutside(
+  refs: React.RefObject<HTMLElement>[], // it is gonna be Ref/Refs for something HTMLElement in the array
+  handler: () => void
+) {
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (
+        // e.target instanceof HTMLElement && // we do not need that here typing e.target as Node
+        // !buttonRef.current?.contains(e.target) &&
+        // !popoverRef.current?.contains(e.target)
+        // we check for every one of refs (array of refs), if click happens inside or not, this is basically the same as above -> !popoverRef.current?.contains(e.target)
+        // e (event click) on some target, is that target inside popover ref or button ref or not, if it is not in there we will run this handler function
+        refs.every((ref) => !ref.current?.contains(e.target as Node)) // red underline for -> e.target, we can overwrite TypeScript here again, we assert/make of type Node forcing (e.target as Node), it should not be an issue
+      ) {
+        // setIsOpen(false);
+        handler();
+      }
+    };
+    document.addEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [refs, handler]);
+  // whenever refs changes we are going to run useOnClickOutside function again, we are going to attach new event listener
+}
+// this custom hook des not use useState

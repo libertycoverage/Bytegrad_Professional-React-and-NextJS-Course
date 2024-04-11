@@ -1,6 +1,7 @@
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import BookmarksPopover from "./BookmarksPopover";
 import { useEffect, useRef, useState } from "react";
+import { useOnClickOutside } from "../lib/hooks";
 
 export default function BookmarksButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +13,12 @@ export default function BookmarksButton() {
   // we are going to create Ref that we can attach to button in the DOM
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+
+  // custom hook des not have to return something, often that is the case, but not always
+  useOnClickOutside([buttonRef, popoverRef], () => setIsOpen(false));
+
+  // ---------- MOVED TO CUSTOM HOOK useOnClickOutside(),
+  //this code should (and can) be removed but stays to document implementation
 
   useEffect(() => {
     // const handleClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -52,6 +59,8 @@ export default function BookmarksButton() {
   // if we have useEffect we wanna do some clean up, if the component gets unmounted, e.g. when we navigate to some different page;
   // we do not wanna have lingering event listeners, we return the clean up function -> in there we remove that event listener
   // -> here we need to reference that function that is used here -> document.removeEventListener('click', )
+
+  // ---------- MOVED TO CUSTOM HOOK useOnClickOutside()
 
   return (
     <section>
