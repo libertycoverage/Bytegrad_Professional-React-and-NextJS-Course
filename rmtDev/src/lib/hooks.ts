@@ -891,3 +891,23 @@ export function useOnClickOutside(
   // whenever refs changes we are going to run useOnClickOutside function again, we are going to attach new event listener
 }
 // this custom hook des not use useState
+
+// Description: Close popover on click outside by using a custom hook
+// Functionality that we click outside some element and that closes, we may use that in other components or other projects as well,
+// when we want to detect a click happened outside some element
+// It is often used in models and popovers, so you can close it
+// It is so common that there is a third party hook https://usehooks-ts.com/react-hook/use-on-click-outside
+// When creating a custom hook, we take our previous implementation for one use case and we need to generalize it for other use cases
+// We copy the specific solution to the hook
+// The second step is looking how you would like to use it, how usage should usage look like
+// We want to call it in the place we use it, we want to specify what we want it to do when that occurs, it is like dealing with the event, OnClick, OnChange
+// we wanna run the function when the event occurs -> useOnClickOutside([], () =>{});
+
+// We need to specify what we are clicking outside of, we are going to use Refs,
+// we are passing refs to the function so we can detect when click happens outside those elements we attach the Ref to
+
+// parameters in the array, first parameter needs to be a way for us to determine what is this element about (array is a the first parameter),
+// second parameter is what we wanna do when there is a click outside of them
+// -> BookmarksButton.tsx
+
+///-------------------------------------------------------------------------------
