@@ -1,3 +1,4 @@
+import { useActiveIdContext } from "../contexts/ActiveIdContextProvider";
 import { useActiveJobItemId, useJobItem } from "../lib/hooks";
 import { JobItemExpanded, jobItem } from "../lib/types";
 import BookmarkIcon from "./BookmarkIcon";
@@ -16,7 +17,9 @@ export default function JobItemContent() {
   // benefit of that moving is that whenever the id of chosen offer changes, App component rerendered,
   // previously whole App rerendered whenever id changes, it is using useState under the hood,
   // now only this component of JobItemContent will rerender
-  const activeJobItemId = useActiveJobItemId();
+
+  //const activeJobItemId = useActiveJobItemId(); // replaced with context hook
+  const { activeJobItemId } = useActiveIdContext();
   console.log(activeJobItemId);
   // const jobItem = useJobItem(activeJobItemId);
 

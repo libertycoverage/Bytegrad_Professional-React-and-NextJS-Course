@@ -1,3 +1,4 @@
+import { useActiveIdContext } from "../contexts/ActiveIdContextProvider";
 import { useActiveJobItemId } from "../lib/hooks";
 import { jobItem } from "../lib/types";
 import JobListItem from "./JobListItem";
@@ -12,7 +13,10 @@ export function JobList({ jobItems, isLoading }: JobListProps) {
   //we reuse the custom hook for getting and activeJobItemId to know
   //which one we need to be checked/darker with className job-item--active
   // if jobItem.id === activeId is true the outcome will be true
-  const activeId = useActiveJobItemId();
+
+  //const activeId = useActiveJobItemId();  // replaced with context hook
+  const { activeJobItemId: activeId } = useActiveIdContext();
+  // since it is an object we need to destructure the exact name, we can use alias in place
 
   return (
     <ul className="job-list">
