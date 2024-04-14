@@ -1,14 +1,19 @@
+import { useJobItemsContext } from "../contexts/JobItemsContextProvider";
 import { SortBy } from "../lib/types";
 
-type SortingControlsProps = {
-  sortBy: SortBy;
-  onClick: (newSortBy: SortBy) => void; // function is not returning anything, even undefined (return; at the end of a function)
-};
+// type SortingControlsProps = {
+//   sortBy: SortBy;
+//   onClick: (newSortBy: SortBy) => void; // function is not returning anything, even undefined (return; at the end of a function)
+// };
+//
+// export default function SortingControls({
+//   sortBy,
+//   onClick,
+// }: SortingControlsProps) {
+// REPLACED DUE TO JobItemsContextProvider
+export default function SortingControls() {
+  const { sortBy, handleChangeSortBy: onClick } = useJobItemsContext();
 
-export default function SortingControls({
-  sortBy,
-  onClick,
-}: SortingControlsProps) {
   return (
     <section className="sorting">
       <i className="fa-solid fa-arrow-down-short-wide"></i>

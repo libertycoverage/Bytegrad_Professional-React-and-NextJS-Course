@@ -1,4 +1,5 @@
 import { useActiveIdContext } from "../contexts/ActiveIdContextProvider";
+import { useJobItemsContext } from "../contexts/JobItemsContextProvider";
 import { useActiveJobItemId } from "../lib/hooks";
 import { jobItem } from "../lib/types";
 import JobListItem from "./JobListItem";
@@ -10,6 +11,10 @@ type JobListProps = {
 };
 
 export function JobList({ jobItems, isLoading }: JobListProps) {
+  // REPLACED DUE TO JobItemsContextProvider
+  // export function JobList() {
+  //   const { jobItems, isLoading } = useJobItemsContext();
+
   //we reuse the custom hook for getting and activeJobItemId to know
   //which one we need to be checked/darker with className job-item--active
   // if jobItem.id === activeId is true the outcome will be true
