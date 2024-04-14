@@ -30,7 +30,7 @@ function App() {
   // useState initially is an empty string
 
   // state
-  const [searchText, setSearchText] = useState("");
+  // ** MOVED TO SearchTextContextProvider.tsx // const [searchText, setSearchText] = useState(""); // ** MOVED TO SearchTextContextProvider.tsx
 
   // Hook rules
   // With hooks you cannot call that conditionally
@@ -82,7 +82,7 @@ function App() {
   // we need to prevent calling this hook useJobItems(searchText); with the new value every time
   // debouncedSearchText is a slowed down version of the searchText, we need to find way to update debouncedSearchText variable
 
-  const debouncedSearchText = useDebounce(searchText, 250);
+  // ** MOVED TO SearchTextContextProvider.tsx // const debouncedSearchText = useDebounce(searchText, 250); // ** MOVED TO SearchTextContextProvider.tsx
   // const { totalNumberOfResults, jobItemsSliced, isLoading } = useJobItems(debouncedSearchText);
   // = useJobItems(searchText);
 
@@ -248,7 +248,10 @@ function App() {
           <BookmarksButton />
         </HeaderTop>
 
-        <SearchForm searchText={searchText} setSearchText={setSearchText} />
+        {/* <SearchForm searchText={searchText} setSearchText={setSearchText} /> */}
+        {/* V181 we use handleChangeSearchText with Context, we do not need props passed to SearchForm component because of Context API*/}
+        {/* <SearchForm searchText={searchText} onChangeSearch={handleChangeSearchText} /> */}
+        <SearchForm />
       </Header>
       {/* <Container jobItems={jobItems} setJobItems={setJobItems} /> */}
       <Container>

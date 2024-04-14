@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
+import { useSearchTextContext } from "../contexts/SearchTextContextProvider";
 
-type SearchFormProps = {
-  searchText: string;
-  setSearchText: (searchText: string) => void;
-  // we can use that type on setSearchText React.Dispatch<React.SetStateAction<string>>
-  // or we know it is a function returning nothing and takes a string as an argument
-};
+// type SearchFormProps = {
+//   searchText: string;
+//   setSearchText: (searchText: string) => void;
+// we can use that type on setSearchText React.Dispatch<React.SetStateAction<string>>
+// or we know it is a function returning nothing and takes a string as an argument
+// };
+//
+// export default function SearchForm({
+//   searchText,
+//   setSearchText,
+// }: SearchFormProps) {
+// with the prop it could be more semantic if the name setSearchText was replaced here by onSearchTextChange
 
-export default function SearchForm({
-  searchText,
-  setSearchText,
-}: SearchFormProps) {
-  // with the prop it could be more semantic if the name setSearchText was replaced here by onSearchTextChange
+// useState searchText, jobItems and useEffect with fetch moved up the component tree to App.tsx
 
-  // useState searchText, jobItems and useEffect with fetch moved up the component tree to App.tsx
+// Instead of using props we can use useSearchTextContext();
+export default function SearchForm() {
+  const { searchText, handleChangeSearchText } = useSearchTextContext();
 
   return (
     // when you press enter on the form there is some strange behavior of reloading after submission the form,
@@ -40,7 +45,8 @@ export default function SearchForm({
         value={searchText}
         onChange={(e) => {
           // console.log(e.target.value);
-          setSearchText(e.target.value);
+          //setSearchText(e.target.value);  // because we use Context with changed name
+          handleChangeSearchText(e.target.value);
           //onSearchTextChange(e.target.value); it could be more adequate naming but it will stay with the name of a row setter for now
 
           // we can use fetch here instead of useEffect as above (second option after useEffect())
