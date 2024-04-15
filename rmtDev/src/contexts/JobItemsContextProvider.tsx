@@ -44,9 +44,20 @@ export default function JobItemsContextProvider({
   const totalNumberOfResults = jobItems?.length || 0;
   const totalNumberOfPages = totalNumberOfResults / RESULTS_PER_PAGE;
 
+  // There is a tricky bug that you will run into when you do not copy over jobItems array (with ... spread operator)
+  // mutating original array would be bad, when you use sort that would be the same array, but in the different order, reference to the array is gonna be the same jobItems,
+  // since we use useMemo reference to the jobItemsSorted will stay the same, if you use that reference in dependency array is some other case,
+  // useEffect or alike in this case useMemo [jobItemsSorted, currentPage]. That means when you sort the array it does not change the array, it des not become new value,
+  // it is gonna stay the same reference. Since it does not change, it will not trigger running jobItemsSortedAndSliced again.
+  // The button of sorting will not work, the initial render of jobItemsSortedAndSliced will be passed in the value object.
+  // jobItemsSortedAndSliced depends on jobItemsSorted, the reference does not change, sorting happens in line it does not change the array,
+  // jobItemsSorted will point to the same array. Mutating arrays or objects is a bad idea, you wanna update thing immutably. You wanna put this in a new array or new object.
+  // When you create a new array with a spread operator it will be a new reference to the array.
   const jobItemsSorted = useMemo(
     () =>
       [...(jobItems || [])].sort((a, b) => {
+        // this above is correct, makes a new array with a spread operator
+        //(jobItems || []).sort((a, b) => { // this is wrong, cause a tricky bug
         if (sortBy == "relevant") {
           return b.relevanceScore - a.relevanceScore;
         } else {
