@@ -1,4 +1,10 @@
-import React, { useState, createContext, useEffect, useContext } from "react";
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useContext,
+  useMemo,
+} from "react";
 
 import { RESULTS_PER_PAGE } from "../lib/constants";
 import { JobItem, PageDirection, SortBy } from "../lib/types";
@@ -38,19 +44,36 @@ export default function JobItemsContextProvider({
   const totalNumberOfResults = jobItems?.length || 0;
   const totalNumberOfPages = totalNumberOfResults / RESULTS_PER_PAGE;
 
-  const jobItemsSorted = [...(jobItems || [])].sort((a, b) => {
-    if (sortBy == "relevant") {
-      return b.relevanceScore - a.relevanceScore;
-    } else {
-      return a.daysAgo - b.daysAgo;
-    }
-  });
+  const jobItemsSorted = useMemo(
+    () =>
+      [...(jobItems || [])].sort((a, b) => {
+        if (sortBy == "relevant") {
+          return b.relevanceScore - a.relevanceScore;
+        } else {
+          return a.daysAgo - b.daysAgo;
+        }
+      }),
+    [sortBy, jobItems]
+  );
+  // we can use useMemo hook, it expects dependency array which determines how often this function runs (e.g. we want to run this when jobItems, sortBy changes)
 
-  const jobItemsSortedAndSliced =
-    jobItemsSorted.slice(
-      currentPage * RESULTS_PER_PAGE - RESULTS_PER_PAGE,
-      currentPage * RESULTS_PER_PAGE
-    ) || [];
+  const jobItemsSortedAndSliced = useMemo(
+    () =>
+      jobItemsSorted.slice(
+        currentPage * RESULTS_PER_PAGE - RESULTS_PER_PAGE,
+        currentPage * RESULTS_PER_PAGE
+      ) || [],
+    [jobItemsSorted, currentPage]
+  );
+
+  // whenever the state changes, it is gonna run all of the entire interior of a context provider,
+  // when we get to the sorting especially the new array, copying all of the elements of the other array, creating new array, .sort does it in place
+  // hence we need to create new array first if if we want to do it immutability, basically sort and creating a new array this is relatively computation heavy,
+  // we do not necessarily wanna run this whenever it re-renders, for example when the page changes, you do not have to run this again, no reason to do that, that would be wasteful
+
+  // The order here is important, first we are gonna sort and then we gonna slice off part of that result
+  // It is quite common that one of useMemos depends on some other value that is also using useMemo
+  // other ContextProviders are client-efficient, there is no need to use useMemo there
 
   // event handlers / actions
   const handleChangePage = (direction: PageDirection) => {
