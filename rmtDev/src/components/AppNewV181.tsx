@@ -22,6 +22,7 @@ import {
 import { BASE_API_URL, RESULTS_PER_PAGE } from "../lib/constants";
 import { Toaster } from "react-hot-toast";
 import { PageDirection, SortBy } from "../lib/types";
+import JobListSearchData from "./JobListSearchData";
 
 // type SortBy = "relevant" | "recent";
 
@@ -62,9 +63,9 @@ function AppNewV181() {
           {/* <JobList jobItems={jobItems} isLoading={isLoading} /> */}
           {/* <JobList jobItems={jobItemsSliced} isLoading={isLoading} />  change jobItemsSliced to jobItemsSorted*/}
           {/* <JobList jobItems={jobItemsSorted} isLoading={isLoading} /> we replace -> jobItems?.slice( with -> jobItemsSorted?.slice */}
-          <JobList jobItems={jobItemsSortedAndSliced} isLoading={isLoading} />{" "}
-          // REPLACED DUE TO JobItemsContextProvider
-          <JobList />
+
+          {/* <JobList jobItems={jobItemsSortedAndSliced} isLoading={isLoading} /> MOVED TO JobListSearchData component BECAUSE of JobItemsContextProvider usage */}
+          <JobListSearchData />
           {/* //an error with types boolean | never[] after destructuring as an array from the custom hook with that above: const [jobItems, isLoading] = useJobItems(searchText); */}
           {/* jobItems cannot be a boolean, it is an array, there are two issues here, first, JobItems is not a correct type, when you fetch the data TypeScript by default types that as any type,
            we do not immediately get the correct type when we fetch data, and also when we use useState TypeScript will infer (wywnioskowuje) the type, 
