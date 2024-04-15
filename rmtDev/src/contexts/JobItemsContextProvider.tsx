@@ -103,19 +103,53 @@ export default function JobItemsContextProvider({
     setSortBy(newSortBy);
   };
 
+  // what happens in JobItemsContextProvider, you will use useSearchTextContext, that means whenever debouncedSearchText changes JobItemsContextProvider component will re-render,
+  // wherever you use the context and context changes, it will re-render the component, it will create a new object value={{}},
+  // and that means that all of the consumers of the context (all the components that are using this context) they will re-render,
+  // React is gonna check if the value is new or not, here we are creating an object literal value={{}};
+  // even if the value in the objects are still the same it will create a new object every time it renders,
+  // therefore all of the consumers of the context will also re-render,
+  // React will look at the object reference and will check if that reference is new (new object) and it will re-render all of the consumer of this object
+
+  // some people will memoize this contextValue, so it is re-created whenever the actual value is changed, whenever any of the values is change it is gonna recreate that object
+  // all of the consumers will re-render
+  const contextValue = useMemo(
+    () => ({
+      jobItems,
+      jobItemsSortedAndSliced,
+      isLoading,
+      totalNumberOfResults,
+      totalNumberOfPages,
+      currentPage,
+      sortBy,
+      handleChangePage,
+      handleChangeSortBy,
+    }),
+    [
+      jobItems,
+      jobItemsSortedAndSliced,
+      isLoading,
+      totalNumberOfResults,
+      totalNumberOfPages,
+      currentPage,
+      sortBy,
+      handleChangePage,
+      handleChangeSortBy,
+    ]
+  );
+
   return (
     <JobItemsContext.Provider
-      value={{
-        jobItems,
-        jobItemsSortedAndSliced,
-        isLoading,
-        totalNumberOfResults,
-        totalNumberOfPages,
-        currentPage,
-        sortBy,
-        handleChangePage,
-        handleChangeSortBy,
-      }}
+      // value ={{jobItems,
+      //   jobItemsSortedAndSliced,
+      //   isLoading,
+      //   totalNumberOfResults,
+      //   totalNumberOfPages,
+      //   currentPage,
+      //   sortBy,
+      //   handleChangePage,
+      //   handleChangeSortBy,}}
+      value={contextValue}
     >
       {children}
     </JobItemsContext.Provider>
