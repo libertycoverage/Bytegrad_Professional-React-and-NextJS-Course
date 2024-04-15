@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useContext,
   useMemo,
+  useCallback,
 } from "react";
 
 import { RESULTS_PER_PAGE } from "../lib/constants";
@@ -87,21 +88,43 @@ export default function JobItemsContextProvider({
   // other ContextProviders are client-efficient, there is no need to use useMemo there
 
   // event handlers / actions
-  const handleChangePage = (direction: PageDirection) => {
+  const handleChangePage = useCallback((direction: PageDirection) => {
     // here we should know whether we want to go to the next one or previous one
     // based on the direction we want to increase or decrease currentPage useState (1)
     if (direction === "next") {
       setCurrentPage((prev) => prev + 1);
+      // setCurrentPage(currentPage +1); // alternative way of doing that, terrible idea, you have to add that to dependency array and that will cause a re-render whenever page changes
     } else if (direction === "previous") {
       // we want to be more specific, more strict with previous
       setCurrentPage((prev) => prev - 1); // we will get zero, but we will prevent that situation to occur
     }
-  };
+  }, []);
 
-  const handleChangeSortBy = (newSortBy: SortBy) => {
+  const handleChangeSortBy = useCallback((newSortBy: SortBy) => {
     setCurrentPage(1); // <- added only this single line to implement automatic teleport user to Page 1 if he chooses other option (relevant or recent)
     setSortBy(newSortBy);
-  };
+  }, []);
+  // Green underline, intellisense: "The 'handleChangePage' function makes the dependencies of useMemo Hook change on every render.
+  // Move it inside the useMemo callback. Alternatively, wrap the definition of 'handleChangePage' in its own useCallback() hook"
+  //
+  // The object in contextValue will only get recreated if any of the dependencies change, the way it works with the functions is that they get recreated on every render
+  // (new function in memory with the reference).  React create new reference in memory and assign to the variable,
+  // since that -> handleChangePage, handleChangeSortBy, is changing, every render these functions are gonna be different (new function in memory with the reference).
+  // We will recreate new contextValue every re-render, basically undoing all of the benefits of useMemo.
+  // We do not want to recreate these functions every re-render, we also want to memoize these two functions.
+  // For function we do not have useMemo, we have useCallback, this is basically the same as useMemo but for the functions
+  //
+  // useCallback also have the dependency array, it has to be created once, dependency array is empty
+  // Adding setter function to the dependency array is not necessary. React will make sure that setter functions are so called stable values,
+  // they will stay the same actually, we do not have to add them to the dependency array, you can add them but it won't make a difference
+  //
+  // to update the state we are using functions setCurrentPage((prev) => prev + 1)
+  // this is actually a benefit of using this function format
+  // if you alternatively would do this setCurrentPage(currentPage +1); if you do this this way, now you have currentPage in there that could change,
+  // it means you have add that to the dependency array in useCallback
+  // now the function gets recreated whenever the page changes, and that is not what we want
+
+  // -------
 
   // what happens in JobItemsContextProvider, you will use useSearchTextContext, that means whenever debouncedSearchText changes JobItemsContextProvider component will re-render,
   // wherever you use the context and context changes, it will re-render the component, it will create a new object value={{}},
