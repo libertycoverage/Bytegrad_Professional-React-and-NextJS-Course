@@ -11,7 +11,7 @@ Page /events
 Page / - home page
 Page /event/[slug] - for individual event page, and in Next.js we have some kind of dynamic route( in Evento project so called slug(animal))
 
-![[V191 2024-04-19 o 09.53.58.png]]
+![V191 2024-04-19 o 09 53 58](https://github.com/libertycoverage/Bytegrad_Professional-React-and-NextJS-Course/assets/5951210/d5156260-cd40-4f23-adfe-b1d19e2ee927)
 
 It is more about the Root Layout and then you have Pages (or routes)
 
