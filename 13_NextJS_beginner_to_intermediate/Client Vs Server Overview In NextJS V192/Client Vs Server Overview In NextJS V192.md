@@ -4,7 +4,7 @@ Description: Learn the differences between client and server in Next.js
 
 High level overview of full stack Next.js application in terms of client and server side
 
-![[V192 2024-04-19 o 16.30.27.png]]
+![V192 2024-04-19 o 16 30 27](https://github.com/libertycoverage/Bytegrad_Professional-React-and-NextJS-Course/assets/5951210/1986eb9e-2068-4f30-851c-fc5c1a28839f)
 
 Next.js is full stack
 
