@@ -9,7 +9,7 @@ export default function Home() {
       </h1>
       <p className="mb-12 mt-7 text-2xl lg:text-3xl opacity-75">
         Browse more than{" "}
-        <span className="font-bold text-[#a4f839] italic underline">
+        <span className="font-bold text-accent italic underline">
           10,000 events
         </span>{" "}
         around you
@@ -18,7 +18,7 @@ export default function Home() {
       {/* We want input field wrapped in the form */}
       <form className="w-full sm:w-[580px]">
         <input
-          className="w-full h-16 rounded-lg bg-white/[7%] px-6 outline-none ring-[#a4f839]/50 transition focus:ring-2 focus:bg-white/10"
+          className="w-full h-16 rounded-lg bg-white/[7%] px-6 outline-none ring-accent/50 transition focus:ring-2 focus:bg-white/10"
           placeholder="Search events in any city..."
           spellCheck={false}
         />
@@ -93,3 +93,14 @@ export default function Home() {
 // The parent element of a Footer is actually a `<body>` element in RootLayout in layout.tsx
 // ---
 // next part in container.tsx
+
+// V205
+// On the home page we use accent color which is a part of a branding for this project, till now we were carrying this around,
+// like in page.tsx with `text-[#a4f839]`, we needed to find specific HEX code whenever we wanted to use it, `ring-[#a4f839]/50`.
+// Whenever we wanted to use that, we had to hunt down what was the HEX code again.
+// Instead of that we can go to Tailwind CSS configuration `tailwind.config.ts` file and define that HEX color,
+// it will be easier for us to use it.
+// We want to extend theme settings specifically for colours, HEX is a string here (in `tailwind.config.ts`).
+// The benefit is that we need to specify these types of colours and maybe other settings as well once here in Tailwind CSS, and now we can just use that.
+// Now we change HEX `text-[#a4f839]` to a word  `accent`, `text-accent`
+// Whatever we give the name here e.g. accent, we can use then in classes that will use that e.g. `text-accent` or `bg-accent` etc.
