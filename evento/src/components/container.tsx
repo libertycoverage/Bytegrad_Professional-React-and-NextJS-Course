@@ -1,6 +1,13 @@
 import React from "react";
 
-export default function Container({ children }) {
+type ContainerProps = {
+  children: React.ReactNode;
+};
+// React.ReactNode is a TypeScript type that represents the types of children that a React component can accept.
+// It's a union type that includes null, undefined, boolean, number, string, ReactElement, ReactFragment, and ReactPortal.
+// React.ReactNode is not a component type itself but rather a type that encompasses various types of content that can be rendered within a component.
+
+export default function Container({ children }: ContainerProps) {
   return (
     <div className="flex flex-col max-w-7xl min-h-screen mx-auto bg-white/[2%]">
       {children}
