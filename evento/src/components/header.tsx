@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
 import Logo from "./logo";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
+import { motion } from "framer-motion";
 
 // Typically in React we define `routes` (or `links` ) outside, each one represented as the object, and then we map over routes
 const routes = [
@@ -15,15 +20,49 @@ const routes = [
 ];
 
 export default function Header() {
+  const activePathname = usePathname();
+
+  console.log(activePathname);
+
   return (
     <header className="flex items-center justify-between border-b border-white/10 h-14 px-3 sm:px-9">
       <Logo />
-      <nav>
-        <ul className="flex gap-x-6 text-sm">
+      <nav className="h-full">
+        <ul className="flex gap-x-6 h-full text-sm">
           {routes.map((route) => (
             <li
               key={route.path}
-              className="text-white/50 hover:text-white transition"
+              // className="text-white/50 hover:text-white transition"
+              //
+              // V207
+              // 1) Implementation of active route in the header, on the route (Home, All Events) there is an indicator on which page we are on.
+              // There is an opacity gradation of the text depending on the activity status of the route (treated like a button), there is also a green indicator line.
+              // We can see that both `<li>`s have 50% percent opacity. But when we are on the route, link or `<li>` should have text opacity 100%.
+              // To implement this we need to know on which route we are currently on, or which pathname we have in the URL.
+              // With the `route` we can check if `route.path` when we are mapping over is the same as what is currently here in URL,
+              // that is gonna be the active. To know which path we are on we can use Next.js Hook `usePathname`
+              // When we use `usePathname()` we run into issue caused by server and client component.
+              // When we use hooks using name "use-" we need to make sure we are calling that hook in a client component, right now everything is a server component by default in Next.js.
+              // We are trying to read from URL, we need to add `"use client";`, server does not see URL like that.
+              // We use `const activePathname = usePathname();`, when we log `  console.log(activePathname);` we can see `/events/all` in console or `/`. It will give what is after domain name or localhost.
+              // When we are mapping over those routes, we can check if that is the same as the `activePathname`, when that is true we change to 100% opacity `text-white/100`
+              // There is a better way to do that in Tailwind CSS (using clsx), but we can do also something like this (This technically works but the syntax is not great)->
+              // className={`${
+              //   activePathname === route.path ? "text-white" : "text-white/50"
+              // } hover:text-white transition`}
+              //
+              // 2) Now clsx implementation of the class manipulation in case of a highlight of an active Link,
+              // we want to make sure that the active route is always visible ->
+              // First, we install clsx package, `/evento/$ npm install clsx`, string will be the function input
+              // This is what we always want `"hover:text-white transition"`; in object {} we have conditions
+              // (This is an object and `text-white` is a key (string), class we want to apply, we want to get the class `text-white`, this condition is true `activePathname === route.path` )
+              className={clsx(
+                "hover:text-white flex items-center relative transition",
+                {
+                  "text-white": activePathname === route.path,
+                  "text-white/50": activePathname !== route.path,
+                }
+              )} // we need curly braces {clsx()} to open a window for JS
             >
               {/* We can use `{route.name}` as key, but better is to use `{route.path}`, path is more likely to be unique */}
               <Link href={route.path}>
@@ -32,6 +71,27 @@ export default function Header() {
                 {route.name}
                 {/* </a> */}
               </Link>
+
+              {/* 3) What we also have is a green (theme accent colour) highlighted underline of an active Link, that will nicely animate when we go to the route, it is easy to animate with something called Framer Motion  */}
+              {/* `/evento/ $ npm install framer-motion@10.16.04` */}
+              {/* To create green (accent colour) bar we will use empty div; background colour of accent `bg-accent`; height 1 `h-1`; width full `w-full`; absolutely positioned `absolute`; 
+              zero pixels from the bottom `bottom-0` (bottom of `<li>`) - so add `relative` class to `<li>`. 
+              It is currently sitting 0 pixels from the bottom of Links, but we want this to be sitting as the end of entire header, 
+              `<ul>` needs to be the full height of the header - height full `h-full`, that does not work alone, we also need to give `<nav>` a class of `h-full`; 
+              because of this `<nav>` a class of `h-full` (Home & All Events) Links are close to the top of the website, 
+              to prevent that we also need to add to `<li>` classes `flex` and `items-center` - this is basic centering in flexbox */}
+              {/* Now we always see these underline highlight bars, but it should only be visible for the active route. 
+              We want to check if the `activePathname` is the same as `route.path` we are mapping over, then we want to show the div */}
+              {/* We want to animate this bar, Framer Motion makes it easy to animate, we only need to change this into Framer Motion component,
+               we rename `<div>` to `<motion.div>`, that alone is not enough. We are gonna have 2 divs here for each route, Framer Motion needs to know they are the same, 
+               therefore they need to be animated, we add `layoutId`, that could be anything, if we do this Framer Motion will know when you animate and go to the new route, 
+               these divs are the same, so that the difference between them needs to be animated. */}
+              {activePathname === route.path && (
+                <motion.div
+                  layoutId="header-active-link"
+                  className="bg-accent h-1 w-full absolute bottom-0"
+                ></motion.div>
+              )}
             </li>
           ))}
         </ul>
