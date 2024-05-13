@@ -1,7 +1,17 @@
+import SearchForm from "@/components/search-form";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
+  // V208
+  // We have a `form` in page.tsx, when we type something in `<input />` and press enter there would be a submit event we can hook into
+  // When we have event `e` we need to type the event. If we do not know the type or use Github Copilot we can write `<form onSubmit={e => handleSubmit}` - when we hover on `e` we get type of event.
+  //
+  //Moved from page.tsx to search-form.tsx
+  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  // };
+
   return (
     <main className="flex flex-col items-center pt-36">
       <h1 className="text-3xl lg:text-6xl font-bold tracking-tight">
@@ -16,13 +26,15 @@ export default function Home() {
       </p>
 
       {/* We want input field wrapped in the form */}
-      <form className="w-full sm:w-[580px]">
+      {/* Moved from page.tsx to search-form.tsx */}
+      {/* <form onSubmit={handleSubmit} className="w-full sm:w-[580px]">
         <input
           className="w-full h-16 rounded-lg bg-white/[7%] px-6 outline-none ring-accent/50 transition focus:ring-2 focus:bg-white/10"
           placeholder="Search events in any city..."
           spellCheck={false}
         />
-      </form>
+      </form> */}
+      <SearchForm />
 
       <section className="mt-4 flex gap-x-4 text-sm text-white/50">
         <p>Popular:</p>
