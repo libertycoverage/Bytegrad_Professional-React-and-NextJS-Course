@@ -1,16 +1,21 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 export default function Logo() {
   return (
-    <Image
-      src="https://bytegrad.com/course-assets/react-nextjs/evento.png"
-      alt="EVENTO logo"
-      width={53}
-      height={12}
-    />
+    <Link href="/">
+      <Image
+        src="https://bytegrad.com/course-assets/react-nextjs/evento.png"
+        alt="EVENTO logo"
+        width={53}
+        height={12}
+      />
+    </Link>
   );
 }
+// V210
+// When we click on the logo we want to go to the home page. We can wrap Logo component in Link component.
 
 // V201
 //
