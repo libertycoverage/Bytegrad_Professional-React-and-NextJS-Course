@@ -33,7 +33,9 @@ export default function RootLayout({
   return (
     // We use class from Tailwind CSS for background color
     <html lang="en">
-      <body className={`${inter.className} bg-gray-950 text-white`}>
+      <body
+        className={`${inter.className} bg-gray-950 text-white overflow-y-scroll`}
+      >
         <Container>
           <Header />
           {children}
