@@ -1,3 +1,4 @@
+import EventsList from "@/components/events-list";
 import H1 from "@/components/h1";
 import { EventoEvent } from "@/lib/types";
 import React from "react";
@@ -34,14 +35,14 @@ type EventsPageProps = {
 // we can put secrets in here that won't be visible on the client, on the client only the result of rendering will be visible, we can have API keys as well and other secrets.
 
 export default async function EventsPage({ params }: EventsPageProps) {
-  const city = params.city;
-
   const response = await fetch(
     "https://bytegrad.com/course-assets/projects/evento/api/events?city=austin"
   );
 
   const events: EventoEvent[] = await response.json();
   console.log(events);
+
+  const city = params.city;
 
   return (
     <main className="flex flex-col items-center py-24 px-[20px] min-h-[110vh]">
@@ -65,9 +66,15 @@ export default async function EventsPage({ params }: EventsPageProps) {
       // Now when we try to access something that does not exist e.g. `event.blabla` we get TypeScript warning, also we get intellisense when we try to access `event.` 
       // to see what properties are available (To invoke intellisense on access "CTRL + SPACE" on Windows/ Mac OR "Option(Alt) + Esc" on Mac)  */}
 
-      {events.map((event) => (
+      {/* {events.map((event) => (
         <section key={event.id}>{event.name}</section>
-      ))}
+      ))} */}
+      {/* // V215
+      // 1) Here, below, we are mapping over, but it is cleaner to have a separate component that will list out events, we will create `<EventsList events={events} />`, and will pass events to that component  
+      // 2) we create this component in file named `events-list.tsx` with lower case, a component still needs uppercase name `export default function EventsList() {` 
+      // Naming convention of files -> in Next.js there is a convention to use lower case for everything (any file), in React Vite app there is a convention with upper case naming for file names.
+      */}
+      <EventsList events={events} />
     </main>
   );
 }
