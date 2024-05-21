@@ -1,5 +1,6 @@
 import { EventoEvent } from "@/lib/types";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 type EventCardProps = {
@@ -9,32 +10,56 @@ type EventCardProps = {
 export default function EventCard({ event }: EventCardProps) {
   return (
     // {event.name}
-    <section className="flex flex-col flex-1 basis-80 h-[380px] max-w-[500px] bg-white/[3%] rounded-xl overflow-hidden relative">
-      <Image
-        src={event.imageUrl}
-        alt={event.name}
-        width={500}
-        height={280}
-        className="h-[60%] object-fit"
-      />
-      <div className="flex flex-col flex-1 justify-center items-center">
-        <h2 className="text-2xl font-semibold">{event.name}</h2>
-        <p className="italic text-white/75">By {event.organizerName}</p>
-        <p className="text-sm text-white/50 mt-4">{event.location}</p>
-      </div>
+    <Link
+      className="flex-1 basis-80 h-[380px] max-w-[500px]"
+      href={`/event/${event.slug}`}
+    >
+      {/* <section className="flex flex-col flex-1 basis-80 h-[380px] max-w-[500px] bg-white/[3%] rounded-xl overflow-hidden relative transition hover:scale-105 active:scale-[1.02]"> */}
+      <section className="w-full h-full flex flex-col bg-white/[3%] rounded-xl overflow-hidden relative transition hover:scale-105 active:scale-[1.02]">
+        <Image
+          src={event.imageUrl}
+          alt={event.name}
+          width={500}
+          height={280}
+          className="h-[60%] object-fit"
+        />
+        <div className="flex flex-col flex-1 justify-center items-center">
+          <h2 className="text-2xl font-semibold">{event.name}</h2>
+          <p className="italic text-white/75">By {event.organizerName}</p>
+          <p className="text-sm text-white/50 mt-4">{event.location}</p>
+        </div>
 
-      <section className="absolute flex flex-col justify-center items-center left-[12px] top-[12px] h-[45px] w-[45px] bg-black/30 rounded-md">
-        <p className="text-xl font-bold -mb-[5px]">
-          {/* {new Date(event.date).getDate()} */}
-          {new Date(event.date).toLocaleDateString("en-US", { day: "2-digit" })}
-        </p>
-        <p className="text-xs uppercase text-accent">
-          {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
-        </p>
+        <section className="absolute flex flex-col justify-center items-center left-[12px] top-[12px] h-[45px] w-[45px] bg-black/30 rounded-md">
+          <p className="text-xl font-bold -mb-[5px]">
+            {/* {new Date(event.date).getDate()} */}
+            {new Date(event.date).toLocaleDateString("en-US", {
+              day: "2-digit",
+            })}
+          </p>
+          <p className="text-xs uppercase text-accent">
+            {new Date(event.date).toLocaleDateString("en-US", {
+              month: "short",
+            })}
+          </p>
+        </section>
       </section>
-    </section>
+    </Link>
   );
 }
+
+// V218 - Finish the EventCard component by wrapping it in a Link and adding a hover effect
+// We want to have animations, when we hover these cards they grow a little big bigger, also when we click and hold down the mouse cards become a little bit smaller again.
+// 1) We go to `<section>` `className`s in EventCard React component (holding Image, `<div>` with `h2` and 2 paragraphs, also holding a  section with date details),
+// let's say in hover state it scales a little bit bigger (5%, relative it is 105%), `hover:scale-105`, and when we click down (and hold down) it should be a little bit bigger than in default idle state,
+// but smaller than in hover state, custom value `active:scale-[1.02]` not 102, and we want transitions to be smooth `transition`
+// 2) When we click the card for event we want to go to event page, we want to go to route e.g. `(localhost:8080)/event/jazz-fusion-night` notice `jazz-fusion-night` it is a slug fetched with API from database
+// We can use `<Link>` component, we are going to wrap the entire card (entire `<section>`) in a `<Link>` component, we specify `href` for the component
+// 3) Now when we save (`<Link>` component surrounding `<section>`) we will have an issue with layout, because we are here using flexbox, flexbox is always between parent element and it's direct child element,
+// if you change or add something in a hierarchy, you change the layout. Right now when we click on the card we can go to the page from that route
+// 4) To fix the layout we need to add `className` to `<Link>` component, we need to add layout properties that will determine the size form the `<section>` -> `flex-1 basis-80 h-[380px] max-w-[500px]`,
+// we just need to add that to `<Link>` component (move `className`s from `<section>` to  `<Link>`).
+// When we save that that should fix that, but not completely, the `<section>` need to take up the full space of `<Link>`,
+// so in `className`s in `<section>` (holding everything, Image component etc.) we want to add `w-full` and `h-full`, so to take up all the space in this `<Link>`, now that should fix that
 
 // V217 - Add the event date to the EventCard component and learn about the magic of Copilot.
 // We want to implement date in the top left corner of the cards.
