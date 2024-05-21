@@ -9,7 +9,7 @@ type EventCardProps = {
 export default function EventCard({ event }: EventCardProps) {
   return (
     // {event.name}
-    <section className="flex flex-col flex-1 basis-80 h-[380px] max-w-[500px] bg-white/[3%] rounded-xl overflow-hidden">
+    <section className="flex flex-col flex-1 basis-80 h-[380px] max-w-[500px] bg-white/[3%] rounded-xl overflow-hidden relative">
       <Image
         src={event.imageUrl}
         alt={event.name}
@@ -22,9 +22,45 @@ export default function EventCard({ event }: EventCardProps) {
         <p className="italic text-white/75">By {event.organizerName}</p>
         <p className="text-sm text-white/50 mt-4">{event.location}</p>
       </div>
+
+      <section className="absolute flex flex-col justify-center items-center left-[12px] top-[12px] h-[45px] w-[45px] bg-black/30 rounded-md">
+        <p className="text-xl font-bold -mb-[5px]">
+          {/* {new Date(event.date).getDate()} */}
+          {new Date(event.date).toLocaleDateString("en-US", { day: "2-digit" })}
+        </p>
+        <p className="text-xs uppercase text-accent">
+          {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
+        </p>
+      </section>
     </section>
   );
 }
+
+// V217 - Add the event date to the EventCard component and learn about the magic of Copilot.
+// We want to implement date in the top left corner of the cards.
+// 2) We have the date number and a three-letter abbreviation of the month. Let's hardcode it first and then we will make it dynamic.
+// Describing `className`s,  `<section>` with date details should be absolutely positioned `absolute`, it should sit 12px from the left `left-[12px]`, and 12 pixels from the top `top-[12px]`,
+// it should have a height of 45px  `h-[45px]` , and a width of 45 pixels as well `w-[45px]`. We are using a lot of custom values, because Tailwind CSS does not have the exact one e.g. `h-45`.
+// Let's give it black background with 30% opacity `bg-black/30`. When we use absolute positioning `absolute` and then e.g. `left-[12px]`, `top-[12px]` we need to specify to which element the class refers to
+// (top of what element exactly). We want to be explicit about it, it should be relative to the overall card, in this case we need to add `relative` to `<section>` responsible for creating `EventCard`.
+// Furthermore we add border radius `rounded-md`.
+// 3) Then we style individual paragraphs `<p>`, could also use `<span>`, first paragraph we give it `text-xl`, `font-bold`,
+// second paragraph `text-xs`, all `uppercase`, this also should be in accent color `text-accent`,
+// we want the t4ext from the paragraphs to be centered in that square, we use flexbox, `flex flex-col justify-center items-center` in `<section>` holding these two paragraphs,
+// `flexbox justify-center items-center` to keep the vertical flow.
+// We also want to push the number closer to the month, for the paragraph `<p>` holding the number we add negative margin (margin means space between elements),
+// negative margin means it will come closer `-mb`, in Taillwind CSS we need to add minus sign, we want negative margin of custom 5px, `-mb-[5px]`.
+// 4) Now instead of hardcoding values we need to get that from database (fetch), we need to output right date time for each event, we use `{event.date}`.
+// `<p className="text-xl font-bold -mb-[5px]">{event.date}</p>` We have got an error "type Date is not assignable to type ReactNode", we cannot use date type because it expects ReactNode in between opening and closing tag,
+// for some reason date time is not a part of that. So to work with date in JavaScript a little bit easier we can turn it into a date object (right now in here `{event.date}` it is a string),
+// we turn into a new object `{new Date(event.date)}` now we get the date object, we can use certain methods on that `{new Date(event.date).getDate()}`- it will give us an actual day ,
+// for some of these numbers e.g. when it is a single digit below 10 we want 0 (zero) to be in the front of a number (leading zero) so it will be two digits e.g. 01
+// 5) How we would do that in a real world?
+// We will use Gihub Copilot: "turn date into day of the month with leading 0", now we start typing word "event" and Copilot comes up with suggestion
+// `{ new Date(event.date).toLocalDateString("en-US", {day: "2-digit",}) }`
+// Copilot is really good in these types of algorithmic situations.
+// Now copilot suggests in the paragraph for the month  `{ new Date(event.date).toLocaleDateString("en-US", {month: "short", })}`
+// When you do not use  some kind of a AI copilot you are gonna fall behind these days.
 
 // V215
 // 5) For each event we still map over events, but we want to use `<section>{event.name}</section>` for the event card, we do not want to copy the key here
