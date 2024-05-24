@@ -48,7 +48,7 @@ export default async function EventsPage({ params }: EventsPageProps) {
     <main className="flex flex-col items-center py-24 px-[20px] min-h-[110vh]">
       {/* // V212 */}
       {/* <H1>Events in {params.city}</H1> */}
-      <H1>
+      <H1 className="mb-28">
         {/* Events in {city.charAt(0).toUpperCase() + city.slice(1)} */}
         {city === "all" && "All Events"}
         {city !== "all" &&
