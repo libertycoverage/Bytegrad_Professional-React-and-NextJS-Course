@@ -35,14 +35,17 @@ type EventsPageProps = {
 // we can put secrets in here that won't be visible on the client, on the client only the result of rendering will be visible, we can have API keys as well and other secrets.
 
 export default async function EventsPage({ params }: EventsPageProps) {
+  const city = params.city;
   const response = await fetch(
-    "https://bytegrad.com/course-assets/projects/evento/api/events?city=austin"
+    // "https://bytegrad.com/course-assets/projects/evento/api/events?city=austin"
+    // V221 - Fetch Events For Correct City
+    // Problem that when we go to `localhost:3000/events/seattle` we do not see events from Seatte but Austin, that is because we hardcoded the URL for fetching the data of events to that city Austin
+    // Let's change quotes with template literal. We do need to make sure `const city` is initialized before we are using `city` in query params while fetching `Error: Cannot access 'city' before initialization`
+    `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
   );
 
   const events: EventoEvent[] = await response.json();
   console.log(events);
-
-  const city = params.city;
 
   return (
     <main className="flex flex-col items-center py-24 px-[20px] min-h-[110vh]">
