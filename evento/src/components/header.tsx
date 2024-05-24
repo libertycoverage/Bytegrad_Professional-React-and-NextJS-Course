@@ -6,6 +6,7 @@ import Logo from "./logo";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 // Typically in React we define `routes` (or `links` ) outside, each one represented as the object, and then we map over routes
 const routes = [
@@ -56,13 +57,20 @@ export default function Header() {
               // First, we install clsx package, `/evento/$ npm install clsx`, string will be the function input
               // This is what we always want `"hover:text-white transition"`; in object {} we have conditions
               // (This is an object and `text-white` is a key (string), class we want to apply, we want to get the class `text-white`, this condition is true `activePathname === route.path` )
-              className={clsx(
+              // className={clsx(
+              //   "hover:text-white flex items-center relative transition",
+              //   {
+              //     "text-white": activePathname === route.path,
+              //     "text-white/50": activePathname !== route.path,
+              //   }
+              // )} // we need curly braces {clsx()} to open a window for JS
+              className={cn(
                 "hover:text-white flex items-center relative transition",
                 {
                   "text-white": activePathname === route.path,
                   "text-white/50": activePathname !== route.path,
                 }
-              )} // we need curly braces {clsx()} to open a window for JS
+              )}
             >
               {/* We can use `{route.name}` as key, but better is to use `{route.path}`, path is more likely to be unique */}
               <Link href={route.path}>
