@@ -15,7 +15,9 @@ export default function EventCard({ event }: EventCardProps) {
       href={`/event/${event.slug}`}
     >
       {/* <section className="flex flex-col flex-1 basis-80 h-[380px] max-w-[500px] bg-white/[3%] rounded-xl overflow-hidden relative transition hover:scale-105 active:scale-[1.02]"> */}
-      <section className="w-full h-full flex flex-col bg-white/[3%] rounded-xl overflow-hidden relative transition hover:scale-105 active:scale-[1.02]">
+      {/* <section className="w-full h-full flex flex-col bg-white/[3%] rounded-xl overflow-hidden relative transition hover:scale-105 active:scale-[1.02]"> */}
+      {/* V227 - Reusable Hover Effect (Tailwind @Apply Rule) (Trick to centralize Tailwind CSS classes shared by components) */}
+      <section className="w-full h-full flex flex-col bg-white/[3%] rounded-xl overflow-hidden relative state-effects">
         <Image
           src={event.imageUrl}
           alt={event.name}

@@ -62,7 +62,9 @@ export default async function EventPage({ params }: EventPageProps) {
               Organized by <span className="italic">{event.organizerName}</span>
             </p>
 
-            <button className="bg-white/20 text-lg capitalize mt-5 lg:mt-auto w-[95vw] sm:w-full py-2 rounded-md border-white/10 border-2 bg-blur hover:scale-105 active:scale-[1.02] transition focus:scale-105">
+            {/* <button className="bg-white/20 text-lg capitalize mt-5 lg:mt-auto w-[95vw] sm:w-full py-2 rounded-md border-white/10 border-2 bg-blur hover:scale-105 active:scale-[1.02] transition focus:scale-105"> */}
+            {/* V227 - Reusable Hover Effect (Tailwind @Apply Rule) (Trick to centralize Tailwind CSS classes shared by components) */}
+            <button className="bg-white/20 text-lg capitalize mt-5 lg:mt-auto w-[95vw] sm:w-full py-2 rounded-md border-white/10 border-2 bg-blur state-effects">
               Get tickets
             </button>
           </div>
@@ -234,3 +236,36 @@ export default async function EventPage({ params }: EventPageProps) {
 // With `<button> </button>` we also want to have focused state (usually when we point with the mouse or keyboard if that is available), only one element on the page at any time can be focused.
 // Here when we click a button it should be focused element and we can have special styling to indicate that, very ofter it just should be the same as the hover state `focus:scale-105`.
 // Now when we click a button it stays at the focused state (after click it remains a little bit bigger that default).
+
+// V227 - Reusable Hover Effect (Tailwind @Apply Rule) (Trick to centralize Tailwind CSS classes shared by components)
+// Description: Extract the hover effect to a reusable class with the @apply rule.
+//
+// This patent is not recommended by the Tailwind CSS team, because one of the goals of CSS was to remove a need for own classes, took up with own classNames,
+// and context switching between the targets of a styling and the actual place of styling (using tabs in editor).
+// Now we are going back to that pattern we had before, but this is the best way to abstract that. Still in 2024 there is no better way to do this.
+//
+// In the `/components/event-card.tsx` when we hover a Link, we have used the same effect as in `/event/[slug]/page.tsx` hovering on `<button>`
+// ```css
+//       transition hover:scale-105 active:scale-[1.02]
+// ```
+// (Maybe we should use that `transition hover:scale-105 active:scale-[1.02]` on the Link component itself, now we are the entire `<section>` in EventCard)
+//
+// Maybe we want that hover effect on the other elements as well, because typically we want to be consistent in our design in interactions.
+// We may want to have these state effects in other elements as well. We want to nicely abstract that so we are not repeating ourselves.
+// We want to centralize these in one place, what we could do we can go to `global.css` and we can create custom class `.state-effects` and here we can put these Tailwind CSS classes,
+// but to make it work we need to add `@apply` in front of that
+// global.css
+// ```css
+// .state-effects {
+//   @apply hover:scale-105 active:scale-[1.02] transition focus:scale-105;
+// }
+// ```
+// Now when we apply all of them, we can use `.state-effects` in `<button>` and in EventCard
+// `/event/[slug]/page.tsx`
+// ```tsx
+//       <button className="bg-white/20 text-lg capitalize mt-5 lg:mt-auto w-[95vw] sm:w-full py-2 rounded-md border-white/10 border-2 bg-blur state-effects">
+// ```
+// `/components/event-card.tsx`
+// ```tsx
+//       <section className="w-full h-full flex flex-col bg-white/[3%] rounded-xl overflow-hidden relative state-effects">
+// ```
