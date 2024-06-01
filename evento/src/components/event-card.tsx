@@ -23,7 +23,12 @@ export default function EventCard({ event }: EventCardProps) {
           alt={event.name}
           width={500}
           height={280}
-          className="h-[60%] object-fit"
+          // V229 - Fix Image Object Fit Vs Object Cover (Change image object fit to object cover.)
+          // There is a problem with maintaining aspect ration in "All Events" view, the image tries to fit in regardless of aspect ratio in `/components/event-card.tsx`.
+          // That is because in the `Image` component we were using `object-fit` className. Now instead of that we are using `object-cover` className,
+          // it will cut some part of the image to retain aspect ratio, so it looks good in any size.
+          //className="h-[60%] object-fit"
+          className="h-[60%] object-cover"
         />
         <div className="flex flex-col flex-1 justify-center items-center">
           <h2 className="text-2xl font-semibold">{event.name}</h2>
