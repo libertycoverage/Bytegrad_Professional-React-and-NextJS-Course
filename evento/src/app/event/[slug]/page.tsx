@@ -71,8 +71,49 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
       </section>
 
-      <div></div>
+      {/* V228 */}
+      <div className="text-center px-5 py-16 min-h-[75vh]">
+        {/* <section className="mb-12">
+          <h2 className="text-2xl mb-8">About this event</h2>
+          <p className="text-lg leading-8 text-white/75 max-w-4xl mx-auto">
+            {event.description}
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-2xl mb-8">Location</h2>
+          <p className="text-lg leading-8 text-white/75 max-w-4xl mx-auto">
+            {event.location}
+          </p>
+        </section> */}
+
+        <Section>
+          <SectionHeading>About this event</SectionHeading>
+          <SectionContent>{event.description}</SectionContent>
+        </Section>
+
+        <Section>
+          <SectionHeading>Location</SectionHeading>
+          <SectionContent>{event.location}</SectionContent>
+        </Section>
+      </div>
     </main>
+  );
+}
+
+function Section({ children }: { children: React.ReactNode }) {
+  return <section className="mb-12">{children}</section>;
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-2xl mb-8">{children}</h2>;
+}
+
+function SectionContent({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-lg leading-8 text-white/75 max-w-4xl mx-auto">
+      {children}
+    </p>
   );
 }
 
@@ -269,3 +310,37 @@ export default async function EventPage({ params }: EventPageProps) {
 // ```tsx
 //       <section className="w-full h-full flex flex-col bg-white/[3%] rounded-xl overflow-hidden relative state-effects">
 // ```
+
+// V228
+// In `/event/[slug]/page.tsx` below the `<section>` (holding information, date, button and `Image` components) we want to display event details such as description ("About this event") and location place.
+// Inside the `<div> <div>` we want to have one `<section>` for the description and the second `<section>` for the location.
+// We want these sections to be centered, to the `div` we add `text-center` `<div className="text-center">`
+//
+// ### first section
+// In the first `section` we are going to have `<h2>About this event</h2>` and then the actual content `<p>{event.description}</p>`.
+// We style `h2` adding a className `text-2xl`, for description `p` we add `text-lg`, we add space between the lines `leading-8`.
+// `leading-` and `tracking-` these are 2 tricky Tailwind CSS classes, `leading-` is for adding space between the lines, `tracking-` is for space between the characters
+// intellisense e.g. .leading-8 { line-height: 2rem/* 32px */; }
+// Also we deemphasize text with 75% opacity `text-white/75`
+// We edit paragraph `p`, we do not want the text to span the entire `width`, we want to constraint a width for text a little bit.
+// Maximum width of 4xl `max-w-4xl`, when we do that text will be left-aligned, we need to add margin horizontal auto `mx-auto` to center the text horizontally again.
+// We also want to add padding to the `div` surrounding text, so it is not sitting against the edge, some horizontal padding `px-5` as well as vertical padding `py-16`
+//
+// ### second section
+// In the second `section` we are going to have `<h2>Location</h2>` and then `<p>{event.location}</p>`.
+// We want the same classNames to be used with description section as well as location section. We could abstract this out to a separate component,
+// because now we need to copy all of this style to paragraph for location, what if we have even more sections to style the same way?
+// We need to add some space between the sections, so we add className margin bottom 12 `mb-12` to the first `<section>` with description
+// It could be a little bit crammed here, we could give a little bit height to the entire `div`, we can add a className minimum height should be 75% of the viewport height `min-h-[75vh]`,
+// now we have more space to the footer. `<div className="text-center px-5 py-16 min-h-[75vh]">`.
+// We also want a little more space below the heading, we add className margin bottom 8 `mb-8` to both `h2` in two sections.
+//
+// ### children pattern to abstract logic into separate components
+// Once we start copy pasting things we may consider abstracting it out to the separate component. It could make sense because we could have more sections here.
+// Let's abstract this `section` to a separate component, that is how we would do that in the real world. We can define that in the same file, it is more like a utility function essentially.
+// We have `Section()` component that will hold `<section>` (returns section tag), it will get `children`, pass along `children`. We will also add a className for the margin.
+// Now when we want to add `<Section>`, or we want to change styling of the `Section` we only have to change it in one place, and all these `sections`,
+// as long they are using the `Section` component will be updated. We specify `children` props in line (by typing it, assigning a type for it).
+// Because each section needs a margin on the bottom we add that to `section` within `Section` component, `mb-12`.
+// We create another utility function as the `SectionHeading()` component, we are using a `children` common pattern, it is also being used working with Shadcn library
+// While creating `SectionContent()`, we receive great suggestion for Github Copilot, refactoring is another great use case for Copilot.
