@@ -81,14 +81,14 @@ export default function EventCard({ event }: EventCardProps) {
 // we want the t4ext from the paragraphs to be centered in that square, we use flexbox, `flex flex-col justify-center items-center` in `<section>` holding these two paragraphs,
 // `flexbox justify-center items-center` to keep the vertical flow.
 // We also want to push the number closer to the month, for the paragraph `<p>` holding the number we add negative margin (margin means space between elements),
-// negative margin means it will come closer `-mb`, in Taillwind CSS we need to add minus sign, we want negative margin of custom 5px, `-mb-[5px]`.
+// negative margin means it will come closer `-mb`, in Tailwind CSS we need to add minus sign, we want negative margin of custom 5px, `-mb-[5px]`.
 // 4) Now instead of hardcoding values we need to get that from database (fetch), we need to output right date time for each event, we use `{event.date}`.
 // `<p className="text-xl font-bold -mb-[5px]">{event.date}</p>` We have got an error "type Date is not assignable to type ReactNode", we cannot use date type because it expects ReactNode in between opening and closing tag,
 // for some reason date time is not a part of that. So to work with date in JavaScript a little bit easier we can turn it into a date object (right now in here `{event.date}` it is a string),
 // we turn into a new object `{new Date(event.date)}` now we get the date object, we can use certain methods on that `{new Date(event.date).getDate()}`- it will give us an actual day ,
 // for some of these numbers e.g. when it is a single digit below 10 we want 0 (zero) to be in the front of a number (leading zero) so it will be two digits e.g. 01
 // 5) How we would do that in a real world?
-// We will use Gihub Copilot: "turn date into day of the month with leading 0", now we start typing word "event" and Copilot comes up with suggestion
+// We will use Github Copilot: "turn date into day of the month with leading 0", now we start typing word "event" and Copilot comes up with suggestion
 // `{ new Date(event.date).toLocalDateString("en-US", {day: "2-digit",}) }`
 // Copilot is really good in these types of algorithmic situations.
 // Now copilot suggests in the paragraph for the month  `{ new Date(event.date).toLocaleDateString("en-US", {month: "short", })}`

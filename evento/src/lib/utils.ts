@@ -24,3 +24,70 @@ export function cn(...inputs: ClassValue[]) {
 // as a prop coming in, it needs to be intelligent merging)
 // We type `...inputs` as an array of `ClassValue` type -> `ClassValue[]`, instead of using general strings. We do not need to type ClassValue ourselves, clsx gives us a ClassValue type.
 // Now we use `cn()` in h1.tsx nad header.tsx instead of `twMerge` and `clsx` separately.
+
+// V230
+// export function sleep() {
+//   return new Promise((resolve) => {
+//     setTimeout(resolve, 1000);
+//   });
+// }
+
+// V230
+export async function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+// V230 - Client-side cache in Next.js (Router Cache), sleeper function to emphasize the normally observed delay
+// Let's talk a little bit about loading state and caching, if we click around we may notice that some parts of Next.js will be loaded slower than the other,
+// sometimes it is very fast, but sometimes we have to wait a second or so for the page to be loaded. Sometimes it is a little bit slow.
+//
+// What happens when we click on a `Link` "All Events" and go to URL `localhost:3000/events/all`.
+// What will happen it will render `/events/[city]/page.tsx`, this page is a server component, so there will be some network requests in the background to the server,
+// and on the server EventsPage component gets rendered.
+// With the network requests when we click on the `Link`, with the network request the params in URL `localhost:3000/events/all` will be available on the server,
+// the URL will be just sent to the server, Next.js will take the `{params}` `EventsPage({ params }`, form that and give it to us in `EventsPage` component (all happening on server).
+// Then we need to wait until the fetch call is complete, we make a fetch call to bytegrad.com server somewhere on the Internet, and that can take some time, this is the biggest blocker we could say.
+// Then we eventually get the events, and EventPage component will produce (return) a final render result, and the result of that is send back to client and we see the result as page.
+// We can see it can potentially take some time before we get a result with fetch and we get the result back from the server on the client. On the client it can take some time.
+//
+// To show the delay even better we are going to temporarily add a sleeper function `sleep()`. In `utils.ts` people sometimes use sleeper function in JavaScript,
+// we can essentially use promises here, we `return` a `new Promise`, create a `new Promise`, we can decide when the `Promise` is resolved,
+// we can give it arbitrary 1000ms, after that time `Promise` will be resolved
+// When we call that function (we can make it async), it will take one second before function is complete
+// To make it a little more fancy people also allow to add, use milliseconds as the input, instead of hardcoding 1 s (one second)
+// We can await `sleep()` function, on the "events" page, now when we click on Link `/components/header.tsx` we have to wait until we get the result
+// -> `/events/[city]/page.tsx`
+//    export default async function EventsPage({ params }: EventsPageProps) {
+//      const city = params.city;
+//      await sleep(2000);
+// ->
+//
+// When we go to the individual event `/event/[slug]/page.tsx` when we click on the  individual events (individual cards) on "All Events" page `/events/[city]/page.tsx`
+// there is a network request in the background (we can see that in Network tab in developer tools in browser). This fetch call will take some time.
+// When we create a fetch call, by clicking a Link it will go to our server where our server component is available (EventPage component) and it will render this component.
+// Here we also take the params `EventPage({ params } (...) const slug = params.slug;` and it can take some time and that will produce the render result (`/event/[slug]/page.tsx`),
+// and that is what is sent back to the client (browser), that is what we see eventually by going to individual page of an event  `/event/[slug]/page.tsx` `http://localhost:3000/event/harmony-festival`
+// That can take some time, to show why it is a problem let's add a sleeper function to `EventPage()` component,
+// it will just add additional time (2s) in waiting until we can continue with the rest of the component, (it will go line by line and just wait before it can continue)
+// -> `/event/[slug]/page.tsx`
+//   export default async function EventPage({ params }: EventPageProps) {
+//     const slug = params.slug;
+//     await sleep(2000);
+//     const response = await fetch(
+// ->
+//
+// What happens when we click on the card of event, there is a network request to the server, on the server we have server components, it needs to wait 2s while it is rendering,
+// it makes a fetch call and that will also take some time, sometimes it can also take couple of seconds, eventually after couple of seconds on `return` it can start rendering everything,
+// the result of that actually is not HTML, it is a React Server Component Payload, the payload is the actual render result, that payload gets send back to the front-end again,
+// that is what we eventually see on the page opened in the browser (we are discussing `/event/[slug]/page.tsx`).
+// The Payload will be sent to the front-end, the front-end receives the Payload an it will process it in such a way we get the final result.
+// A little bit tricky, but what we want to point out here, especially when we go to production, because here server and the client are on the same computer,
+// in real world server and the client are going to be separate, it could be very big distance between them.
+//
+// By adding additional 2 second everywhere, now when we go to some event using an event card interface it takes some time.
+// Now because it takes some time Next.js has tried to optimize that for us. With normal time waiting for fetches and two-directional communication between client and server,
+// we have to wait a little bit between network request. Next.js will help with that by caching.
+// Certain parts are cached automatically so we do not have to make new network requests going back and forth e.g. EventsPage component will not be rendered.
+// Whatever the result of the component is it will be sent to the client and Next.js will store it in the browser, caching it (client-side cache).
