@@ -76,3 +76,22 @@ export default function Loading() {
 // Sometimes we do not see loading indicator because once we have received that result on the front-end, Next.js will put that in the cache, basically store the result.
 // Next time we go to the route we already have that result, it does not need to make a network request again, it will reuse that.
 // It is a little bit unpredictable sometimes when it is using cache (here Router Cache).
+
+// V234 - Suspense & Streaming In NextJS (Loading.tsx) (Description: How the loading.tsx file works with Suspense.)
+// We are using loading.tsx file and this is actually working behind the scenes with so called Suspense component from React.
+// Next.js documentation website has good infographic about this
+// https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming
+// ->
+// <Layout>
+//   <Header />
+//   <SideNav />
+//   <Suspense fallback={<Loading />}>
+//     <Page />
+//   </Suspense>
+// </Layout>
+// ->
+// So if we are using loading.tsx file it will actually wrap page.tsx with so called `Suspense` component. if we use `Loading()` it will wrap `Page` in the `Suspense` component
+// and the fallback for that is that loading file. So while the page is suspended, while there is a loading behind the scenes (e.g. fetch) we will show the fallback,
+// and once the page has been rendered we will replace that `Loading` with the actual result.
+// That is basically an abstraction that Next.js does for us with this Suspense and Loading files.
+// We could also use that ourselves. That is something we haven't used before, Suspense is probably something that works only in Next.js.
