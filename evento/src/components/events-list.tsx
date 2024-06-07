@@ -1,12 +1,31 @@
 import { EventoEvent } from "@/lib/types";
 import React from "react";
 import EventCard from "./event-card";
+import { sleep } from "@/lib/utils";
 
+// V235 -> we do not need events accepted as a prop in events-list.tsx, we fetch it in events-list.tsx
+// type EventsListProps = {
+//   events: EventoEvent[];
+// };
 type EventsListProps = {
-  events: EventoEvent[];
+  city: string;
 };
 
-export default function EventsList({ events }: EventsListProps) {
+// export default function EventsList({ events }: EventsListProps) {
+// V235 -> we do not need events accepted as a prop in events-list.tsx, we fetch it in events-list.tsx
+export default async function EventsList({ city }: EventsListProps) {
+  await sleep(2000); // V235 moved here //
+
+  // V235 moved here //
+  const response = await fetch(
+    `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
+  );
+  // V235 moved here //
+
+  const events: EventoEvent[] = await response.json(); // V235 moved here //
+  console.log(events); // V235 moved here //
+  // V235 moved here //
+
   return (
     <section className="max-w-[1100px] flex flex-wrap gap-10 justify-center px-[20px]">
       {events.map((event) => (
@@ -27,3 +46,5 @@ export default function EventsList({ events }: EventsListProps) {
 // 6) We can use a key on our own custom component, we need to pass the entire `event` to the card, in `EventCard` we accept `event` as a prop
 // 7) We fetch the data on the page.tsx, we pass that to `<EventsList />` component, this list component receives these events, it just map over them, and pass the individual events to `<EventCard />` component,
 // this component will receive the actual event object and create the card
+
+// V235 - EventsList Suspense (Advanced Pattern For Data Fetching) - (Description: Fetch data in a component and wrap it in Suspense.)

@@ -1,8 +1,9 @@
 import EventsList from "@/components/events-list";
 import H1 from "@/components/h1";
-import { EventoEvent } from "@/lib/types";
-import { sleep } from "@/lib/utils";
-import React from "react";
+//import { EventoEvent } from "@/lib/types";
+//import { sleep } from "@/lib/utils";
+import React, { Suspense } from "react";
+import Loading from "./loading";
 
 // V212
 type EventsPageProps = {
@@ -39,18 +40,19 @@ export default async function EventsPage({ params }: EventsPageProps) {
   const city = params.city;
 
   // V230
-  //await sleep(2000);
+  // V235 cutout // V230 await sleep(2000);
 
-  const response = await fetch(
-    // "https://bytegrad.com/course-assets/projects/evento/api/events?city=austin"
-    // V221 - Fetch Events For Correct City
-    // Problem that when we go to `localhost:3000/events/seattle` we do not see events from Seatte but Austin, that is because we hardcoded the URL for fetching the data of events to that city Austin
-    // Let's change quotes with template literal. We do need to make sure `const city` is initialized before we are using `city` in query params while fetching `Error: Cannot access 'city' before initialization`
-    `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
-  );
+  // V235 cutout //
+  // V235 cutout // const response = await fetch(
+  // V221 // "https://bytegrad.com/course-assets/projects/evento/api/events?city=austin"
+  // V221 - Fetch Events For Correct City
+  // Problem that when we go to `localhost:3000/events/seattle` we do not see events from Seatte but Austin, that is because we hardcoded the URL for fetching the data of events to that city Austin
+  // Let's change quotes with template literal. We do need to make sure `const city` is initialized before we are using `city` in query params while fetching `Error: Cannot access 'city' before initialization`
+  // V235 cutout // `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
+  // V235 cutout // );
 
-  const events: EventoEvent[] = await response.json();
-  console.log(events);
+  // V235 cutout // const events: EventoEvent[] = await response.json();
+  // V235 cutout // console.log(events);
 
   return (
     <main className="flex flex-col items-center py-24 px-[20px] min-h-[110vh]">
@@ -82,7 +84,13 @@ export default async function EventsPage({ params }: EventsPageProps) {
       // 2) we create this component in file named `events-list.tsx` with lower case, a component still needs uppercase name `export default function EventsList() {` 
       // Naming convention of files -> in Next.js there is a convention to use lower case for everything (any file), in React Vite app there is a convention with upper case naming for file names.
       */}
-      <EventsList events={events} />
+
+      {/* // V235 -> We are not passing events as a prop to EventsList component anymore  */}
+      {/* <EventsList events={events} /> */}
+      {/* // V235 -> We are not passing events as a prop to EventsList component anymore  */}
+      <Suspense fallback={<Loading />}>
+        <EventsList city={city} />
+      </Suspense>
     </main>
   );
 }
@@ -127,3 +135,66 @@ export default async function EventsPage({ params }: EventsPageProps) {
 // then we want to concatenate this one big letter with the rest of the word (slice from the first character onwards to the end of the word) `{city.charAt(0).toUpperCase() + city.slice(1)}`
 // 5) Now when we go to the `http://localhost:3000/events/all`  we want to display all events but not to show title `Events in All`,
 // we can have conditional logic here, when the city is all `city === 'all'` we want to display `All Events` and when it is not `all` we want this condition in template literals
+
+// V235 - EventsList Suspense (and streaming) (Advanced Pattern For Data Fetching) - (Description: Fetch data in a component and wrap it in Suspense.)
+// We have added the loading state using skeletons. Now if we go to "All Events" we the loading indicator (using array of SkeletonCards), but it is blocking a whole page,
+// meaning we also do not see `H1` telling "All Events".
+//
+// If we go to that `/events/[city]/page.tsx` with EventsPage component we can see we have used EventsList component and it needs data we are fetching,
+// EventsPage also is using `<H1>` and it does not need the data, ideally when we go to that "All Events" page we can immediately show the `H1` telling "All Events",
+// so the user knows that is on the right page, or when we go to Austin, it can immediately show "Events in Austin" and SkeletonCards array below for the actual data we are waiting for.
+//
+// But now the way we have done it, it gonna fetch the data in EventsPage server component and everything is affected by that, because that `/events/[city]/loading.tsx` file,
+// that will just wrap a `Suspense` around the entire `Page`, so everything on the page.tsx is going to be affected by that.
+// Even though this `<EventsList events={events} />` is the only one that really needs that data.
+//
+// This fetching of data is now blocking the rest of the page. We do not want to block the whole page, because we can already show the `H1` with the title,
+// we do not need to wait for that (it should be able to immediately show the `H1`) while fetching the data and waiting rest of the page to load.
+// What we are going to do is to to put data fetching inside EventsList component, we will also put `await sleep(2000);` in there.
+// So it can already return this `H1` and other components we may have on the page, it can show that faster, and then until the data is fetched and EventsList can render
+// and show the result of that data.
+//
+// To EventsList component in events-list.tsx we are moving from EventsPage `/events/[city]/page.tsx` this:
+// ```tsx
+//   const response = await fetch(
+//     `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
+//   );
+//   const events: EventoEvent[] = await response.json();
+//   console.log(events);
+// ```
+// in `/events/[city]/page.tsx` we do not need passing `events` to `EventsList` component as a prop anymore `{/* <EventsList events={events} /> */}`.
+//
+// in events-list.tsx
+// EventsList is a server component so we can make `async`. To fetch the data EventsList does need to know `city` we are on (part or a query params),
+// `city` needs to be passed as a prop to `<EventsList />` component in `/events/[city]/page.tsx`.
+//
+// ### pattern in Next.js -> move down data fetching to a child component, loading moved down to a child component to not to block the whole page
+// This is a common pattern in Next.js btw. where we are going to move down data fetching to a child component, because if we put at a page.tsx level, it blocks the entire page.
+//
+// The benefit is that we are doing data fetching in `EventsList()` component, all of the waiting is concentrated in this component,
+// so now we can wrap EventsPage component in `/events/[city]/page.tsx` in a `Suspense`
+//
+// Now the whole page.tsx is not blocked anymore, it is only this component `<EventsList city={city}/>`, it will just stream in a little bit later,
+// and in the meantime we can already show `H1` and possibly other components that we would have on the page.
+//
+// If we do not provide "loading indicator" as as a `fallback` in `Suspense` we will not see that loading indicator (made with SkeletonCards),
+// we should provide loading indicator as a `fallback`. While we are waiting for that, while EventsList is fetching the data, finally rendering,
+// while we are waiting for that, we can show `fallback`, we want to show `Loading()` component in `loading.tsx`.
+// Now it should show loading indicator in place of that EventsList (! not in the place of a whole page), but everything else can already be shown.
+// Now we can see loading indicator (that is using SkeletonCards) and the `H1`.
+//
+// That is a pretty smooth UX user experience, this is much better than we had before (with loading.tsx blocking a whole page),
+// and this is coming to be very common pattern in Next.js, because if you fetch the data at a page.tsx level, you are blocking everything on the page.
+// You are going to see a lot of fetching moving down into the components that it is actually needed.
+// Mind these imports ! `import React { Suspense } from "react"; import Loading from "./loading";` -> `/events/[city]/page.tsx`
+//
+// In browser devtools in network tab (Response tab inside Network tab), if we go to e.g. `localhost:3000/events/all` and in the devtools we go to main document,
+// we can see in the initial response (HTML) we got from the server we can see we have `<body>`, `<header>`,
+// then we go to our page, in `<main>` we have `<h1>` , then we have something with `<template>` and in the `<div>` we can see class `space-y-4` and `animate-pulse`, this is from skeletons.
+// In the initial page load in the `<main>`, it is going to give us loading indicator (`{<Loading />}` from the `fallback`) ,
+// and then while this is happening in the background (fetch within `<EventsList>`), it is going to show us a loading indicator `<Loading />`,
+// but eventually `EventsList` component has finished fetching data, has finished rendering, and the result of that rendering will then be **streamed** to the front-end
+// and that will replace the initial loading stuff in the actual HTML document in the browser that we get
+//
+// There is Suspense (component) and streaming, it does not need to do reload of the page, it is just one part on the page that Next.js can swap out by streaming in the result.
+// This is something that we couldn't do even year ago (2022-2023) or so.
