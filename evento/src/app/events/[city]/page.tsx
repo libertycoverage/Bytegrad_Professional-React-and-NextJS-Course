@@ -198,3 +198,31 @@ export default async function EventsPage({ params }: EventsPageProps) {
 //
 // There is Suspense (component) and streaming, it does not need to do reload of the page, it is just one part on the page that Next.js can swap out by streaming in the result.
 // This is something that we couldn't do even year ago (2022-2023) or so.
+
+// V236 - Advanced Pattern: Data Fetching Wrapper Component For EventsList
+// (Description: An Advanced pattern for data fetching in Next.js would be to create a data fetching wrapper component in order to keep the reusability of EventsList intact.)
+//
+// In EventPage we are still fetching the data at a page level `/event/[slug]/page.tsx`, so all of the website will be blocked here
+// until fetching event data will be finished, but here in `/event/[slug]/page.tsx`, we do not have a choice,
+// basically whole page needs `event` (`const event = await response.json();`), we can leave this in code of that page.tsx as it is,
+// we are blocking everything but on purpose, everything needs that `event` data.
+//
+// In events-list.tsx we are fetching data into `EventsList` component.
+// One downside is that if we want to use `EventsList` component somewhere else, (maybe we allow user to bookmark these events,
+// and we want to use this `EventsList` component to show all of the bookmarks, somewhere else in the website).
+// The problem is that we have fetch call in there, it does make the component less usable, because every time we want to use that,
+// we have fetch call there and it needs `city` as the query parameter. Maybe we have a list of events that has nothing to do with `city`,
+// we could just show the bookmarks using EventsList.
+// The downside of moving data fetching down is (if you do in this events-list.tsx component at least),
+// it is going to reduce reusability of the component. If we want more advanced pattern perhaps, we could a separate component between here,
+// some kind of a wrapper component, (to-do here) ->
+// `/events/[city]/page.tsx`
+// ```tsx
+//       <Suspense fallback={<Loading />}>
+//         <EventsList city={city} />
+//       </Suspense>
+// ```
+// and anything that component would do is just fetch data and then it would pass down data to `EventsList`.
+// Data fetching wouldn't be in this component (`EventsList`), it would be in some wrapper component, and then we would have the reusability
+// of `EventsList` component intact. That would be a little bit more advanced, that would be something we would like to do,
+// but for now we will keep that simple.
