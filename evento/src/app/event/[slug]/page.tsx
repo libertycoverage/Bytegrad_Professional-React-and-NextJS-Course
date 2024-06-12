@@ -34,6 +34,26 @@ EventPageAndMetadataProps): Promise<Metadata> {
   };
 }
 
+// V239 - Fetch Memoization In React & NextJS
+// You are maybe worried here because of making fetch twice in `/event/[slug]/page.tsx`, first time trying to get event name for title of the page (this is `Metadata`)
+// (displayed on the tab or window in the browser), second time for obtaining all event details to display it on the page itself.
+// Does this have an impact on performance? Are we going to make this fetch call twice?
+// ### using a Data Cache
+// Not necessarily, if we have already fetched that once, the next time it will just reuse that cache.
+// ### fetch memoization
+// But what if the cache is empty let's say. We first time go to the page, and now to generate Metadata it will make the fetch call,
+// and also to in `EventPage` server component it will also make a fetch call, because there is no Data Cache yet -
+// - actually no, what will happen is that it gets memoized as it's called. In a single render pass (React itself is going to do that),
+// in a single render pass if we are fetching the same URL it is ok, it is not a problem, it is not going to make fetch call twice, it will just do it once.
+//
+// React itself sees that it is the same URL, it doesn't have to do with Next.js. That is called memoization.
+// As soon as the render pass, as soon as all of that has been rendered and we see the result, that is not saved later for later or something like that. That is during a render pass.
+// Maybe some part of the component tree is rendering, or maybe the entire tree is rendering (when we load the page all the component tree is rendering).
+// It will eventually go to `EventPage`, so Next.js will actually make the part of the component tree where we fetch for `event.name` based on `slug` for title (first fetch),
+// React will pick up, this is the same fetch call to the same URL, so we are doing once.
+//
+// It has nothing to do with caching in Next.js, it is actually behaviour that we also get outside Next.js.
+
 // export default async function EventPage({ params }: EventPageProps) {
 export default async function EventPage({ params }: EventPageAndMetadataProps) {
   // ---- V238 end of block
