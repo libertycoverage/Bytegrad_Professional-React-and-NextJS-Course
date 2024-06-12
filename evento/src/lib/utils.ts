@@ -91,3 +91,11 @@ export async function sleep(ms: number) {
 // we have to wait a little bit between network request. Next.js will help with that by caching.
 // Certain parts are cached automatically so we do not have to make new network requests going back and forth e.g. EventsPage component will not be rendered.
 // Whatever the result of the component is it will be sent to the client and Next.js will store it in the browser, caching it (client-side cache).
+
+// ---- V238 begin of block
+export function capitalize(string: string) {
+  // input of the function -> string: (of type) string
+
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+// ---- V238 end of block

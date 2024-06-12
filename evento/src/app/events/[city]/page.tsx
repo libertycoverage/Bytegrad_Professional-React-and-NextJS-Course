@@ -4,13 +4,34 @@ import H1 from "@/components/h1";
 //import { sleep } from "@/lib/utils";
 import React, { Suspense } from "react";
 import Loading from "./loading";
+import { Metadata } from "next";
+import { capitalize } from "@/lib/utils";
 
 // V212
-type EventsPageProps = {
+// type EventsPageProps = {
+// V238
+type EventsPageAndMetadataProps = {
   params: {
     city: string;
   };
 };
+
+// ---- V238 begin of block
+// export const metadata: Metadata = {
+//   title: "Events in Austin",
+// };
+export function generateMetadata({
+  params,
+}: EventsPageAndMetadataProps): Metadata {
+  const city = params.city;
+
+  return {
+    // title: `Events in ${city}`,
+    //title: `Events in ${capitalize(city)}`,
+    title: city === "all" ? "All Events" : `Events in ${capitalize(city)}`,
+  };
+}
+// ---- V238 end of block
 
 // V213
 // Below the `H1` we want to have a list of events displayed in the grid (mapping over)
@@ -36,7 +57,12 @@ type EventsPageProps = {
 // on the client that would be an issue, so we would have to create separate API and then we would have to do it through that. Now using fetch in server component,
 // we can put secrets in here that won't be visible on the client, on the client only the result of rendering will be visible, we can have API keys as well and other secrets.
 
-export default async function EventsPage({ params }: EventsPageProps) {
+// ---- V238 begin of block
+// export default async function EventsPage({ params }: EventsPageProps) {
+export default async function EventsPage({
+  params,
+}: EventsPageAndMetadataProps) {
+  // ---- V238 end of block
   const city = params.city;
 
   // V230
@@ -62,7 +88,10 @@ export default async function EventsPage({ params }: EventsPageProps) {
         {/* Events in {city.charAt(0).toUpperCase() + city.slice(1)} */}
         {city === "all" && "All Events"}
         {city !== "all" &&
-          `Events in ${city.charAt(0).toUpperCase() + city.slice(1)}`}
+          // ---- V238 begin of block
+          // `Events in ${city.charAt(0).toUpperCase() + city.slice(1)}`}
+          `Events in ${capitalize(city)}`}
+        {/* // ---- V238 end of block   */}
       </H1>
 
       {/* // V214

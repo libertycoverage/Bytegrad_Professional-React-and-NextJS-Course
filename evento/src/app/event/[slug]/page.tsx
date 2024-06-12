@@ -2,14 +2,41 @@ import H1 from "@/components/h1";
 import { sleep } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
+import { capitalize } from "@/lib/utils";
+import { Metadata } from "next";
 
-type EventPageProps = {
+// type EventPageProps = {
+// V238
+type EventPageAndMetadataProps = {
   params: {
     slug: string;
   };
 };
 
-export default async function EventPage({ params }: EventPageProps) {
+// ---- V238 begin of block
+export async function generateMetadata({
+  params,
+}: // }: EventPageAndMetadataProps): Metadata {
+EventPageAndMetadataProps): Promise<Metadata> {
+  const slug = params.slug;
+
+  // copied here, based on slug we get the data for name in the title
+  const response = await fetch(
+    `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
+  );
+  const event = await response.json();
+  // copied here, based on slug we get the data for name in the title
+
+  return {
+    //blabla: 5 // we get a warning trying to return something that does not exist, that is not part of Metadata object in Next.js
+    //title: `Events: ${slug}`,
+    title: event.name,
+  };
+}
+
+// export default async function EventPage({ params }: EventPageProps) {
+export default async function EventPage({ params }: EventPageAndMetadataProps) {
+  // ---- V238 end of block
   const slug = params.slug;
 
   // V230
@@ -349,3 +376,253 @@ function SectionContent({ children }: { children: React.ReactNode }) {
 // Because each section needs a margin on the bottom we add that to `section` within `Section` component, `mb-12`.
 // We create another utility function as the `SectionHeading()` component, we are using a `children` common pattern, it is also being used working with Shadcn library
 // While creating `SectionContent()`, we receive great suggestion for Github Copilot, refactoring is another great use case for Copilot.
+
+// V238 - Display the event name as the title of the page using the generateMetadata function.
+// There are also another advanced topics that is good to show. If we look at the metadata, we always have the same title in the tab in the browser.
+// If we go for e.g. Events in Austin, it would be nice to display title "Events in Austin" instead of generic website title, this is actually quite common use case.
+//
+// ### customized title for `/events/` route page
+// We have this `metadata` as `constant` in `layout.tsx`, if we export this Next.js will use this on every page, but what if we want to have different one on `localhost:3000/events/[city]`
+// layout.tsx - Metadata ->
+// ```tsx
+// export const metadata: Metadata = {
+//   title: "Evento - Find events around you",
+//   description: "Browse more than 10,000 events worldwide",
+// };
+// ```
+// We can go to EventsPage component, what we also can do, is to export `metadata` from that EventsPage (`/events/[city]/page.tsx`). We copy `metadata` from `layout.tsx` to `/events/[city]/page.tsx`).
+// We want to import the `Metadata` type where we use `metadata` constant `import { Metadata } from "next";`. We want to import the type because it protects us from making mistakes,
+// giving a key in metadata object of something that does not exist (valid key, value - `title: "Evento - Find events around you",`). It also gives us intellisense, we can see what is available here.
+//
+// On `/events/[city]/page.tsx` we want to keep description, so we don't include that in the object where we want to overwrite `metadata`.
+// When we write "Events in Austin" (which is not what we want), we get this title as a hardcoded value, without differentiation for a any city.
+//
+// For some reason, also favicon seems not to work.
+//
+// hardcoded Austin in `/events/[city]/page.tsx` ->
+// ```tsx
+// // V212
+// type EventsPageProps = {
+//   params: {
+//     city: string;
+//   };
+// };
+//
+// // V238
+// export const metadata: Metadata = {
+//   title: "Events in Austin",
+// };
+//
+// export default async function EventsPage({ params }: EventsPageProps) {
+// ```
+//
+// ### generateMetadata
+// When we want to have something dynamic like that, instead of exporting a constant, we can also export a function here, we export function `generateMetadata()`,
+// in there we would like to have the same as we have in server component `export default async function EventsPage({ params }: EventsPageProps) {`, we need to know which city we are looking at,
+// in `EventsPage` component we are looking at `params.city` (`const city = params.city;`), in `generateMetadata()` we can do the same, here we also get `params` from Next.js,
+// we can actually type that the same as we have for the EventsPage `EventsPageProps`, here we also have `params`.
+// We can rename the type `EventsPageProps` to more generic name like `Props` or can do something like `EventsPageAndMetadataProps`.
+// To obtain `city` we do just like before `const city = params.city;`. What we actually want to return here is actually an object that is the same as here with `const metadata` (here is title, description).
+// We return object with ```title: `Events in ${city}` ```
+// ```tsx
+// export const metadata: Metadata = {
+//   title: "Events in Austin",
+// };
+// ```
+// `/events/[city]/page.tsx` fragment with `generateMetadata()` ->
+// ```tsx
+// // V212
+// //type EventsPageProps = {
+// type EventsPageAndMetadataProps = {
+//   params: {
+//     city: string;
+//   };
+// };
+//
+// // V238
+// export function generateMetadata({ params }: EventsPageAndMetadataProps) {
+//   const city = params.city;
+//
+//   return {
+//     title: `Events in ${city}`
+//   }
+// }
+//
+// export default async function EventsPage({ params }: EventsPageProps) {
+// ```
+//
+// It would be nice to capitalize city name, (right now is lower case), we did that before with ``` `Events in ${city.charAt(0).toUpperCase() + city.slice(1)}` ```.
+// Let's create a utility function so we can reuse throughout the application, function that will capitalize the string.
+//
+// ### extracted as a separate utility function `capitalize`
+// `utils.ts` ->
+// ```ts
+// export function capitalize(string: string) {
+// // input of the function -> string: (of type) string
+//
+//   return string.charAt(0).toUpperCase() + string.slice(1);
+// }
+// ```
+//
+// Function `capitalize()` takes a string, it takes charter at index zero (first character in a string, word), converts it to upper case,
+// then concatenates that with the rest of the string, word (slice from index 1 (word from the second character onwards))
+//
+// `/events/[city]/page.tsx` fragment
+// ```tsx
+// import { capitalize } from "@/lib/utils";
+// (...)
+//         {city !== "all" &&
+//           // `Events in ${city.charAt(0).toUpperCase() + city.slice(1)}`}
+//           `Events in ${capitalize(city)}`}
+//       </H1>
+// ```
+//
+// `/events/[city]/page.tsx` fragment with `generateMetadata()` with `capitalize()` func ->
+// ```tsx
+// import { capitalize } from "@/lib/utils";
+//
+// // V212
+// //type EventsPageProps = {
+// type EventsPageAndMetadataProps = {
+//   params: {
+//     city: string;
+//   };
+// };
+//
+// // V238
+// export function generateMetadata({ params }: EventsPageAndMetadataProps) {
+//   const city = params.city;
+//
+//   return {
+//     //title: `Events in ${city}`
+//     title: `Events in ${capitalize(city)}`,
+//   }
+// }
+//
+// // export default async function EventsPage({ params }: EventsPageProps) {
+// export default async function EventsPage({
+//   params,
+// }: EventsPageAndMetadataProps) {
+// ```
+// Now the title in the browser tab based on chosen city works as expected.
+//
+//
+// Now when we go to `localhost:3000/events/all` route, we can see title "Events in All" which is not what we want, we want title to say "All Events" perhaps.
+// We want to check -> if the `city` is all, we will say "All Events" and otherwise we will use city name `Events in capitalize(city)`
+//
+// `/events/[city]/page.tsx` fragment with `generateMetadata()` with `capitalize()` function and satisfied exception for "All Events" for `/events/all` route ->
+// ```tsx
+// import { capitalize } from "@/lib/utils";
+//
+// // V212
+// //type EventsPageProps = {
+// type EventsPageAndMetadataProps = {
+//   params: {
+//     city: string;
+//   };
+// };
+//
+// // V238
+// export function generateMetadata({ params }: EventsPageAndMetadataProps): Metadata {
+//   const city = params.city;
+//
+//   return {
+//     //title: `Events in ${city}`
+//     //title: `Events in ${capitalize(city)}`,
+//     title: city === "all" ? "All Events" : `Events in ${capitalize(city)}`,
+//   }
+// }
+//
+// // export default async function EventsPage({ params }: EventsPageProps) {
+// export default async function EventsPage({
+//   params,
+// }: EventsPageAndMetadataProps) {
+// ```
+// This is more advanced technique to customize the metadata on some individual page based on the `params`.
+//
+//
+// ### customized title for individual event page
+// This was for `/events/` route (URL), now it would be nice if the page for individual event also had customized title.
+// Now we go to individual event page `/event/[slug]/page.tsx`, it would be nice if we could do something similar with customized title
+// We should return metadata just like before, it should be the same structure as the metadata in layout.tsx, the metadata should be an object with title, description properties that is what we should return.
+//
+// What we should not do is to `return { blabla: 5 }` because right now we do not get a warning, we can return any object.
+// It is a good idea to type the return of of `generateMetadata` function, so we safeguard ourselves from making a mistake of returning something that does not exist.
+// We type output `Metadata` for the function `generateMetadata({ params }: EventPageAndMetadataProps): Metadata {`,
+// now we instantly get a warning if we try to return something that does not exist `return { blabla: 5 }`, that is not part of Metadata object in Next.js.
+//
+// As return we can do ```title: `Events: ${slug}`, ```, then the title would be "Events dj-practice-session", that is not what we want,
+// we want a name of event (that is using spacebar, spaces between words). To get the name of event we would have to do data fetching,
+// we can actually copy this fetching and do it here, making `generateMetadata` function `async`, based on the slug it can fetch the data, we can use `event.name`
+//
+// `/event/[slug]/page.tsx`->
+// ```tsx
+// import { capitalize } from "@/lib/utils";
+// import { Metadata } from "next";
+//
+// // type EventPageProps = {
+// type EventPageAndMetadataProps = {
+//   params: {
+//     slug: string;
+//   };
+// };
+//
+// //export function generateMetadata({
+// export async function generateMetadata({
+//   params,
+// //}: EventPageAndMetadataProps): Metadata {
+// }: EventPageAndMetadataProps): Promise<Metadata> {
+//   const slug = params.slug;
+//
+//   // copied here, based on slug we get the data for name in the title
+//   const response = await fetch(
+//     `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
+//   );
+//   const event = await response.json();
+//   // copied here, based on slug we get the data for name in the title
+//
+//   return {
+//     //blabla: 5 // we get a warning trying to return something that does not exist
+//     //title: `Events: ${slug}`,
+//     title: event.name,
+//   }
+// }
+//
+// // export default async function EventPage({ params }: EventPageProps) {
+// export default async function EventPage({ params }: EventPageAndMetadataProps) {
+//   const slug = params.slug;
+//
+//   const response = await fetch(
+//     `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
+//   );
+//   const event = await response.json();
+//   console.log(event);
+// ```
+// This the feature you want to have on professional website.
+//
+//
+// We get re squiggly lines for `Metadata` as the type of an output, (we return an object with type `Metadata`),
+// THAT ERROR IS BECAUSE when we make a function `async`, what will be returned is a Promise, the Promise will eventually resolve in what we return `return { title: event.name, }`,
+// but what is returned initially is a Promise.
+// We need to return a Promise that will eventually resolve in `Metadata` (`Promise<Metadata>`) -> `export async function generateMetadata({ params,}: EventPageAndMetadataProps): Promise<Metadata> {`
+//
+// error intellisense ->
+// ```js
+// Type „Metadata” is not a valid async function return type in ES5/ES3, because it does not refer to a Promise-compatible constructor value. ts(1055)
+//
+// (alias) interface Metadata
+// import Metadata
+//
+// Metadata interface to describe all the metadata fields that can be set in a document.
+//
+// @interface
+// ```
+//
+//
+// BTW.
+// There is some error when we write `blabla` in search form, because there is no city named this way, there is an error when we try to fetch data,
+// we will not get good response from the server that we are fetching data from, we cannot parse that as JSON, it will throw an error.
+// ```js
+// # Unhandled Runtime Error
+// Error: Unexpected token 'N', "Not Found" is not valid JSON
+// ```
