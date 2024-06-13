@@ -1,7 +1,7 @@
 import { EventoEvent } from "@/lib/types";
 import React from "react";
 import EventCard from "./event-card";
-import { sleep } from "@/lib/utils";
+import { getEvents, sleep } from "@/lib/utils";
 
 // V235 -> we do not need events accepted as a prop in events-list.tsx, we fetch it in events-list.tsx
 // type EventsListProps = {
@@ -16,21 +16,28 @@ type EventsListProps = {
 export default async function EventsList({ city }: EventsListProps) {
   await sleep(2000); // V235 moved here //
 
+  // V240 commented out - begin
   // V235 moved here //
-  const response = await fetch(
-    `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`,
-    // {
-    //   cache: "no-cache",
-    // }
-    {
-      next: {
-        revalidate: 300,
-      },
-    }
-  );
+  //const response = await fetch(
+  //  `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`,
+  // {
+  //   cache: "no-cache",
+  // }
+  // OR UP OR DOWN
+  //  {
+  //    next: {
+  //      revalidate: 300,
+  //    },
+  //  }
+  //);
   // V235 moved here //
 
-  const events: EventoEvent[] = await response.json(); // V235 moved here //
+  //const events: EventoEvent[] = await response.json(); // V235 moved here //
+  // V240 commented out - end
+
+  // V240
+  const events = await getEvents(city);
+
   console.log(events); // V235 moved here //
   // V235 moved here //
 

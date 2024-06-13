@@ -1,5 +1,6 @@
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { EventoEvent } from "./types";
 
 //type ClassValue = string | boolean | null | undefined;
 //type ClassValue = string | number | bigint | boolean | ClassArray | ClassDictionary | null | undefined
@@ -99,3 +100,21 @@ export function capitalize(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 // ---- V238 end of block
+
+// V240
+export async function getEvents(city: string) {
+  const response = await fetch(
+    `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
+  );
+  const events: EventoEvent[] = await response.json();
+  return events;
+}
+
+export async function getEvent(slug: string) {
+  const response = await fetch(
+    `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
+  );
+  const event = await response.json();
+  return event;
+}
+// V240 end

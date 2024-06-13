@@ -1,5 +1,5 @@
 import H1 from "@/components/h1";
-import { sleep } from "@/lib/utils";
+import { getEvent, sleep } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 import { capitalize } from "@/lib/utils";
@@ -20,12 +20,15 @@ export async function generateMetadata({
 EventPageAndMetadataProps): Promise<Metadata> {
   const slug = params.slug;
 
-  // copied here, based on slug we get the data for name in the title
-  const response = await fetch(
-    `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
-  );
-  const event = await response.json();
-  // copied here, based on slug we get the data for name in the title
+  // V240 commented out - begin
+  // copied here, based on slug we get the data for name in the title - older V238
+  //const response = await fetch(
+  //  `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
+  //);
+  //const event = await response.json();
+  // copied here, based on slug we get the data for name in the title - older V238
+  // V240 commented out - end
+  const event = await getEvent(slug); // V240 instead of above
 
   return {
     //blabla: 5 // we get a warning trying to return something that does not exist, that is not part of Metadata object in Next.js
@@ -62,10 +65,14 @@ export default async function EventPage({ params }: EventPageAndMetadataProps) {
   // V230
   //await sleep(2000);
 
-  const response = await fetch(
-    `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
-  );
-  const event = await response.json();
+  // V240 commented out - begin
+  // const response = await fetch(
+  //   `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
+  // );
+  // const event = await response.json();
+  // V240 commented out - end
+  const event = await getEvent(slug); // V240 instead of above
+
   console.log(event);
 
   // V224 - Event Page Scaffolding
@@ -646,3 +653,17 @@ function SectionContent({ children }: { children: React.ReactNode }) {
 // # Unhandled Runtime Error
 // Error: Unexpected token 'N', "Not Found" is not valid JSON
 // ```
+
+// V240 Data Fetching Utilities - Description: Create data fetching utilities to keep the code DRY.
+// We are repeating ourselves in the code writing the fetch in `/event/[slug]/page.tsx` literally twice, maybe we can abstract this to separate utility function,
+// that is quite common in React and Next.js that we are putting our data fetching to a separate utility function.
+//
+// We are doing two utility functions for `events` as well as `event`, minding plural and singular form.
+// ### `getEvents()` fetching function
+// Here on `/events/[city]/page.tsx` page we are fetching data, we put it (fetch) down in the `EventsList` component,
+// let's copy that implementation to `getEvents` function in `utils.ts`, to use that function we need to pass the `city` that needs to be a `string`
+// Then in `EventsList` instead of fetching, we invoke `getEvents` function with a input of a `city`
+// ### `getEvent()` fetching function
+// Let's do this for the individual `event` page `/event/[slug]/page.tsx`, we will use `getEvents()`  function twice, also for the `Metadata`, based on the `slug` we should get the rest of event data
+// -> fragment of `/event/[slug]/page.tsx` where `fetch` is used twice
+// This function `getEvents()` will not be executed twice `const event = await getEvent(slug);`, when it is rendering it is going to see these are the same functions, it will only execute one of them.
