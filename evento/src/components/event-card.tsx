@@ -1,18 +1,48 @@
+"use client"; // <- added V241
+
 import { EventoEvent } from "@/lib/types";
+import { motion, useScroll, useTransform } from "framer-motion"; // <- added V241
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useRef } from "react"; // <- added V241
 
 type EventCardProps = {
   event: EventoEvent;
 };
 
+// V241 - begin of modifications
+const MotionLink = motion(Link);
+
 export default function EventCard({ event }: EventCardProps) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["0 1", "1.5 1"],
+  });
+  const scaleProgress = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
+  const opacityProgress = useTransform(scrollYProgress, [0, 1], [0.3, 1]);
+  // V241 - end of modifications
+
   return (
     // {event.name}
-    <Link
+    // <Link // V241
+    // V241 - begin of modifications
+    <MotionLink
+      ref={ref}
       className="flex-1 basis-80 h-[380px] max-w-[500px]"
       href={`/event/${event.slug}`}
+      style={{
+        //scale: scrollYProgress,
+        // @ts-ignore
+        scale: scaleProgress,
+        // @ts-ignore
+        opacity: opacityProgress,
+      }}
+      initial={{
+        opacity: 0,
+        scale: 0.8,
+      }}
+      // V241 - end of modifications
     >
       {/* <section className="flex flex-col flex-1 basis-80 h-[380px] max-w-[500px] bg-white/[3%] rounded-xl overflow-hidden relative transition hover:scale-105 active:scale-[1.02]"> */}
       {/* <section className="w-full h-full flex flex-col bg-white/[3%] rounded-xl overflow-hidden relative transition hover:scale-105 active:scale-[1.02]"> */}
@@ -50,7 +80,8 @@ export default function EventCard({ event }: EventCardProps) {
           </p>
         </section>
       </section>
-    </Link>
+      {/* </Link> // V241*/}
+    </MotionLink>
   );
 }
 
@@ -172,3 +203,69 @@ export default function EventCard({ event }: EventCardProps) {
 // Here's a breakdown:
 // - `justify-center`: Centers items horizontally along the main axis.
 // - `items-center`: Centers items vertically along the cross axis.
+
+// V241 EventCard Scroll-Based Animation With Framer Motion - Description: Implement a scroll-based animation for the event cards with Framer Motion.
+// Next thing we want to do is to make list of events `localhost:3000/events/all` or `localhost:3000/events/seattle` look a little bit more interesting,
+// when we scroll events into view, they grow into the view, it is really nice effect.
+//
+// We are going to do that with framer motion. Previously we have used Framer Motion for animating the themed bar under the menu (Home, All Events) on the top right corner of the page.
+//
+// We need to go to `event-card.tsx` `EventCard` component. Before when we used Framer Motion we used something like `<motion.div>`, that is how we have motion component.
+// In `EventCard` we need to do that with `<Link>`, `<Link>` is already a separate component.
+// If it would be `<section>`, it would be easy, making it a `<motion.section>`; in Framer Motion we cannot do `<motion.Link>`, `<Link>` component is a React component specific to Next.js.
+//
+// We could do `const MotionLink = motion(Link);`, we also need to import motion `import {motion} from "framer-motion";`, and then we use `<MotionLink>` just how we would use `<Link>` component normally.
+//
+// Now we have got an issue returned by development server
+// ->
+// # Server Error
+// TypeError: (0 , react__WEBPACK_IMPORTED_MODULE_0__.createContext) is not a function
+// This error happened while generating the page. Any console logs will be displayed in the terminal window.
+// ->
+//
+// Behind the scenes Framer Motion uses React hooks actually, it uses useContext here `createContext`.
+// We could do `const MotionLink = motion(Link);`, we also need to import motion `import {motion} from "framer-motion";`, and then we use `<MotionLink>` just how we would use `<Link>` component normally
+//
+// That is not gonna work because EventCard is a server component, to make it work we would have to change `event-card.tsx` into client component,
+// it costs a little bit here to achieve this effect using Framer Motion because now it will become a client component. How big of the problem is that (that we are making it a client component)?
+// Not a huge deal because we are not fetching data in this component, we do not have here any big third-party dependencies. We are not importing any other component an least for ourselves that we are using here.
+// We basically have a bunch of markup here. It is not a huge deal that we turn this into a client component. It is still worth it to turn this into a client component to get that effect.
+// `/components/event-card.tsx`, usage of `"use client"`;
+//
+// With Framer Motion we can style these cards based on the scroll position, we can use `useScroll()` hook that we get from Framer Motion,
+// we need to import that from Framer Motion as well `import { motion, useScroll } from "framer-motion";`. That will give us an indicator of how much we have scrolled, we can destructure `scrollYProgress` from there.
+// To make that work it needs to know what exactly we are trying to measure this  `scrollYProgress` of , because it would be relevant to some component.
+// It should be this `<MotionLink>` component, so we need a reference to that. We are going to use `useRef()` here. This is also only possible in a client component.
+// Initially it should be `null`, `const ref = useRef(null);`. We are going to attach this `ref` to `<MotionLink>`. We can say `useScroll({target: ref})`.
+// We have `scrollYProgress`, we can measure essentially how far we scroll relative to that component. Based on that we can style that component, here in `<MotionLink>` what we can do is to use `style` attribute.
+// We could also use Tailwind classes before, sometimes we still want to use inline `style`s for this. We could do `scale` saying how bit it is `scale: scrollYProgress` whatever that value is.
+// changes to `/components/event-card.tsx`, fragment of `event-card.tsx`
+//
+// We get a warning, issue from TypeScript (red squiggly lines) for `scale`. We will ignore this for now.
+//
+// Now it is a strange result, cards are vanishing from the view when we scroll down. When we scroll down size of the cards depends on that. This is not what we want.
+// For the `scrollYProgress` we also want other value, we need to specify the `offset: []`.
+// What we want, when the top of the target, top of the card reaches the bottom of the viewport that where the animation should start. In `offset: ["0 1", ]` the first number is the target.
+// Animation should end when 50% of the target is passed the bottom of the viewport `offset: ["0 1", "1.5 1"]`, bottom of the viewport is the second number with 1.
+// Now we can see that the animation start from absolute zero size of the card which is not what we want, the scale starts at zero, from zero it will animate in, it is a bit too much.
+// We want to fine-tune a little bit, so it is actually a little bit bigger.
+// With another hook from Framer Motion `useTransform` (remember to import hook), we can say take `scrollYProgress`, here we can customize it, we can specify `[0, 1]` and then for the other value here `[0.8, 1]`.
+// These values work similar as above, basically it takes value of `scrollYProgress` and it will make it little bit less dramatic. Let's make that constant of `scaleProgress`.
+// Then we use that `scaleProgress` in the place previously held by `scrollYProgress` in `style={{ scale: scrollYProgress, }}` used in `<MotionLink>`, `style={{ scale: scaleProgress, }}`.
+// Effect is a little bit less dramatic, it looks subtle and better, cards nicely grow into the view.
+//
+// Now we want to do the same for the opacity, we add `style={{ scale: scaleProgress, opacity: scaleProgress, }}` if we do that we do not see anything for opacity,
+// that is okay because we are not going to use `scaleProgress` for opacity anyway. We need to make second equation, we want opacity to be finished a little bit earlier.
+// We change `0.8` to `0.3`. Opacity will work a little bit different from the scale. Opacity should work a little bit faster. Now we see when we scroll into view, we have a nice scale as well as opacity effect.
+// further changes to `/components/event-card.tsx`, fragment of `event-card.tsx`
+//
+// It (animated cards) is a nice addition to the project.
+//
+// When we reload (refresh) the page we can see that the cards pop-up in place into view, but that is not smooth, we get a little bit laggy result.
+// We should fix that, to solve this we can also specify what the initial state should be `initial={{ opacity: 0, scale: 0.8, }}`.
+// Now cards look normally initially, without lagging increasing of a size.
+// yet further changes to `/components/event-card.tsx`, fragment of `event-card.tsx`
+//
+// We still have TypeScript issue with red squiggly lines for `scale, opacity` in `style={{` used by `<MotionLink>`.
+// This is simply because TypeScript cannot infer that this eventually comes down to `<Link>`, that comes down to anchor tag `<a href= >` behind the scenes.
+// We need to ignore these red squiggly lines. If we are confident we can write `// @ts-ignore` to ignore the next line after that mark. Now we are explicit about that (ignore), that is good.
