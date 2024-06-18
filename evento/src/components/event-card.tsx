@@ -1,6 +1,7 @@
 "use client"; // <- added V241
 
-import { EventoEvent } from "@/lib/types";
+//import { EventoEvent } from "@/lib/types"; //V242
+import { EventoEvent } from "@prisma/client"; //V242
 import { motion, useScroll, useTransform } from "framer-motion"; // <- added V241
 import Image from "next/image";
 import Link from "next/link";

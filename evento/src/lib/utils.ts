@@ -1,6 +1,7 @@
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { EventoEvent } from "./types";
+//import { EventoEvent } from "@/lib/types"; //V242
+import { EventoEvent } from "@prisma/client"; //V242
 
 //type ClassValue = string | boolean | null | undefined;
 //type ClassValue = string | number | bigint | boolean | ClassArray | ClassDictionary | null | undefined
@@ -114,7 +115,7 @@ export async function getEvent(slug: string) {
   const response = await fetch(
     `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
   );
-  const event = await response.json();
+  const event: EventoEvent = await response.json(); // <- V242 quick fix type
   return event;
 }
 // V240 end
