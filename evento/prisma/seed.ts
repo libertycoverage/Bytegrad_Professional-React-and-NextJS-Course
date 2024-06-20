@@ -259,18 +259,19 @@ async function main() {
     const result = await prisma.eventoEvent.upsert({
       where: { id: event.id },
       update: {},
-      //   create: event, // this has been replaced by the code below; V242 Prisma id issue
+      create: event, // this has been replaced by the code below; V242 Prisma id issue
       // manually added between this; V242 Prisma id issue
-      create: {
-        name: event.name,
-        slug: event.slug,
-        location: event.location,
-        date: event.date,
-        organizerName: event.organizerName,
-        imageUrl: event.imageUrl,
-        description: event.description,
-        // and this, to solve issue with id
-      },
+      // create: {
+      //   name: event.name,
+      //   slug: event.slug,
+      //   city: event.city,
+      //   location: event.location,
+      //   date: event.date,
+      //   organizerName: event.organizerName,
+      //   imageUrl: event.imageUrl,
+      //   description: event.description,
+      //   // and this, to solve issue with id
+      // },
     });
     console.log(`Created event with id: ${result.id}`);
   }
@@ -287,3 +288,32 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+
+// ## (sic!) extra V242, note on error with id
+
+// the error also may come if we did an error and in the model in `schema.prisma`, by an accident we omit a field in `model EventoEvent` e.g. `city   String`, but that field is represented in the data in the`seed.ts` field, 
+// then it may run into error with `id` (`where id`) when we try to run `seed.ts` with command `evento $ npx prisma db seed`, due to difference number in fields. 
+// Now after fixing the issue with omitted field we can create a whole `event` object using `create: event,`
+
+// seed.ts
+// ```ts
+//     const result = await prisma.eventoEvent.upsert({
+//       where: { id: event.id },
+//       update: {},
+//       create: event, // this has been replaced by the code below; V242 Prisma id issue
+//       // manually added between this; V242 Prisma id issue
+//       // create: {
+//       //   name: event.name,
+//       //   slug: event.slug,
+//       //   city: event.city,
+//       //   location: event.location,
+//       //   date: event.date,
+//       //   organizerName: event.organizerName,
+//       //   imageUrl: event.imageUrl,
+//       //   description: event.description,
+//       //   // and this, to solve issue with id
+//       // },
+//     });
+// ```
+
