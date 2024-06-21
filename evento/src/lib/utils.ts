@@ -1,7 +1,11 @@
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 //import { EventoEvent } from "@/lib/types"; //V242
-import { EventoEvent } from "@prisma/client"; //V242
+
+//import { EventoEvent, PrismaClient } from "@prisma/client"; //V242 //V243
+//const prisma = new PrismaClient(); //V243
+// further in V243, instead upper import of PrismaClient and instantiating, we moved that to db.ts
+import prisma from "./db"; //V243
 
 //type ClassValue = string | boolean | null | undefined;
 //type ClassValue = string | number | bigint | boolean | ClassArray | ClassDictionary | null | undefined
@@ -103,7 +107,8 @@ export function capitalize(string: string) {
 // ---- V238 end of block
 
 // V240
-export async function getEvents(city: string) {
+export async function getEvents1(city: string) {
+  // V243
   const response = await fetch(
     `https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`
   );
@@ -111,7 +116,8 @@ export async function getEvents(city: string) {
   return events;
 }
 
-export async function getEvent(slug: string) {
+export async function getEvent1(slug: string) {
+  // V243
   const response = await fetch(
     `https://bytegrad.com/course-assets/projects/evento/api/events/${slug}`
   );
@@ -119,3 +125,30 @@ export async function getEvent(slug: string) {
   return event;
 }
 // V240 end
+
+// V243 Replace Fetch API With Prisma Client
+export async function getEvents(city: string) {
+  //prisma.eventoEvent.findMany(); // it will actually get all of the events
+  const events = await prisma.eventoEvent.findMany({
+    where: {
+      // city city, // this solution does not work because of a lowercase city from params URL and uppercase in database
+      //city: {     // this solution works
+      //  equals: city,
+      //  mode: "insensitive",
+      //},
+      //city: capitalize(city), // this solution also works, but does not for "city all"
+      city: city === "all" ? undefined : capitalize(city),
+    },
+  });
+  return events;
+}
+
+export async function getEvent(slug: string) {
+  const event = await prisma.eventoEvent.findUnique({
+    where: {
+      slug: slug,
+    },
+  });
+  return event;
+}
+// V243 end
