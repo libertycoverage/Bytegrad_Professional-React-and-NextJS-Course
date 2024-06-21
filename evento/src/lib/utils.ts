@@ -139,6 +139,9 @@ export async function getEvents(city: string) {
       //city: capitalize(city), // this solution also works, but does not for "city all"
       city: city === "all" ? undefined : capitalize(city),
     },
+    orderBy: {
+      date: "asc",
+    }
   });
   return events;
 }
@@ -152,3 +155,8 @@ export async function getEvent(slug: string) {
   return event;
 }
 // V243 end
+
+// V244 - Sort Events By Date (Prisma Sorting)
+// If we look at the dates in "All Events" website, dates right now are random.
+// When we get our data from the database, we get `events` (`utils.ts`). One thing that Prisma makes very easy is to do `orderBy: { }`. 
+// We can order the results by e.g. `date`, we can say ascending `asc`.
