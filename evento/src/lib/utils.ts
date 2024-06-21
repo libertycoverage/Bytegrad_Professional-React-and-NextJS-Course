@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 //const prisma = new PrismaClient(); //V243
 // further in V243, instead upper import of PrismaClient and instantiating, we moved that to db.ts
 import prisma from "./db"; //V243
+import { notFound } from "next/navigation"; // V245
 
 //type ClassValue = string | boolean | null | undefined;
 //type ClassValue = string | number | bigint | boolean | ClassArray | ClassDictionary | null | undefined
@@ -139,6 +140,7 @@ export async function getEvents(city: string) {
       //city: capitalize(city), // this solution also works, but does not for "city all"
       city: city === "all" ? undefined : capitalize(city),
     },
+    // V244
     orderBy: {
       date: "asc",
     }
@@ -152,6 +154,11 @@ export async function getEvent(slug: string) {
       slug: slug,
     },
   });
+  // V245
+  if (!event) {
+    return notFound();
+  }
+
   return event;
 }
 // V243 end
@@ -160,3 +167,12 @@ export async function getEvent(slug: string) {
 // If we look at the dates in "All Events" website, dates right now are random.
 // When we get our data from the database, we get `events` (`utils.ts`). One thing that Prisma makes very easy is to do `orderBy: { }`. 
 // We can order the results by e.g. `date`, we can say ascending `asc`.
+
+// V245 - NotFound() Function In NextJS For Event Page - Not Found page.
+// One other thing we can also do is when we go to the individual page here `http://localhost:3000/event/dj-practice-session`, 
+// what if the user changes something and we have some gibberish in the URL `http://localhost:3000/event/blabla`, some event that does not exist. 
+// Right now if we do this we have an issue here. What we want to do here, is when we try get the event, and it does not find any event, we do not want to `return event`, and then use it in our application. 
+//
+// We want to check if it cannot find the event `(!event)`, what we can actually do in Next.js is, we can have `not-found.tsx` page. If we go to some route that does not exist this is what we are going to get. 
+// How do we programmatically make sure that `not-found.tsx` will be served when we have no event? We can call `notFound()`, (`import { notFound } from "next/navigation";`). 
+// Now when we type `http://localhost:3000/event/blabla`, we get `NotFound()` component from `not-found.tsx` page.
