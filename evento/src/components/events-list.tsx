@@ -2,6 +2,7 @@ import { EventoEvent } from "@/lib/types";
 import React from "react";
 import EventCard from "./event-card";
 import { getEvents, sleep } from "@/lib/utils";
+import PaginationControls from "./pagination-controls"; // <- added V246
 
 // V235 -> we do not need events accepted as a prop in events-list.tsx, we fetch it in events-list.tsx
 // type EventsListProps = {
@@ -9,11 +10,12 @@ import { getEvents, sleep } from "@/lib/utils";
 // };
 type EventsListProps = {
   city: string;
+  page: number; //V246
 };
 
 // export default function EventsList({ events }: EventsListProps) {
 // V235 -> we do not need events accepted as a prop in events-list.tsx, we fetch it in events-list.tsx
-export default async function EventsList({ city }: EventsListProps) {
+export default async function EventsList({ city, page }: EventsListProps) {
   await sleep(2000); // V235 moved here //
 
   // V240 commented out - begin
@@ -36,7 +38,15 @@ export default async function EventsList({ city }: EventsListProps) {
   // V240 commented out - end
 
   // V240
-  const events = await getEvents(city);
+  //const events = await getEvents(city); //V246
+  // const events = await getEvents(city, page); //V246
+  const { events, totalCount } = await getEvents(city, page); //V246
+
+  //const previousPath = `/events/${city}?page=${page - 1}`; //V246
+  const previousPath = page > 1 ? `/events/${city}?page=${page - 1}` : ""; //V246
+  //const nextPath = `/events/${city}?page=${page + 1}`; //V246
+  const nextPath =
+    totalCount > 6 * page ? `/events/${city}?page=${page + 1}` : ""; //V246
 
   console.log(events); // V235 moved here //
   // V235 moved here //
@@ -47,6 +57,8 @@ export default async function EventsList({ city }: EventsListProps) {
         // <section key={event.id}>{event.name}</section>
         <EventCard key={event.id} event={event} />
       ))}
+      {/* //V246 */}
+      <PaginationControls previousPath={previousPath} nextPath={nextPath} />
     </section>
   );
 }

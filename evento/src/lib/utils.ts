@@ -128,7 +128,11 @@ export async function getEvent1(slug: string) {
 // V240 end
 
 // V243 Replace Fetch API With Prisma Client
-export async function getEvents(city: string) {
+//export async function getEvents(city: string) { //V246
+// export async function getEvents(city: string, page: number) { //V246
+export async function getEvents(city: string, page = 1) {
+  //V246
+  //V246
   //prisma.eventoEvent.findMany(); // it will actually get all of the events
   const events = await prisma.eventoEvent.findMany({
     where: {
@@ -143,9 +147,35 @@ export async function getEvents(city: string) {
     // V244
     orderBy: {
       date: "asc",
-    }
+    },
+    take: 6, //V246
+    skip: (page - 1) * 6, //V246
   });
-  return events;
+
+  //V246
+  let totalCount;
+  if (city === "all") {
+    totalCount = await prisma.eventoEvent.count();
+  } else {
+    totalCount = await prisma.eventoEvent.count({
+      where: {
+        city: capitalize(city),
+      },
+    });
+  }
+
+  //V246
+  // const totalCount = await prisma.eventoEvent.count({
+  //   where: {
+  //     city: capitalize(city),
+  //   },
+  // });
+
+  //V246
+  return {
+    events,
+    totalCount,
+  };
 }
 
 export async function getEvent(slug: string) {
@@ -165,14 +195,14 @@ export async function getEvent(slug: string) {
 
 // V244 - Sort Events By Date (Prisma Sorting)
 // If we look at the dates in "All Events" website, dates right now are random.
-// When we get our data from the database, we get `events` (`utils.ts`). One thing that Prisma makes very easy is to do `orderBy: { }`. 
+// When we get our data from the database, we get `events` (`utils.ts`). One thing that Prisma makes very easy is to do `orderBy: { }`.
 // We can order the results by e.g. `date`, we can say ascending `asc`.
 
 // V245 - NotFound() Function In NextJS For Event Page - Not Found page.
-// One other thing we can also do is when we go to the individual page here `http://localhost:3000/event/dj-practice-session`, 
-// what if the user changes something and we have some gibberish in the URL `http://localhost:3000/event/blabla`, some event that does not exist. 
-// Right now if we do this we have an issue here. What we want to do here, is when we try get the event, and it does not find any event, we do not want to `return event`, and then use it in our application. 
+// One other thing we can also do is when we go to the individual page here `http://localhost:3000/event/dj-practice-session`,
+// what if the user changes something and we have some gibberish in the URL `http://localhost:3000/event/blabla`, some event that does not exist.
+// Right now if we do this we have an issue here. What we want to do here, is when we try get the event, and it does not find any event, we do not want to `return event`, and then use it in our application.
 //
-// We want to check if it cannot find the event `(!event)`, what we can actually do in Next.js is, we can have `not-found.tsx` page. If we go to some route that does not exist this is what we are going to get. 
-// How do we programmatically make sure that `not-found.tsx` will be served when we have no event? We can call `notFound()`, (`import { notFound } from "next/navigation";`). 
+// We want to check if it cannot find the event `(!event)`, what we can actually do in Next.js is, we can have `not-found.tsx` page. If we go to some route that does not exist this is what we are going to get.
+// How do we programmatically make sure that `not-found.tsx` will be served when we have no event? We can call `notFound()`, (`import { notFound } from "next/navigation";`).
 // Now when we type `http://localhost:3000/event/blabla`, we get `NotFound()` component from `not-found.tsx` page.

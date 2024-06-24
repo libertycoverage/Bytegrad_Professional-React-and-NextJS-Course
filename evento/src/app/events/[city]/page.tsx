@@ -16,6 +16,11 @@ type EventsPageAndMetadataProps = {
   };
 };
 
+// V246
+type EventsPageOnlyProps = EventsPageAndMetadataProps & {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
 // ---- V238 begin of block
 // export const metadata: Metadata = {
 //   title: "Events in Austin",
@@ -61,9 +66,13 @@ export function generateMetadata({
 // export default async function EventsPage({ params }: EventsPageProps) {
 export default async function EventsPage({
   params,
-}: EventsPageAndMetadataProps) {
+  searchParams, //V246
+}: //}: EventsPageAndMetadataProps) {
+EventsPageOnlyProps) {
   // ---- V238 end of block
   const city = params.city;
+  const page = searchParams.page || 1; //V246
+  //useSearchParams(); // <- usage of that forces to use client component, we do not that, we are not going to use that, instead we use searchParams prop // V246
 
   // V230
   // V235 cutout // V230 await sleep(2000);
@@ -118,7 +127,7 @@ export default async function EventsPage({
       {/* <EventsList events={events} /> */}
       {/* // V235 -> We are not passing events as a prop to EventsList component anymore  */}
       <Suspense fallback={<Loading />}>
-        <EventsList city={city} />
+        <EventsList city={city} page={+page} /> {/* V246 {page} */}
       </Suspense>
     </main>
   );
