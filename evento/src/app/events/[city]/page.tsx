@@ -126,7 +126,8 @@ EventsPageOnlyProps) {
       {/* // V235 -> We are not passing events as a prop to EventsList component anymore  */}
       {/* <EventsList events={events} /> */}
       {/* // V235 -> We are not passing events as a prop to EventsList component anymore  */}
-      <Suspense fallback={<Loading />}>
+      {/* <Suspense fallback={<Loading />}> */}  {/* V247 */}
+      <Suspense key={city + page} fallback={<Loading />}> {/* V247 */}
         <EventsList city={city} page={+page} /> {/* V246 {page} */}
       </Suspense>
     </main>
