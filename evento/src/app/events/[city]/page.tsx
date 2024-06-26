@@ -265,3 +265,18 @@ EventsPageOnlyProps) {
 // Data fetching wouldn't be in this component (`EventsList`), it would be in some wrapper component, and then we would have the reusability
 // of `EventsList` component intact. That would be a little bit more advanced, that would be something we would like to do,
 // but for now we will keep that simple.
+
+// V247 Advanced: Key Prop For Suspense - Retrigger the Suspense component with fallback loading when searchParams change.
+// One very subtle problem that we have now, if we navigate between pages, we do not see loading indicator. 
+// Now loading indicator is seen only when we go fist time to the list, refresh, or going to the URL first time, but not on the subsequent pages. 
+// That is because we have wrapped `EventsList` in the `Suspense`, but this will only work once when we load page initially, 
+// but when we change the search params it will not see that as a new page essentially.
+//
+// Here what we can actually use is the `key` prop, because the `key` prop is how React keeps track of something that is unique, often it used in a map, 
+// when we map over something we use the key, we have to provide the key, that is how React keep of track something that is unique.
+//
+// Here we can actually do that on normal other component, we can just say `key`, this should be new, unique for every `city` and `page`, we can create a unique key by combining `city` and `page`. 
+// Now whenever `page` changes, or the `city`, it is most relevant for `page` here because if the `city` changes we will actually go to the new route. 
+// However if we stay on the same route we are changing the search params, the `Suspense`does not get triggered. 
+// However if we do like this `<Suspense key={city + page}` it will get triggered or should get triggered.
+// Now when we will introduce the key in this form, loading indicator is triggered on every page in pagination.
