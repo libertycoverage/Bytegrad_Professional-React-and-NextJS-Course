@@ -6,6 +6,7 @@ import React, { Suspense } from "react";
 import Loading from "./loading";
 import { Metadata } from "next";
 import { capitalize } from "@/lib/utils";
+import { z } from "zod";  // <- just added V248
 
 // V212
 // type EventsPageProps = {
@@ -62,6 +63,8 @@ export function generateMetadata({
 // on the client that would be an issue, so we would have to create separate API and then we would have to do it through that. Now using fetch in server component,
 // we can put secrets in here that won't be visible on the client, on the client only the result of rendering will be visible, we can have API keys as well and other secrets.
 
+const pageNumberSchema = z.coerce.number().int().positive().optional(); // <- just added V248
+
 // ---- V238 begin of block
 // export default async function EventsPage({ params }: EventsPageProps) {
 export default async function EventsPage({
@@ -71,8 +74,16 @@ export default async function EventsPage({
 EventsPageOnlyProps) {
   // ---- V238 end of block
   const city = params.city;
-  const page = searchParams.page || 1; //V246
+  //const page = searchParams.page || 1; //V246 // <- replaced V248
   //useSearchParams(); // <- usage of that forces to use client component, we do not that, we are not going to use that, instead we use searchParams prop // V246
+  
+  // <- changed V248 start
+  //pageNumberSchema.parse() 
+  const parsedPage = pageNumberSchema.safeParse(searchParams.page);
+  if (!parsedPage.success) {
+    throw new Error("Invalid page number");
+  }
+  // <- changed V248 end
 
   // V230
   // V235 cutout // V230 await sleep(2000);
@@ -127,8 +138,10 @@ EventsPageOnlyProps) {
       {/* <EventsList events={events} /> */}
       {/* // V235 -> We are not passing events as a prop to EventsList component anymore  */}
       {/* <Suspense fallback={<Loading />}> */}  {/* V247 */}
-      <Suspense key={city + page} fallback={<Loading />}> {/* V247 */}
-        <EventsList city={city} page={+page} /> {/* V246 {page} */}
+      {/* <Suspense key={city + page} fallback={<Loading />}> */} {/* V247 */} {/* // V248 */}
+      <Suspense key={city + parsedPage.page} fallback={<Loading />}>
+        {/* <EventsList city={city} page={+page} />  */} {/* V246 {page} */} {/* // V248 */}
+        <EventsList city={city} page={parsedPage.page} /> 
       </Suspense>
     </main>
   );

@@ -10,12 +10,14 @@ import PaginationControls from "./pagination-controls"; // <- added V246
 // };
 type EventsListProps = {
   city: string;
-  page: number; //V246
+  // page: number; //V246 // V248
+  page?: number; // V248
 };
 
 // export default function EventsList({ events }: EventsListProps) {
 // V235 -> we do not need events accepted as a prop in events-list.tsx, we fetch it in events-list.tsx
-export default async function EventsList({ city, page }: EventsListProps) {
+// export default async function EventsList({ city, page }: EventsListProps) {
+  export default async function EventsList({ city, page = 1 }: EventsListProps) { // V248
   await sleep(2000); // V235 moved here //
 
   // V240 commented out - begin
