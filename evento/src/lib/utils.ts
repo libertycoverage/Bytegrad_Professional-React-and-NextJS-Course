@@ -2,7 +2,7 @@ import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 //import { EventoEvent } from "@/lib/types"; //V242
 
-//import { EventoEvent, PrismaClient } from "@prisma/client"; //V242 //V243
+import { EventoEvent, PrismaClient } from "@prisma/client"; //V242 //V243
 //const prisma = new PrismaClient(); //V243
 // further in V243, instead upper import of PrismaClient and instantiating, we moved that to db.ts
 import prisma from "./db"; //V243

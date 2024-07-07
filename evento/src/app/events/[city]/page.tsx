@@ -139,9 +139,9 @@ EventsPageOnlyProps) {
       {/* // V235 -> We are not passing events as a prop to EventsList component anymore  */}
       {/* <Suspense fallback={<Loading />}> */}  {/* V247 */}
       {/* <Suspense key={city + page} fallback={<Loading />}> */} {/* V247 */} {/* // V248 */}
-      <Suspense key={city + parsedPage.page} fallback={<Loading />}>
+      <Suspense key={city + parsedPage.data} fallback={<Loading />}>
         {/* <EventsList city={city} page={+page} />  */} {/* V246 {page} */} {/* // V248 */}
-        <EventsList city={city} page={parsedPage.page} /> 
+        <EventsList city={city} page={parsedPage.data} /> 
       </Suspense>
     </main>
   );
@@ -293,3 +293,39 @@ EventsPageOnlyProps) {
 // However if we stay on the same route we are changing the search params, the `Suspense`does not get triggered. 
 // However if we do like this `<Suspense key={city + page}` it will get triggered or should get triggered.
 // Now when we will introduce the key in this form, loading indicator is triggered on every page in pagination.
+
+// ## Fix the problem after V248 Zod
+//
+// When we try to go to `http://localhost:3000/event/dj-practice-session`, there is a problem 
+//
+// On error stripped by Error.tsx 
+// ```js
+// # Unhandled Runtime Error
+//
+// TypeError: Cannot read properties of undefined (reading 'call')
+// ```
+//
+// Also when trying to `$ npm run build` in the project catalog
+//
+// ```tsx
+// Type error: Property 'page' does not exist on type 'SafeParseSuccess<number | undefined>'.
+
+//   140 |       {/* <Suspense fallback={<Loading />}> */}  {/* V247 */}
+//   141 |       {/* <Suspense key={city + page} fallback={<Loading />}> */} {/* V247 */} {/* // V248 */}
+// > 142 |       <Suspense key={city + parsedPage.page} fallback={<Loading />}>
+//       |                                        ^
+//   143 |         {/* <EventsList city={city} page={+page} />  */} {/* V246 {page} */} {/* // V248 */}
+//   144 |         <EventsList city={city} page={parsedPage.page} /> 
+//   145 |       </Suspense>
+// ```
+//
+// repaired with properly referred property `data` on object `parsedPage`
+//
+// ```tsx
+//       <Suspense key={city + parsedPage.data} fallback={<Loading />}>
+//         {/* <EventsList city={city} page={+page} />  */} {/* V246 {page} */} {/* // V248 */}
+//         <EventsList city={city} page={parsedPage.data} /> 
+//       </Suspense>
+// ```
+// problem / errors in `npm run dev` and `npm run build` with `getEvents1, getEvent1` resolved by uncommenting that line `import { EventoEvent, PrismaClient } from "@prisma/client"; //V242 //V243`
+
