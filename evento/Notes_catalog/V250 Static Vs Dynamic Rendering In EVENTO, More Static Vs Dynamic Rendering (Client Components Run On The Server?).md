@@ -26,7 +26,7 @@ We can run that locally
 
 When we will run that Next.js will also give us some information about the final result.
 
-```tsx
+```bash
 user@MacBook-Air-user evento % npm run build
 
 > evento@0.1.0 build
@@ -92,3 +92,22 @@ one thing we can also see is
 
 The benefit of static routes that their HTML is already waiting for us when we make a request. We already created the HTML during the build. That is the benefit of static rendering, HTML does not have to be created on demand, during the request itself, it is already waiting.
 
+
+----
+
+## V251 More Static Vs Dynamic Rendering (Client Components Run On The Server?)
+Description: Client components can also run on the server when the route has been statically rendered. Server components only run on the server.
+
+It is good to know btw. `/app/page.tsx` is statically rendered, so everything in there, including other components will run once during the build. Which means when we look at the `<SearchForm />` here, the `<SearchForm />` is actually a client component `"use client";`. Even a client component during the build will actually run on the server once, and then the result will just be used whenever we go to this page. Even as client component run on the server once. This is very confusing, because we thing server components run on the server, and client component will only run on the browser. This is kind of true with one exception which is also the client component also run once on the server. That is a little bit tricky. 
+
+These things are probably the most trickiest things in Next.js, caching, static rendering.
+
+Ideally we want to have static rendering, because we only run it once and then we can re-use it.
+Sometimes we have dynamic rendering, it is going to happen when we have a dynamic route, or we are using `searchParams`. Next.js will automatically makes some routes dynamic, here we have not specified ourselves that this should become a dynamic route, but Next.js can already see it is a dynamic route (based on whatever we pass in the URL), also when we use `searchParams` it will automatically become a dynamic route. 
+
+```bash
+├ λ /event/[slug]                  
+├ λ /events/[city]  
+```
+
+There are some things that Next.js will does for us automatically, as we use certain features.
