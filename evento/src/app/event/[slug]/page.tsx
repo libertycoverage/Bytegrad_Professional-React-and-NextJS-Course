@@ -57,6 +57,20 @@ EventPageAndMetadataProps): Promise<Metadata> {
 //
 // It has nothing to do with caching in Next.js, it is actually behaviour that we also get outside Next.js.
 
+// <- V252
+export async function generateStaticParams() {
+  // top 100 most popular events
+  return [
+    {
+      slug: "comedy-extravaganza",
+    },
+    {
+      slug: "dj-practice-session",
+    },
+  ];
+}
+// <- V252
+
 // export default async function EventPage({ params }: EventPageProps) {
 export default async function EventPage({ params }: EventPageAndMetadataProps) {
   // ---- V238 end of block
