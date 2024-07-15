@@ -7,6 +7,7 @@ import { EventoEvent, PrismaClient } from "@prisma/client"; //V242 //V243
 // further in V243, instead upper import of PrismaClient and instantiating, we moved that to db.ts
 import prisma from "./db"; //V243
 import { notFound } from "next/navigation"; // V245
+import { unstable_cache } from "next/cache"; // V254
 
 //type ClassValue = string | boolean | null | undefined;
 //type ClassValue = string | number | bigint | boolean | ClassArray | ClassDictionary | null | undefined
@@ -130,8 +131,9 @@ export async function getEvent1(slug: string) {
 // V243 Replace Fetch API With Prisma Client
 //export async function getEvents(city: string) { //V246
 // export async function getEvents(city: string, page: number) { //V246
-export async function getEvents(city: string, page = 1) {
-  //V246
+
+// export async function getEvents(city: string, page = 1) {  //V246 // V254 
+export const getEvents = unstable_cache(async (city: string, page = 1) => { // V254
   //V246
   //prisma.eventoEvent.findMany(); // it will actually get all of the events
   const events = await prisma.eventoEvent.findMany({
@@ -177,8 +179,10 @@ export async function getEvents(city: string, page = 1) {
     totalCount,
   };
 }
+); // V254
 
-export async function getEvent(slug: string) {
+// export async function getEvent(slug: string) { // V254
+export const getEvent = unstable_cache(async (slug: string) => { // V254
   const event = await prisma.eventoEvent.findUnique({
     where: {
       slug: slug,
@@ -191,6 +195,7 @@ export async function getEvent(slug: string) {
 
   return event;
 }
+); // V254
 // V243 end
 
 // V244 - Sort Events By Date (Prisma Sorting)
