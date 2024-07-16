@@ -133,7 +133,7 @@ export async function getEvent1(slug: string) {
 // export async function getEvents(city: string, page: number) { //V246
 
 // export async function getEvents(city: string, page = 1) {  //V246 // V254 
-export const getEvents = unstable_cache(async (city: string, page = 1) => { // V254
+export const getEvents2 = unstable_cache(async (city: string, page = 1) => { // V254 // V255 function moved to server-utils.ts
   //V246
   //prisma.eventoEvent.findMany(); // it will actually get all of the events
   const events = await prisma.eventoEvent.findMany({
@@ -182,7 +182,7 @@ export const getEvents = unstable_cache(async (city: string, page = 1) => { // V
 ); // V254
 
 // export async function getEvent(slug: string) { // V254
-export const getEvent = unstable_cache(async (slug: string) => { // V254
+export const getEvent2 = unstable_cache(async (slug: string) => { // V254 // V255 function moved to server-utils.ts
   const event = await prisma.eventoEvent.findUnique({
     where: {
       slug: slug,

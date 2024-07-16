@@ -1,11 +1,13 @@
 "use client";
 
+import { getEvents } from "@/lib/server-utils";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 export default function SearchForm() {
   const [searchText, setSearchText] = useState("");
   const router = useRouter();
+ // const events = getEvents("austin", 2); // V255 this line is for a behaviour check while using server-only package
 
   // V208
   // 1) We have a `form` in page.tsx, when we type something in `<input />` and press enter there would be a submit event we can hook into

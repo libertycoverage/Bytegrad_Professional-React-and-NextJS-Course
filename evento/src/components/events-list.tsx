@@ -1,7 +1,9 @@
 import { EventoEvent } from "@/lib/types";
 import React from "react";
 import EventCard from "./event-card";
-import { getEvents, sleep } from "@/lib/utils";
+//import { getEvents, sleep } from "@/lib/utils"; // V255
+import { sleep } from "@/lib/utils"; // V255
+import { getEvents } from "@/lib/server-utils"; // V255
 import PaginationControls from "./pagination-controls"; // <- added V246
 
 // V235 -> we do not need events accepted as a prop in events-list.tsx, we fetch it in events-list.tsx

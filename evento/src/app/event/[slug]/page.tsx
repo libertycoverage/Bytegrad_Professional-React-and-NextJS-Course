@@ -1,5 +1,7 @@
 import H1 from "@/components/h1";
-import { getEvent, sleep } from "@/lib/utils";
+//import { getEvent, sleep } from "@/lib/utils"; // V255
+import { sleep } from "@/lib/utils"; // V255
+import { getEvent } from "@/lib/server-utils"; // V255
 import Image from "next/image";
 import React from "react";
 import { capitalize } from "@/lib/utils";
