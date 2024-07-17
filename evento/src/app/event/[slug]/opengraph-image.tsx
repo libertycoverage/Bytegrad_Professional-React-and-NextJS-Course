@@ -13,7 +13,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
   return new ImageResponse(
     (
       <section>
-        <h1>{params.slug</h1>
+        <h1>{params.slug}</h1>
         <p>Evento - Browse events around you</p>
       </section>
     )
