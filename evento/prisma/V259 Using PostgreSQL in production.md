@@ -129,4 +129,4 @@ In `package.json` we add `"postinstall": "prisma generate"`, if we won't do this
 }
 ```
 
-Btw. on using a PostgreSQL database, maybe we remember this (looking at `server-utils.ts)`, previously we could not query in mode insensitive. Here we needed to capitalize the city `city: city === "all" ? undefined : capitalize(city),`, now when using PostgreSQL mode insensitive will actually work (look V243). So we do not have to worry about capitalization of the words when we try to make a database query.
+Btw. on using a PostgreSQL database, maybe we remember this (looking at `server-utils.ts`), previously we could not query in mode insensitive. Here we needed to capitalize the city `city: city === "all" ? undefined : capitalize(city),`, now when using PostgreSQL mode insensitive will actually work (look V243). So we do not have to worry about capitalization of the words when we try to make a database query.
