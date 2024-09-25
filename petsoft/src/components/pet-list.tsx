@@ -1,11 +1,17 @@
-import { Pet } from "@/lib/types";
+"use client";
+
+//import { Pet } from "@/lib/types"; // V280
+import { usePetContext } from "@/lib/hooks";
 import Image from "next/image";
 
-type PetListProps = {
-  pets: Pet[];
-};
+// V280 removed
+// type PetListProps = {
+//   pets: Pet[];
+// };
 
-export default function PetList({ pets }: PetListProps) {
+//export default function PetList({ pets }: PetListProps) { // V280 prop 'data' accepted as `pets` removed for usage of Context API Provider component pet-context-provider.tsx
+export default function PetList() {
+  const { pets } = usePetContext(); //V280 Consuming the Context with custom hook
   return (
     <ul className="bg-white border-b border-black/[0.08]">
       {pets.map((pet) => (

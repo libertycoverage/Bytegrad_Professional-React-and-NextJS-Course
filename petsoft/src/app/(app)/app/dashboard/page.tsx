@@ -7,15 +7,16 @@ import PetList from "@/components/pet-list";
 import PetDetails from "@/components/pet-details";
 
 export default async function DashboardPage() {
-  const response = await fetch(
-    "https://bytegrad.com/course-assets/projects/petsoft/api/pets"
-  );
-  if (!response.ok) {
-    throw new Error("Could not fetch pets");
-  }
-  const data = await response.json();
+  // const response = await fetch(
+  //   "https://bytegrad.com/course-assets/projects/petsoft/api/pets"
+  // );
+  // if (!response.ok) {
+  //   throw new Error("Could not fetch pets");
+  // }
+  // const data = await response.json();
 
-  console.log(data);
+  // console.log(data);
+  // V280 fetching moved to nested layout `petsoft/src/app/(app)/app/layout.tsx` so it can be used by <PetContextProvider /> component passed there as a prop
 
   return (
     <main>
@@ -32,7 +33,9 @@ export default async function DashboardPage() {
 
         <div className="md:row-start-2 md:row-span-full md:col-start-1 md:col-span-1">
           <ContentBlock>
-            <PetList pets={data} />
+            {/* <PetList pets={data} /> */}
+            {/* V280 prop 'data' accepted as `pets` removed for usage of Context API Provider component pet-context-provider.tsx */}
+            <PetList />
           </ContentBlock>
         </div>
 
