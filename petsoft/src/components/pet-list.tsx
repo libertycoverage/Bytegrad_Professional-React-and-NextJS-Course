@@ -2,6 +2,7 @@
 
 //import { Pet } from "@/lib/types"; // V280
 import { usePetContext } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 // V280 removed
@@ -12,7 +13,8 @@ import Image from "next/image";
 //export default function PetList({ pets }: PetListProps) { // V280 prop 'data' accepted as `pets` removed for usage of Context API Provider component pet-context-provider.tsx
 export default function PetList() {
   //const { pets, setSelectedPetId } = usePetContext(); //V280 Consuming the Context with custom hook // V282
-  const { pets, handleChangeSelectedPetId } = usePetContext();
+  //const { pets, handleChangeSelectedPetId } = usePetContext(); // V282 //V283
+  const { pets, handleChangeSelectedPetId, selectedPetId } = usePetContext(); //V283
   return (
     <ul className="bg-white border-b border-black/[0.08]">
       {pets.map((pet) => (
@@ -20,7 +22,11 @@ export default function PetList() {
           <button
             // onClick={() => setSelectedPetId(pet.id)} // V282
             onClick={() => handleChangeSelectedPetId(pet.id)}
-            className="flex items-center h-[70px] w-full cursor-pointer px-5 text-base gap-3 hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition"
+            //className="flex items-center h-[70px] w-full cursor-pointer px-5 text-base gap-3 hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition" //V283
+            className={cn(
+              "flex items-center h-[70px] w-full cursor-pointer px-5 text-base gap-3 hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition",
+              { "bg-[#EFF1F2]": selectedPetId === pet.id }
+            )} //V283
           >
             <Image
               src={pet.imageUrl}
