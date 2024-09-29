@@ -29,8 +29,6 @@ type TPetProps = {
   pet: Pet;
 };
 
-
-
 function TopBar({ pet }: TPetProps) {
   return (
     // <div className="flex items-center bg-white px-8 py-5 border-b border-black/[0.08]"> // V286 
