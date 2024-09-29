@@ -29,9 +29,12 @@ type TPetProps = {
   pet: Pet;
 };
 
+
+
 function TopBar({ pet }: TPetProps) {
   return (
-    <div className="flex items-center bg-white px-8 py-5 border-b border-black/[0.08]">
+    // <div className="flex items-center bg-white px-8 py-5 border-b border-black/[0.08]"> // V286 
+    <div className="flex items-center bg-white px-8 py-5 border-b border-light">  {/* // V286 */}
       <Image
         //src={selectedPet?.imageUrl}
         src={pet?.imageUrl}
@@ -67,7 +70,8 @@ function OtherInfo({ pet }: TPetProps) {
 
 function Notes({ pet }: TPetProps) {
   return (
-    <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-black/[0.08]">
+    // <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-black/[0.08]"> // V286
+    <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-light"> {/* // V286 */}
       {pet?.notes}
     </section>
   );
