@@ -1,7 +1,7 @@
 "use client";
 
 //import { Pet } from "@/lib/types"; // V280
-import { usePetContext } from "@/lib/hooks";
+import { usePetContext, useSearchContext } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -15,10 +15,16 @@ export default function PetList() {
   //const { pets, setSelectedPetId } = usePetContext(); //V280 Consuming the Context with custom hook // V282
   //const { pets, handleChangeSelectedPetId } = usePetContext(); // V282 //V283
   const { pets, handleChangeSelectedPetId, selectedPetId } = usePetContext(); //V283
+  const { searchQuery } = useSearchContext(); //V289
+
+  //const filteredPets = pets.filter(pet => pet.name.includes('b')); //V289
+  const filteredPets = pets.filter(pet => pet.name.toLowerCase().includes(searchQuery)); //V289
+
   return (
     // <ul className="bg-white border-b border-black/[0.08]"> // V286
     <ul className="bg-white border-b border-light"> {/* // V286 */}
-      {pets.map((pet) => (
+      {/* {pets.map((pet) => ( // V289 */}
+      {filteredPets.map((pet) => ( // V289
         <li key={pet.id}>
           <button
             // onClick={() => setSelectedPetId(pet.id)} // V282

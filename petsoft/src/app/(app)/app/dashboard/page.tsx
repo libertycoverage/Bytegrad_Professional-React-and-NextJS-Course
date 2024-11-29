@@ -18,6 +18,11 @@ export default async function DashboardPage() {
   // console.log(data);
   // V280 fetching moved to nested layout `petsoft/src/app/(app)/app/layout.tsx` so it can be used by <PetContextProvider /> component passed there as a prop
 
+ // V289
+ // If we want to put the state in here with `useState()`, we need to make this a client component, 
+ // because only these client components can use this React hooks, at least for now.
+ // we do not want to add `useState()` here.
+
   return (
     <main>
       <div className="flex items-center justify-between text-white py-8">
