@@ -3,6 +3,7 @@
 import { usePetContext } from "@/lib/hooks";
 import { Pet } from "@/lib/types";
 import Image from "next/image";
+import PetButton from "./pet-button";
 
 export default function PetDetails() {
   const { selectedPet } = usePetContext();
@@ -31,8 +32,10 @@ type TPetProps = {
 
 function TopBar({ pet }: TPetProps) {
   return (
-    // <div className="flex items-center bg-white px-8 py-5 border-b border-black/[0.08]"> // V286 
-    <div className="flex items-center bg-white px-8 py-5 border-b border-light">  {/* // V286 */}
+    // <div className="flex items-center bg-white px-8 py-5 border-b border-black/[0.08]"> // V286
+    <div className="flex items-center bg-white px-8 py-5 border-b border-light">
+      {" "}
+      {/* // V286 */}
       <Image
         //src={selectedPet?.imageUrl}
         src={pet?.imageUrl}
@@ -45,6 +48,10 @@ function TopBar({ pet }: TPetProps) {
         {/* {selectedPet?.name} */}
         {pet?.name}
       </h2>
+      <div className="ml-auto space-x-2">
+        <PetButton actionType="edit">Edit</PetButton>
+        <PetButton actionType="checkout">Checkout</PetButton> {/* delete */}
+      </div>
     </div>
   );
 }
@@ -69,7 +76,9 @@ function OtherInfo({ pet }: TPetProps) {
 function Notes({ pet }: TPetProps) {
   return (
     // <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-black/[0.08]"> // V286
-    <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-light"> {/* // V286 */}
+    <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-light">
+      {" "}
+      {/* // V286 */}
       {pet?.notes}
     </section>
   );

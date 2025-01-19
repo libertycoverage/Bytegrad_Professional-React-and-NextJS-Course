@@ -5,6 +5,7 @@ import SearchForm from "@/components/search-form";
 import ContentBlock from "@/components/content-block";
 import PetList from "@/components/pet-list";
 import PetDetails from "@/components/pet-details";
+import PetButton from "@/components/pet-button";
 
 export default async function DashboardPage() {
   // const response = await fetch(
@@ -18,10 +19,10 @@ export default async function DashboardPage() {
   // console.log(data);
   // V280 fetching moved to nested layout `petsoft/src/app/(app)/app/layout.tsx` so it can be used by <PetContextProvider /> component passed there as a prop
 
- // V289
- // If we want to put the state in here with `useState()`, we need to make this a client component, 
- // because only these client components can use this React hooks, at least for now.
- // we do not want to add `useState()` here.
+  // V289
+  // If we want to put the state in here with `useState()`, we need to make this a client component,
+  // because only these client components can use this React hooks, at least for now.
+  // we do not want to add `useState()` here.
 
   return (
     <main>
@@ -36,11 +37,15 @@ export default async function DashboardPage() {
           <SearchForm />
         </div>
 
-        <div className="md:row-start-2 md:row-span-full md:col-start-1 md:col-span-1">
+        <div className="relative md:row-start-2 md:row-span-full md:col-start-1 md:col-span-1">
           <ContentBlock>
             {/* <PetList pets={data} /> */}
             {/* V280 prop 'data' accepted as `pets` removed for usage of Context API Provider component pet-context-provider.tsx */}
             <PetList />
+
+            <div className="absolute bottom-4 right-4">
+              <PetButton actionType="add" />
+            </div>
           </ContentBlock>
         </div>
 
