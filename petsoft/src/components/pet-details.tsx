@@ -31,6 +31,8 @@ type TPetProps = {
 };
 
 function TopBar({ pet }: TPetProps) {
+  const { handleCheckoutPet } = usePetContext();
+
   return (
     // <div className="flex items-center bg-white px-8 py-5 border-b border-black/[0.08]"> // V286
     <div className="flex items-center bg-white px-8 py-5 border-b border-light">
@@ -50,7 +52,13 @@ function TopBar({ pet }: TPetProps) {
       </h2>
       <div className="ml-auto space-x-2">
         <PetButton actionType="edit">Edit</PetButton>
-        <PetButton actionType="checkout">Checkout</PetButton> {/* delete */}
+        <PetButton
+          actionType="checkout"
+          onClick={() => handleCheckoutPet(pet.id)}
+        >
+          Checkout
+        </PetButton>{" "}
+        {/* delete */}
       </div>
     </div>
   );
