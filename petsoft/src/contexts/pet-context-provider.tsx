@@ -17,6 +17,7 @@ type TPetContext = {
   numberOfPets: number;
   handleCheckoutPet: (id: string) => void;
   handleAddPet: (newPet: Omit<Pet, "id">) => void;
+  handleEditPet: (petId: string, newPetData: Omit<Pet, "id">) => void;
 };
 
 export const PetContext = createContext<TPetContext | null>(null); // 1. create a Context
@@ -48,6 +49,25 @@ export default function PetContextProvider({
     ]);
   };
 
+  const handleEditPet = (petId: string, newPetData: Omit<Pet, "id">) => {
+    setPets((prev) =>
+      // prev.map will return a new array
+      // we are going over the existing pets
+      prev.map((pet) => {
+        // we are going to find the pet that is tried to be changed
+        if (pet.id === petId) {
+          // for that one we are returning a new object
+          return {
+            id: petId,
+            ...newPetData,
+          };
+        }
+        // if it is not the id we want to change we do not want to do anything, we just return pet, so the new array will still have other pets that are not being modified
+        return pet;
+      })
+    );
+  };
+
   const handleCheckoutPet = (id: string) => {
     setPets((prev) => prev.filter((pet) => pet.id !== id));
     setSelectedPetId(null);
@@ -68,6 +88,7 @@ export default function PetContextProvider({
         numberOfPets,
         handleCheckoutPet,
         handleAddPet,
+        handleEditPet,
       }}
     >
       {children}
