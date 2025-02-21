@@ -22,6 +22,7 @@ export default async function Layout({
 
   // console.log(data);
   const pets = await prisma.pet.findMany();
+  console.log(pets.length);
 
   return (
     <>

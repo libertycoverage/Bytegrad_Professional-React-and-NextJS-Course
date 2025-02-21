@@ -25,12 +25,13 @@ export const PetContext = createContext<TPetContext | null>(null); // 1. create 
 
 //export default function PetContextProvider({ children }) { // V280 accept data
 export default function PetContextProvider({
-  data,
+  data: pets,
   children,
 }: PetContextProviderProps) {
+  //console.log(data.length);
   //state
   //const [pets, setPets] = useState([]); // V280
-  const [pets, setPets] = useState(data);
+  //const [pets, setPets] = useState(data); //V307
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   console.log(selectedPetId);
