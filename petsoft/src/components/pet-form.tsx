@@ -16,9 +16,10 @@ export default function PetForm({
   actionType,
   onFormSubmission,
 }: PetFormProps) {
-  const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
-
   // V305
+  // const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
+  const { selectedPet } = usePetContext();
+
   // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
   //   event.preventDefault();
 
@@ -44,7 +45,16 @@ export default function PetForm({
 
   return (
     // <form onSubmit={handleSubmit} className="flex flex-col"> // V305
-    <form action={addPet} className="flex flex-col">
+    <form
+      action={async (formData) => {
+        // we can do other things before we invoke the action, and also after we invoke the Server Action
+        // before
+        await addPet(formData);
+        // after
+        onFormSubmission();
+      }}
+      className="flex flex-col"
+    >
       <div className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="name">Name</Label>
