@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
-import { addPet } from "@/actions/actions";
+import { addPet, editPet } from "@/actions/actions";
 import PetFormBtn from "./pet-form-btn";
 import { toast } from "sonner";
 
@@ -49,14 +49,24 @@ export default function PetForm({
     // <form onSubmit={handleSubmit} className="flex flex-col"> // V305
     <form
       action={async (formData) => {
-        // we can do other things before we invoke the action, and also after we invoke the Server Action
-        // before
-        const error = await addPet(formData); //V311
-        if (error) {
-          toast.warning(error.message);
-          //alert(error.message);
-          return;
+        if (actionType === "add") {
+          // we can do other things before we invoke the action, and also after we invoke the Server Action
+          // before
+          const error = await addPet(formData); //V311
+          if (error) {
+            toast.warning(error.message);
+            //alert(error.message);
+            return;
+          }
+        } else if (actionType === "edit") {
+          const error = await editPet(selectedPet?.id, formData); //V311
+          if (error) {
+            toast.warning(error.message);
+            //alert(error.message);
+            return;
+          }
         }
+
         // after
         onFormSubmission();
       }}
