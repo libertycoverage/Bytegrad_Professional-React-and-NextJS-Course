@@ -6,7 +6,8 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { addPet } from "@/actions/actions";
-import PetFormBtn from "./pet-form-bnt";
+import PetFormBtn from "./pet-form-btn";
+import { toast } from "sonner";
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -50,7 +51,12 @@ export default function PetForm({
       action={async (formData) => {
         // we can do other things before we invoke the action, and also after we invoke the Server Action
         // before
-        await addPet(formData);
+        const error = await addPet(formData); //V311
+        if (error) {
+          toast.warning(error.message);
+          //alert(error.message);
+          return;
+        }
         // after
         onFormSubmission();
       }}

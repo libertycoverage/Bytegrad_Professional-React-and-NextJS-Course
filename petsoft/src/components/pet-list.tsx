@@ -20,6 +20,7 @@ export default function PetList() {
 
   //const filteredPets = pets.filter(pet => pet.name.includes('b')); //V289
   //const filteredPets = pets.filter(pet => pet.name.toLowerCase().includes(searchQuery)); //V289
+  // V308
   const filteredPets = useMemo(
     () => pets.filter((pet) => pet.name.toLowerCase().includes(searchQuery)),
     [pets, searchQuery]
