@@ -4,22 +4,25 @@ import prisma from "@/lib/db";
 import { sleep } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 
-export async function addPet(formData) {
+//export async function addPet(formData) { // V316
+export async function addPet(petData) {
+  // V316
   await sleep(2000);
 
-  console.log(formData);
+  //  console.log(formData); // V316
 
   try {
     await prisma?.pet.create({
-      data: {
-        name: formData.get("name"),
-        ownerName: formData.get("ownerName"),
-        imageUrl:
-          formData.get("imageUrl") ||
-          "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
-        age: parseInt(formData.get("age")), // A string to convert into a number.
-        notes: formData.get("notes"),
-      },
+      // data: { // V316
+      //   name: formData.get("name"), // V316
+      //   ownerName: formData.get("ownerName"), // V316
+      //   imageUrl: // V316
+      //     formData.get("imageUrl") || // V316
+      //     "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png", // V316
+      //   age: parseInt(formData.get("age")), // A string to convert into a number. // V316
+      //   notes: formData.get("notes"), // V316
+      // }, // V316
+      data: petData, // V316
     });
   } catch (error) {
     return {
@@ -30,7 +33,10 @@ export async function addPet(formData) {
   revalidatePath("/app", "layout");
 }
 
-export async function editPet(petId, formData) {
+// export async function editPet(petId, formData) { // V316
+export async function editPet(petId, newPetData) {
+  // V315
+
   await sleep(2000);
 
   try {
@@ -38,15 +44,18 @@ export async function editPet(petId, formData) {
       where: {
         id: petId,
       },
-      data: {
-        name: formData.get("name"),
-        ownerName: formData.get("ownerName"),
-        age: parseInt(formData.get("age")),
-        imageUrl:
-          formData.get("imageUrl") ||
-          "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
-        notes: formData.get("notes"),
-      },
+      // V316
+      // data: {
+      //   name: formData.get("name"),
+      //   ownerName: formData.get("ownerName"),
+      //   age: parseInt(formData.get("age")),
+      //   imageUrl:
+      //     formData.get("imageUrl") ||
+      //     "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
+      //   notes: formData.get("notes"),
+      // },
+      // V316
+      data: newPetData, // V316
     });
   } catch (error) {
     return {

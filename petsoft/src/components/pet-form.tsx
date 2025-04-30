@@ -20,7 +20,7 @@ export default function PetForm({
 }: PetFormProps) {
   // V305
   // const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
-  const { selectedPet } = usePetContext();
+  const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
 
   // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
   //   event.preventDefault();
@@ -49,26 +49,40 @@ export default function PetForm({
     // <form onSubmit={handleSubmit} className="flex flex-col"> // V305
     <form
       action={async (formData) => {
+        onFormSubmission(); // V316
+        // V316
+        const petData = {
+          name: formData.get("name") as string,
+          ownerName: formData.get("ownerName") as string,
+          imageUrl:
+            (formData.get("imageUrl") as string) ||
+            "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
+          age: Number(formData.get("age")),
+          notes: formData.get("notes") as string,
+        };
+        // V316
         if (actionType === "add") {
           // we can do other things before we invoke the action, and also after we invoke the Server Action
           // before
-          const error = await addPet(formData); //V311
-          if (error) {
-            toast.warning(error.message);
-            //alert(error.message);
-            return;
-          }
+          // const error = await addPet(formData); //V311 //V316
+          // if (error) {  //V316
+          //   toast.warning(error.message);  //V316
+          //   //alert(error.message);
+          //   return;  //V316
+          // }  //V316
+          await handleAddPet(petData); //V316
         } else if (actionType === "edit") {
-          const error = await editPet(selectedPet?.id, formData); //V311
-          if (error) {
-            toast.warning(error.message);
-            //alert(error.message);
-            return;
-          }
+          // const error = await editPet(selectedPet?.id, formData); //V311 //V316
+          // if (error) { //V316
+          //   toast.warning(error.message); //V316
+          //   //alert(error.message);
+          //   return; //V316
+          // }
+          await handleEditPet(selectedPet!.id, petData); //V316 //it always exists when editing pet hence !
         }
 
         // after
-        onFormSubmission();
+        //onFormSubmission(); // V316
       }}
       className="flex flex-col"
     >

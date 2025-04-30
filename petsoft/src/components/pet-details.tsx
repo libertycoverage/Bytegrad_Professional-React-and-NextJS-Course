@@ -42,7 +42,8 @@ function TopBar({ pet }: TPetProps) {
       {/* // V286 */}
       <Image
         //src={selectedPet?.imageUrl}
-        src={pet?.imageUrl}
+        // src={pet?.imageUrl} //V316
+        src={pet.imageUrl} // V316
         alt="Selected pet image"
         height={75}
         width={75}
@@ -50,7 +51,8 @@ function TopBar({ pet }: TPetProps) {
       />
       <h2 className="text-3xl font-semibold leading-7 ml-5">
         {/* {selectedPet?.name} */}
-        {pet?.name}
+        {/* {pet?.name} //V316 */}
+        {pet.name}
       </h2>
       <div className="ml-auto space-x-2">
         <PetButton actionType="edit">Edit</PetButton>
@@ -58,11 +60,16 @@ function TopBar({ pet }: TPetProps) {
           actionType="checkout"
           // onClick={() => handleCheckoutPet(pet.id)} //V313
           disabled={isPending}
-          onClick={async () => {
-            startTransition(async () => {
-              await deletePet(pet.id);
-            });
-          }}
+          onClick={
+            async () =>
+              //{ // V316
+              //startTransition(async () => { // V316
+              //  await deletePet(pet.id); // V316
+              // }); // V316
+              //} // V316
+              //  await handleCheckoutPet(pet?.id) // V316
+              await handleCheckoutPet(pet.id) // V316
+          }
         >
           Checkout
         </PetButton>{" "}
