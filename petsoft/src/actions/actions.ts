@@ -22,7 +22,9 @@ export async function addPet(petData) {
       //   age: parseInt(formData.get("age")), // A string to convert into a number. // V316
       //   notes: formData.get("notes"), // V316
       // }, // V316
-      data: petData, // V316
+
+      data: petData, // V316 // that is right V318
+      //data: pet, // simulating an error with optimistic UI V318
     });
   } catch (error) {
     return {
