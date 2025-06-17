@@ -47,10 +47,28 @@ export default function PetContextProvider({
   // ); // V316 // these pets are now optimistic version of pets optimisticPets
   const [optimisticPets, setOptimisticPets] = useOptimistic(
     data,
-    (state, newPet) => {
-      return [...state, { ...newPet, id: Math.random().toString() }];
+    //(state, newPet) => { //V320
+    // return [...state, { ...newPet, id: Math.random().toString() }]; //V320
+    // ----> V320
+    (prev, { action, payload }) => {
+      switch (action) {
+        case "add":
+          return [...prev, { ...payload, id: Math.random().toString() }];
+        case "edit":
+          return prev.map((pet) => {
+            if (pet.id === payload.id) {
+              return { ...pet, ...payload.newPetData };
+            }
+            return pet;
+          });
+        case "delete":
+          return prev.filter((pet) => pet.id !== payload);
+        default:
+          return prev;
+      }
     }
   );
+  // ----> V320
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   console.log(selectedPetId);
@@ -73,7 +91,8 @@ export default function PetContextProvider({
 
     // moved from pet-form.tsx V316
     //await addPet(newPet); //V316
-    setOptimisticPets(newPet); // V316
+    //setOptimisticPets(newPet); // V316 //V320
+    setOptimisticPets({ action: "add", payload: newPet }); //V320
     const error = await addPet(newPet); //V311 //V316
     if (error) {
       //V315
@@ -105,6 +124,7 @@ export default function PetContextProvider({
     // ); // V316
 
     // moved from pet-form.tsx V316
+    setOptimisticPets({ action: "edit", payload: { id: petId, newPetData } }); //V320
     const error = await editPet(petId, newPetData); //V311 //V316
     if (error) {
       //V316
@@ -118,7 +138,15 @@ export default function PetContextProvider({
   const handleCheckoutPet = async (petId: string) => {
     // V316
     // setPets((prev) => prev.filter((pet) => pet.id !== id)); // V316
-    await deletePet(petId); // V316 moved from pet-details.tsx
+    //await deletePet(petId); // V316 moved from pet-details.tsx //V320
+    setOptimisticPets({ action: "delete", payload: petId }); //V320
+    const error = await deletePet(petId); //V320
+    // --> V320
+    if (error) {
+      toast.warning(error.message);
+      return;
+    }
+    // --> V320
     // V316
     setSelectedPetId(null);
   };
