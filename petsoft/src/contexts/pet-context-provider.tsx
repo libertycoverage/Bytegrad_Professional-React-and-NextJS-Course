@@ -1,7 +1,9 @@
 "use client";
 
 import { addPet, deletePet, editPet } from "@/actions/actions";
-import { Pet } from "@/lib/types";
+import { PetEssentials } from "@/lib/types";
+//import { Pet } from "@/lib/types"; //V321
+import { Pet } from "@prisma/client"; //V321
 import { createContext, useOptimistic, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,16 +15,23 @@ type PetContextProviderProps = {
 
 type TPetContext = {
   pets: Pet[];
-  selectedPetId: string | null;
-  handleChangeSelectedPetId: (id: string) => void;
+  //selectedPetId: string | null; //V321
+  selectedPetId: Pet["id"] | null; //V321
+  //handleChangeSelectedPetId: (id: string) => void; //V321
+  handleChangeSelectedPetId: (id: Pet["id"]) => void; //V321
+
   selectedPet: Pet | undefined;
   numberOfPets: number;
   // handleCheckoutPet: (id: string) => void; // V316
-  handleCheckoutPet: (id: string) => Promise<void>; // V316
+  //handleCheckoutPet: (id: string) => Promise<void>; // V316 //V321
+  handleCheckoutPet: (id: Pet["id"]) => Promise<void>; // V316 //V321
+
   // handleAddPet: (newPet: Omit<Pet, "id">) => void; // V316
-  handleAddPet: (newPet: Omit<Pet, "id">) => Promise<void>; // V316
+  //handleAddPet: (newPet: Omit<Pet, "id">) => Promise<void>; // V316 //V321
+  handleAddPet: (newPet: PetEssentials) => Promise<void>; //V321
   // handleEditPet: (petId: string, newPetData: Omit<Pet, "id">) => void; // V316
-  handleEditPet: (petId: string, newPetData: Omit<Pet, "id">) => Promise<void>; // V316
+  //handleEditPet: (petId: string, newPetData: Omit<Pet, "id">) => Promise<void>; // V316 //V321
+  handleEditPet: (petId: Pet["id"], newPetData: PetEssentials) => Promise<void>; //V321
 };
 
 export const PetContext = createContext<TPetContext | null>(null); // 1. create a Context
@@ -80,7 +89,11 @@ export default function PetContextProvider({
   const numberOfPets = optimisticPets.length; // V316
 
   // event handlers / actions
-  const handleAddPet = async (newPet: Omit<Pet, "id">) => {
+  //const handleAddPet = async (newPet: Omit<Pet, "id">) => { //V321
+  const handleAddPet = async (newPet: PetEssentials) => {
+    //V321
+    //V321
+    //V321
     // setPets((prev) => [
     //   ...prev,
     //   {
@@ -103,7 +116,8 @@ export default function PetContextProvider({
   };
 
   //const handleEditPet = (petId: string, newPetData: Omit<Pet, "id">) => { //V316
-  const handleEditPet = async (petId: string, newPetData: Omit<Pet, "id">) => {
+  //const handleEditPet = async (petId: string, newPetData: Omit<Pet, "id">) => { //V321
+  const handleEditPet = async (petId: Pet["id"], newPetData: PetEssentials) => {
     //V316
 
     // setPets((prev) => // V316
@@ -135,7 +149,10 @@ export default function PetContextProvider({
   };
 
   // const handleCheckoutPet = (id: string) => { // V316
-  const handleCheckoutPet = async (petId: string) => {
+  //const handleCheckoutPet = async (petId: string) => { //V321
+  const handleCheckoutPet = async (petId: Pet["id"]) => {
+    //V321
+
     // V316
     // setPets((prev) => prev.filter((pet) => pet.id !== id)); // V316
     //await deletePet(petId); // V316 moved from pet-details.tsx //V320

@@ -1,13 +1,19 @@
 "use server";
 
 import prisma from "@/lib/db";
+import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
+import { Pet } from "@prisma/client";
+//import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
 
 //export async function addPet(formData) { // V316
-export async function addPet(petData) {
+//export async function addPet(petData: Pet) { //V321
+export async function addPet(petData: PetEssentials) {
+  //V321
   // V316
-  await sleep(2000);
+  //await sleep(2000); //V321
+  await sleep(1000); //V321
 
   //  console.log(formData); // V316
 
@@ -36,10 +42,12 @@ export async function addPet(petData) {
 }
 
 // export async function editPet(petId, formData) { // V316
-export async function editPet(petId, newPetData) {
+//export async function editPet(petId, newPetData) { //V321
+export async function editPet(petId: Pet["id"], newPetData: PetEssentials) {
   // V315
 
-  await sleep(2000);
+  //await sleep(2000); //V321
+  await sleep(1000); //V321
 
   try {
     await prisma.pet.update({
@@ -67,8 +75,11 @@ export async function editPet(petId, newPetData) {
   revalidatePath("/app", "layout");
 }
 
-export async function deletePet(petId) {
-  await sleep(2000);
+//export async function deletePet(petId) { //V321
+export async function deletePet(petId: Pet["id"]) {
+  //V321
+  //await sleep(2000); //V321
+  await sleep(1000); //V321
 
   try {
     await prisma.pet.delete({
