@@ -8,10 +8,19 @@ import { Textarea } from "./ui/textarea";
 import { addPet, editPet } from "@/actions/actions";
 import PetFormBtn from "./pet-form-btn";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
 
 type PetFormProps = {
   actionType: "add" | "edit";
   onFormSubmission: () => void;
+};
+
+type TPetForm = {
+  name: string;
+  ownerName: string;
+  imageUrl: string;
+  age: number;
+  notes: string;
 };
 
 export default function PetForm({
@@ -44,6 +53,26 @@ export default function PetForm({
   //   onFormSubmission();
   // };
   // V305
+
+  //V322
+  // const {
+  //   register,
+  //   formState: { errors },
+  // } = useForm<{
+  //   name: string;
+  //   ownerName: string;
+  //   imageUrl: string;
+  //   age: string;
+  //   notes: string;
+  // }>();
+  //V322
+
+  //V322
+  const {
+    register,
+    formState: { errors },
+  } = useForm<TPetForm>();
+  //V322
 
   return (
     // <form onSubmit={handleSubmit} className="flex flex-col"> // V305
@@ -91,32 +120,42 @@ export default function PetForm({
           <Label htmlFor="name">Name</Label>
           <Input
             id="name"
-            name="name"
-            type="text"
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.name : ""}
+            {...register("name")} //V322
+            // name="name" //V322
+            // type="text" //V322
+            // required //V322
+            // defaultValue={actionType === "edit" ? selectedPet?.name : ""} //V322
           />
+          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="ownerName">Owner Name</Label>
           <Input
             id="ownerName"
-            name="ownerName"
-            type="text"
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.ownerName : ""}
+            {...register("ownerName")} //V322
+            // name="ownerName"//V322
+            // type="text" //V322
+            // required //V322
+            // defaultValue={actionType === "edit" ? selectedPet?.ownerName : ""} //V322
           />
+          {errors.ownerName && (
+            <p className="text-red-500">{errors.ownerName.message}</p>
+          )}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="imageUrl">Image Url</Label>
           <Input
             id="imageUrl"
-            name="imageUrl"
-            type="text"
-            defaultValue={actionType === "edit" ? selectedPet?.imageUrl : ""}
+            {...register("imageUrl")} //V322
+            // name="imageUrl" //V322
+            // type="text" //V322
+            // defaultValue={actionType === "edit" ? selectedPet?.imageUrl : ""} //V322
           />
+          {errors.imageUrl && (
+            <p className="text-red-500">{errors.imageUrl.message}</p>
+          )}
         </div>
 
         <div className="space-y-1">
@@ -124,21 +163,27 @@ export default function PetForm({
           <Input
             id="age"
             type="number"
-            name="age"
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.age : ""}
+            {...register("age")} //V322
+            // name="age" //V322
+            // required  //V322
+            // defaultValue={actionType === "edit" ? selectedPet?.age : ""}  //V322
           />
+          {errors.age && <p className="text-red-500">{errors.age.message}</p>}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="notes">Notes</Label>
           <Textarea
             id="notes"
-            name="notes"
-            rows={3}
-            required
-            defaultValue={actionType === "edit" ? selectedPet?.notes : ""}
+            {...register("notes")} //V322
+            // name="notes" //V322
+            // rows={3} //V322
+            // required //V322
+            // defaultValue={actionType === "edit" ? selectedPet?.notes : ""} //V322
           />
+          {errors.notes && (
+            <p className="text-red-500">{errors.notes.message}</p>
+          )}
         </div>
       </div>
 
