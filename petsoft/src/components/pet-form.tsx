@@ -70,6 +70,7 @@ export default function PetForm({
   //V322
   const {
     register,
+    trigger, //V323
     formState: { errors },
   } = useForm<TPetForm>();
   //V322
@@ -78,6 +79,8 @@ export default function PetForm({
     // <form onSubmit={handleSubmit} className="flex flex-col"> // V305
     <form
       action={async (formData) => {
+        const result = await trigger(); //V323
+        if (!result) return; //V323
         onFormSubmission(); // V316
         // V316
         const petData = {
@@ -120,7 +123,13 @@ export default function PetForm({
           <Label htmlFor="name">Name</Label>
           <Input
             id="name"
-            {...register("name")} //V322
+            {...register("name", {
+              required: "Name is required",
+              minLength: {
+                value: 3,
+                message: "Name must be at least 3 characters long",
+              },
+            })} //V322-V323
             // name="name" //V322
             // type="text" //V322
             // required //V322
@@ -133,7 +142,13 @@ export default function PetForm({
           <Label htmlFor="ownerName">Owner Name</Label>
           <Input
             id="ownerName"
-            {...register("ownerName")} //V322
+            {...register("ownerName", {
+              required: "Owner name is required",
+              maxLength: {
+                value: 20,
+                message: "Owner name must be less than 20 characters long",
+              },
+            })} //V322-V323
             // name="ownerName"//V322
             // type="text" //V322
             // required //V322
