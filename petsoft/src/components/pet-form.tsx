@@ -9,6 +9,8 @@ import { addPet, editPet } from "@/actions/actions";
 import PetFormBtn from "./pet-form-btn";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -22,6 +24,25 @@ type TPetForm = {
   age: number;
   notes: string;
 };
+
+const petFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Name is required " })
+    .max(100, { message: "Name must be below 100 characters" }),
+  ownerName: z
+    .string()
+    .trim()
+    .min(1, { message: "Owner name is required" })
+    .max(100),
+  imageUrl: z.union([
+    z.literal(""),
+    z.string().trim().url({ message: "Image url must be a valid url" }),
+  ]),
+  age: z.coerce.number().int().positive().max(999),
+  notes: z.union([z.literal(""), z.string().trim().max(1000)]),
+});
 
 export default function PetForm({
   actionType,
@@ -72,7 +93,9 @@ export default function PetForm({
     register,
     trigger, //V323
     formState: { errors },
-  } = useForm<TPetForm>();
+  } = useForm<TPetForm>({
+    resolver: zodResolver(petFormSchema),
+  }); //V324
   //V322
 
   return (
@@ -123,13 +146,14 @@ export default function PetForm({
           <Label htmlFor="name">Name</Label>
           <Input
             id="name"
-            {...register("name", {
-              required: "Name is required",
-              minLength: {
-                value: 3,
-                message: "Name must be at least 3 characters long",
-              },
-            })} //V322-V323
+            // {...register("name", {
+            //   required: "Name is required",
+            //   minLength: {
+            //     value: 3,
+            //     message: "Name must be at least 3 characters long",
+            //   },
+            // })} //V322-V323 //V324
+            {...register("name")} //V324
             // name="name" //V322
             // type="text" //V322
             // required //V322
@@ -142,13 +166,14 @@ export default function PetForm({
           <Label htmlFor="ownerName">Owner Name</Label>
           <Input
             id="ownerName"
-            {...register("ownerName", {
-              required: "Owner name is required",
-              maxLength: {
-                value: 20,
-                message: "Owner name must be less than 20 characters long",
-              },
-            })} //V322-V323
+            // {...register("ownerName", {
+            //   required: "Owner name is required",
+            //   maxLength: {
+            //     value: 20,
+            //     message: "Owner name must be less than 20 characters long",
+            //   },
+            // })} //V322-V323 //V324
+            {...register("ownerName")} //V324
             // name="ownerName"//V322
             // type="text" //V322
             // required //V322
