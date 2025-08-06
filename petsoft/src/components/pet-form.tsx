@@ -17,13 +17,15 @@ type PetFormProps = {
   onFormSubmission: () => void;
 };
 
-type TPetForm = {
-  name: string;
-  ownerName: string;
-  imageUrl: string;
-  age: number;
-  notes: string;
-};
+// V325
+// type TPetForm = {
+//   name: string;
+//   ownerName: string;
+//   imageUrl: string;
+//   age: number;
+//   notes: string;
+// };
+// V325
 
 const petFormSchema = z.object({
   name: z
@@ -43,6 +45,8 @@ const petFormSchema = z.object({
   age: z.coerce.number().int().positive().max(999),
   notes: z.union([z.literal(""), z.string().trim().max(1000)]),
 });
+
+type TPetForm = z.infer<typeof petFormSchema>; // V325
 
 export default function PetForm({
   actionType,
