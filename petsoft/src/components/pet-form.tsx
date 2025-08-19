@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DEFAULT_PET_IMAGE } from "@/lib/constants";
 
 type PetFormProps = {
   actionType: "add" | "edit";
@@ -27,24 +28,29 @@ type PetFormProps = {
 // };
 // V325
 
-const petFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { message: "Name is required " })
-    .max(100, { message: "Name must be below 100 characters" }),
-  ownerName: z
-    .string()
-    .trim()
-    .min(1, { message: "Owner name is required" })
-    .max(100),
-  imageUrl: z.union([
-    z.literal(""),
-    z.string().trim().url({ message: "Image url must be a valid url" }),
-  ]),
-  age: z.coerce.number().int().positive().max(999),
-  notes: z.union([z.literal(""), z.string().trim().max(1000)]),
-});
+const petFormSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, { message: "Name is required " })
+      .max(100, { message: "Name must be below 100 characters" }),
+    ownerName: z
+      .string()
+      .trim()
+      .min(1, { message: "Owner name is required" })
+      .max(100),
+    imageUrl: z.union([
+      z.literal(""),
+      z.string().trim().url({ message: "Image url must be a valid url" }),
+    ]),
+    age: z.coerce.number().int().positive().max(999),
+    notes: z.union([z.literal(""), z.string().trim().max(1000)]),
+  })
+  .transform((data) => ({
+    ...data,
+    imageUrl: data.imageUrl || DEFAULT_PET_IMAGE,
+  }));
 
 type TPetForm = z.infer<typeof petFormSchema>; // V325
 
@@ -96,6 +102,7 @@ export default function PetForm({
   const {
     register,
     trigger, //V323
+    getValues, //V326
     formState: { errors },
   } = useForm<TPetForm>({
     resolver: zodResolver(petFormSchema),
@@ -110,7 +117,7 @@ export default function PetForm({
         if (!result) return; //V323
         onFormSubmission(); // V316
         // V316
-        const petData = {
+        const petData2 = {
           name: formData.get("name") as string,
           ownerName: formData.get("ownerName") as string,
           imageUrl:
@@ -120,6 +127,10 @@ export default function PetForm({
           notes: formData.get("notes") as string,
         };
         // V316
+
+        const petData = getValues(); //V326-V327
+        petData.imageUrl = petData.imageUrl || DEFAULT_PET_IMAGE; //V327
+
         if (actionType === "add") {
           // we can do other things before we invoke the action, and also after we invoke the Server Action
           // before
