@@ -3,6 +3,7 @@
 import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
+import { petFormSchema } from "@/lib/validations";
 import { Pet } from "@prisma/client";
 //import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
@@ -10,12 +11,21 @@ import { revalidatePath } from "next/cache";
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
 export async function addPet(petData: PetEssentials) {
+  console.log(petData); //V328
   //V321
   // V316
   //await sleep(2000); //V321
   await sleep(1000); //V321
 
   //  console.log(formData); // V316
+
+  const validatedPet = petFormSchema.safeParse(petData); //V328
+  if (!validatedPet.success) {
+    return {
+      message: "Invalid pet data",
+    };
+  }
+  //V328
 
   try {
     await prisma?.pet.create({
@@ -29,10 +39,12 @@ export async function addPet(petData: PetEssentials) {
       //   notes: formData.get("notes"), // V316
       // }, // V316
 
-      data: petData, // V316 // that is right V318
+      //data: petData, // V316 // that is right V318
+      data: validatedPet.data,
       //data: pet, // simulating an error with optimistic UI V318
     });
   } catch (error) {
+    console.log(error); //V328
     return {
       message: "Could not add pet.",
     };
