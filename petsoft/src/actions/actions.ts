@@ -10,7 +10,9 @@ import { revalidatePath } from "next/cache";
 
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
-export async function addPet(petData: PetEssentials) {
+// export async function addPet(petData: PetEssentials) { //V329
+export async function addPet(petData: unknown) {
+  //V329
   console.log(petData); //V328
   //V321
   // V316
@@ -55,7 +57,9 @@ export async function addPet(petData: PetEssentials) {
 
 // export async function editPet(petId, formData) { // V316
 //export async function editPet(petId, newPetData) { //V321
-export async function editPet(petId: Pet["id"], newPetData: PetEssentials) {
+//export async function editPet(petId: Pet["id"], newPetData: PetEssentials) { //V329
+export async function editPet(petId: unknown, newPetData: unknown) {
+  //V329
   // V315
 
   //await sleep(2000); //V321
@@ -88,7 +92,9 @@ export async function editPet(petId: Pet["id"], newPetData: PetEssentials) {
 }
 
 //export async function deletePet(petId) { //V321
-export async function deletePet(petId: Pet["id"]) {
+//export async function deletePet(petId: Pet["id"]) { // V329
+export async function deletePet(petId: unknown) {
+  //V329
   //V321
   //await sleep(2000); //V321
   await sleep(1000); //V321
