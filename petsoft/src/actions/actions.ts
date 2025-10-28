@@ -67,9 +67,8 @@ export async function editPet(petId: unknown, newPetData: unknown) {
 
   //V330
   const validatedPetId = petIdSchema.safeParse(petId);
-
   const validatedNewPetData = petFormSchema.safeParse(newPetData);
-  if (!validatedNewPetData.success) {
+  if (!validatedPetId.success || !validatedNewPetData.success) {
     return {
       message: "Invalid pet data",
     };
@@ -80,7 +79,7 @@ export async function editPet(petId: unknown, newPetData: unknown) {
     await prisma.pet.update({
       where: {
         //id: petId, //V330
-        id: validatedPetId,
+        id: validatedPetId.data, //V330
       },
       // V316
       // data: {
@@ -112,10 +111,20 @@ export async function deletePet(petId: unknown) {
   //await sleep(2000); //V321
   await sleep(1000); //V321
 
+  //V330
+  const validatedPetId = petIdSchema.safeParse(petId);
+  if (!validatedPetId.success) {
+    return {
+      message: "Invalid pet data",
+    };
+  }
+  //V330
+
   try {
     await prisma.pet.delete({
       where: {
-        id: petId,
+        //id: petId, //V330
+        id: validatedPetId.data, //V330
       },
     });
   } catch (error) {
