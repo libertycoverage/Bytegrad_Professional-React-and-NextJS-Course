@@ -26,3 +26,5 @@ export const petFormSchema = z
   }));
 
 export type TPetForm = z.infer<typeof petFormSchema>; // V325
+
+export const petIdSchema = z.string().cuid();
