@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
-import { petFormSchema } from "@/lib/validations";
+import { petFormSchema, petIdSchema } from "@/lib/validations";
 import { Pet } from "@prisma/client";
 //import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
@@ -65,10 +65,22 @@ export async function editPet(petId: unknown, newPetData: unknown) {
   //await sleep(2000); //V321
   await sleep(1000); //V321
 
+  //V330
+  const validatedPetId = petIdSchema.safeParse(petId);
+
+  const validatedNewPetData = petFormSchema.safeParse(newPetData);
+  if (!validatedNewPetData.success) {
+    return {
+      message: "Invalid pet data",
+    };
+  }
+  //V330
+
   try {
     await prisma.pet.update({
       where: {
-        id: petId,
+        //id: petId, //V330
+        id: validatedPetId,
       },
       // V316
       // data: {
@@ -81,7 +93,8 @@ export async function editPet(petId: unknown, newPetData: unknown) {
       //   notes: formData.get("notes"),
       // },
       // V316
-      data: newPetData, // V316
+      //data: newPetData, // V316 //V330
+      data: validatedNewPetData.data, //V330
     });
   } catch (error) {
     return {
