@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server";
+// import { NextResponse } from "next/server";
 
-export function middleware(request: Request) {
-  console.log(request.url);
-  return NextResponse.next();
-}
+import { auth } from "./lib/auth";
+
+// export function middleware(request: Request) {
+//   console.log(request.url);
+//   return NextResponse.next();
+// }
+
+export default auth;
 
 export const config = {
   matcher: [
