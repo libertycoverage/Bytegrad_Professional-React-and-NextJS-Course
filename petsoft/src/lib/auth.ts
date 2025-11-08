@@ -23,4 +23,4 @@ const config = {
   },
 } satisfies NextAuthConfig;
 
-export const { auth } = NextAuth(config);
+export const { auth, signIn } = NextAuth(config);

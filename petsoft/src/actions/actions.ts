@@ -1,5 +1,6 @@
 "use server";
 
+import { signIn } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
@@ -7,7 +8,7 @@ import { petFormSchema, petIdSchema } from "@/lib/validations";
 import { Pet } from "@prisma/client";
 //import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
-
+// --- pet actions ---
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
 // export async function addPet(petData: PetEssentials) { //V329
@@ -134,4 +135,12 @@ export async function deletePet(petId: unknown) {
   }
 
   revalidatePath("/app", "layout");
+}
+
+// --- user actions ---
+
+export async function logIn(formData: FormData) {
+  const authData = Object.fromEntries(formData.entries());
+
+  await signIn("credentials", authData);
 }
