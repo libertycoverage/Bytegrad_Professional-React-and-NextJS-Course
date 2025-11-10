@@ -139,8 +139,10 @@ export async function deletePet(petId: unknown) {
 
 // --- user actions ---
 
+//V347
 export async function logIn(formData: FormData) {
   const authData = Object.fromEntries(formData.entries());
 
   await signIn("credentials", authData);
 }
+//V347
