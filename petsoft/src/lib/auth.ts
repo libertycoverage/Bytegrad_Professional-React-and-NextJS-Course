@@ -18,6 +18,7 @@ const config = {
       async authorize(credentials) {
         // runs on login (every login attempt)
         const { email, password } = credentials;
+        console.log("email: ", email);
 
         const user = await prisma.user.findUnique({
           where: { email: email },
@@ -41,14 +42,27 @@ const config = {
     }),
   ], //V347
   callbacks: {
-    authorized: ({ request }) => {
+    authorized: ({ auth, request }) => {
       // runs on every request with Middleware
+      const isLoggedIn = Boolean(auth?.user);
       const isTryingToAccessSlashApp =
         request.nextUrl.pathname.includes("/app");
 
-      if (isTryingToAccessSlashApp) {
+      //V350
+      // if (isTryingToAccessSlashApp) {
+      //   return false;
+      // } else {
+      //   return true;
+      // }
+      if (!isLoggedIn && isTryingToAccessSlashApp) {
         return false;
-      } else {
+      } //V350
+
+      if (isLoggedIn && isTryingToAccessSlashApp) {
+        return true;
+      }
+
+      if (!isTryingToAccessSlashApp) {
         return true;
       }
     },
