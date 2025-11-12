@@ -60,11 +60,11 @@ const config = {
 
       if (isLoggedIn && isTryingToAccessSlashApp) {
         return true;
-      }
+      } //V350
 
       if (!isTryingToAccessSlashApp) {
         return true;
-      }
+      } //V350
     },
   },
 } satisfies NextAuthConfig;
