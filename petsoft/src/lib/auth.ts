@@ -62,9 +62,15 @@ const config = {
         return true;
       } //V350
 
-      if (!isTryingToAccessSlashApp) {
-        return true;
-      } //V350
+      if (isLoggedIn && !isTryingToAccessSlashApp) {
+        return Response.redirect(new URL("/app/dashboard", request.nextUrl));
+      } //V350 //V354
+
+      if (!isLoggedIn && !isTryingToAccessSlashApp) {
+        return true; //V354
+      }
+
+      return false; //V354
     },
   },
 } satisfies NextAuthConfig;
