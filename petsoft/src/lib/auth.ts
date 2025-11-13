@@ -69,4 +69,5 @@ const config = {
   },
 } satisfies NextAuthConfig;
 
-export const { auth, signIn } = NextAuth(config);
+//V353 signOut
+export const { auth, signIn, signOut } = NextAuth(config);
