@@ -28,6 +28,9 @@ export default async function Layout({
   if (!session?.user) {
     redirect("/login");
   } //V357
+
+  console.log(session.user); //V358
+
   const pets = await prisma.pet.findMany({
     where: {
       userId: session.user.id,

@@ -143,11 +143,10 @@ export async function deletePet(petId: unknown) {
 
 //V347
 export async function logIn(formData: FormData) {
-  const authData = Object.fromEntries(formData.entries());
+  //const authData = Object.fromEntries(formData.entries());
+  await signIn("credentials", formData); //V356
 
-  await signIn("credentials", authData);
-
-  redirect("/app/dashboard");
+  redirect("/app/dashboard"); //V356
 }
 //V347
 
