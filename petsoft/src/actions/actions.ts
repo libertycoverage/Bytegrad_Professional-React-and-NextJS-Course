@@ -6,8 +6,10 @@ import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
 import { petFormSchema, petIdSchema } from "@/lib/validations";
 import { Pet } from "@prisma/client";
+import bcrypt from "bcryptjs"; //V356
 //import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 // --- pet actions ---
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
@@ -144,6 +146,8 @@ export async function logIn(formData: FormData) {
   const authData = Object.fromEntries(formData.entries());
 
   await signIn("credentials", authData);
+
+  redirect("/app/dashboard");
 }
 //V347
 
@@ -152,3 +156,20 @@ export async function logOut() {
   await signOut({ redirectTo: "/" });
 }
 //V353
+
+export async function signUp(formData: FormData) {
+  //"use server";
+  const hashedPassword = await bcrypt.hash(
+    formData.get("password") as string,
+    10
+  );
+
+  await prisma.user.create({
+    data: {
+      email: formData.get("email") as string,
+      hashedPassword: hashedPassword,
+    },
+  });
+
+  await signIn("credentials", formData);
+} //V356 moved to actions.ts from auth-form.tsx
