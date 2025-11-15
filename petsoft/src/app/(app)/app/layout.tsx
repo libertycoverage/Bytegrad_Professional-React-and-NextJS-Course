@@ -6,6 +6,8 @@ import PetContextProvider from "@/contexts/pet-context-provider";
 import SearchContextProvider from "@/contexts/search-context-provider";
 //import { Pet } from "@/lib/types";
 import prisma from "@/lib/db";
+import { auth } from "@/lib/auth"; //V357
+import { redirect } from "next/navigation";
 
 export default async function Layout({
   children,
@@ -22,7 +24,15 @@ export default async function Layout({
   // const data: Pet[] = await response.json();
 
   // console.log(data);
-  const pets = await prisma.pet.findMany();
+  const session = await auth(); //V357
+  if (!session?.user) {
+    redirect("/login");
+  } //V357
+  const pets = await prisma.pet.findMany({
+    where: {
+      userId: session.user.id,
+    },
+  }); //V357
   console.log(pets.length);
 
   return (
