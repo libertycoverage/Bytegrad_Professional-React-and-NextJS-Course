@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn, signOut } from "@/lib/auth";
+import { auth, signIn, signOut } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
@@ -21,6 +21,11 @@ export async function addPet(petData: unknown) {
   // V316
   //await sleep(2000); //V321
   await sleep(1000); //V321
+
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
 
   //  console.log(formData); // V316
 
@@ -45,7 +50,14 @@ export async function addPet(petData: unknown) {
       // }, // V316
 
       //data: petData, // V316 // that is right V318
-      data: validatedPet.data,
+      data: {
+        ...validatedPet.data,
+        User: {
+          connect: {
+            id: session.user.id,
+          },
+        },
+      },
       //data: pet, // simulating an error with optimistic UI V318
     });
   } catch (error) {
@@ -139,7 +151,7 @@ export async function deletePet(petId: unknown) {
   revalidatePath("/app", "layout");
 }
 
-// --- user actions ---
+// User actions
 
 //V347
 export async function logIn(formData: FormData) {
