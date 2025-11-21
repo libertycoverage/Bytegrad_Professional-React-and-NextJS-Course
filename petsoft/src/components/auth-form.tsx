@@ -38,7 +38,7 @@ export default function AuthForm({ type }: AuthFormProps) {
       <Button className="mt-4">
         {type === "logIn" ? "Log In" : "SignUp"}
       </Button>{" "}
-      {/* //V344 */}
+      {/* //V344 */}x
     </form>
   );
 }

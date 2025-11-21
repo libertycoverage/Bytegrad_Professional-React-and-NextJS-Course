@@ -5,14 +5,3 @@ declare module "@auth/core/jwt" {
     userId: string;
   }
 }
-
-declare module "@auth/core/" {
-  interface Session {
-    user: {
-      id: string;
-    } & DefaultSession["user"];
-  }
-  interface User extends DefaultUser {
-    id: string;
-  }
-}
