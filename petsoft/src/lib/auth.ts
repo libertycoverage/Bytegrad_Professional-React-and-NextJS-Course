@@ -75,13 +75,15 @@ const config = {
     jwt: ({ token, user }) => {
       if (user) {
         //on sign in
-        token.userId = user.id;
+        token.userId = user.id as string;
       }
 
       return token;
     }, //V357
     session: ({ session, token }) => {
-      session.user.id = token.userId;
+      if (session.user) {
+        session.user.id = token.userId;
+      }
 
       return session;
     }, //V357
