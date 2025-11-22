@@ -126,7 +126,14 @@ export async function deletePet(petId: unknown) {
   //await sleep(2000); //V321
   await sleep(1000); //V321
 
+  //authentication check (User own pet) //V360
+  const session = await auth(); //V360
+  if (!session?.user) {
+    redirect("/login");
+  }
+
   //V330
+  // validation
   const validatedPetId = petIdSchema.safeParse(petId);
   if (!validatedPetId.success) {
     return {
@@ -135,6 +142,26 @@ export async function deletePet(petId: unknown) {
   }
   //V330
 
+  //V360
+  // authorization check
+  const pet = await prisma.pet.findUnique({
+    where: {
+      id: validatedPetId.data,
+    },
+  });
+  if (!pet) {
+    return {
+      message: "Pet not found.",
+    };
+  }
+  if (pet.userId !== session.user.id) {
+    return {
+      message: "Not authorized.",
+    };
+  }
+  //V360
+
+  // database mutation
   try {
     await prisma.pet.delete({
       where: {
