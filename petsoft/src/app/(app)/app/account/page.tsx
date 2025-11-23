@@ -5,12 +5,15 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import SignOutBtn from "@/components/sign-out-btn";
+import { checkAuth } from "@/lib/server-utils"; //V363
 
 export default async function AccountPage() {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  // const session = await auth();
+  // if (!session?.user) {
+  //   redirect("/login");
+  // }
+  const session = await checkAuth(); //V363
+
 
   return (
     <main>

@@ -8,6 +8,7 @@ import SearchContextProvider from "@/contexts/search-context-provider";
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth"; //V357
 import { redirect } from "next/navigation";
+import { checkAuth } from "@/lib/server-utils"; //V363
 
 export default async function Layout({
   children,
@@ -24,10 +25,11 @@ export default async function Layout({
   // const data: Pet[] = await response.json();
 
   // console.log(data);
-  const session = await auth(); //V357
-  if (!session?.user) {
-    redirect("/login");
-  } //V357
+  // const session = await auth(); //V357
+  // if (!session?.user) {
+  //   redirect("/login");
+  // } //V357
+  const session = await checkAuth(); //V363
 
   console.log(session.user); //V358
 

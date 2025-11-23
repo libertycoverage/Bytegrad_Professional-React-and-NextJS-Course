@@ -10,6 +10,7 @@ import bcrypt from "bcryptjs"; //V356
 //import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { checkAuth } from "@/lib/server-utils"; //V362-V363
 // --- pet actions ---
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
@@ -79,10 +80,7 @@ export async function editPet(petId: unknown, newPetData: unknown) {
   await sleep(1000); //V321
 
   // authentication check
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  const session = await checkAuth(); //V363
 
   // validation
   //V330
@@ -150,10 +148,11 @@ export async function deletePet(petId: unknown) {
   await sleep(1000); //V321
 
   //authentication check (User own pet) //V360
-  const session = await auth(); //V360
-  if (!session?.user) {
-    redirect("/login");
-  }
+  // const session = await auth(); //V360
+  // if (!session?.user) {
+  //   redirect("/login");
+  // }
+  const session = await checkAuth(); //V363
 
   //V330
   // validation
