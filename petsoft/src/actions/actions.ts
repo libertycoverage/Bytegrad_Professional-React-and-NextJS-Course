@@ -22,10 +22,7 @@ export async function addPet(petData: unknown) {
   //await sleep(2000); //V321
   await sleep(1000); //V321
 
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  const session = await checkAuth(); //V362
 
   //  console.log(formData); // V316
 
@@ -35,6 +32,7 @@ export async function addPet(petData: unknown) {
       message: "Invalid pet data",
     };
   }
+
   //V328
 
   try {
