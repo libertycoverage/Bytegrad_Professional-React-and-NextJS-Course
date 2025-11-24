@@ -1,3 +1,5 @@
+import "server-only"; //V364
+
 import { redirect } from "next/navigation";
 import { auth } from "./auth";
 
