@@ -20,13 +20,14 @@ const config = {
         const { email, password } = credentials;
         console.log("email: ", email);
 
-        const user = await prisma.user.findUnique({
-          where: { email: email },
-        });
+        // const user = await prisma.user.findUnique({
+        //   where: { email: email },
+        // }); //V365
+        const user = await getUserByEmail(email);
         if (!user) {
           console.log("No user found");
           return null;
-        }
+        } //V365
 
         const passwordsMatch = await bcrypt.compare(
           password as string,

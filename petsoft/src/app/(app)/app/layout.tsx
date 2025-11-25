@@ -8,7 +8,8 @@ import SearchContextProvider from "@/contexts/search-context-provider";
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth"; //V357
 import { redirect } from "next/navigation";
-import { checkAuth } from "@/lib/server-utils"; //V363
+import { checkAuth, getPetsByUserId } from "@/lib/server-utils"; //V363
+
 
 export default async function Layout({
   children,
@@ -33,11 +34,12 @@ export default async function Layout({
 
   console.log(session.user); //V358
 
-  const pets = await prisma.pet.findMany({
-    where: {
-      userId: session.user.id,
-    },
-  }); //V357
+  // const pets = await prisma.pet.findMany({
+  //   where: {
+  //     userId: session.user.id,
+  //   },
+  // }); //V357
+  const pets = await getPetsByUserId(session.user.id);
   console.log(pets.length);
 
   return (

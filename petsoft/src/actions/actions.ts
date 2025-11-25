@@ -166,11 +166,12 @@ export async function deletePet(petId: unknown) {
 
   //V360
   // authorization check
-  const pet = await prisma.pet.findUnique({
-    where: {
-      id: validatedPetId.data,
-    },
-  });
+  // const pet = await prisma.pet.findUnique({
+  //   where: {
+  //     id: validatedPetId.data,
+  //   },
+  // }); // moved to src/lib/server-utils.ts
+  const pet = await getPetById(validatedPetId.data); //V365
   if (!pet) {
     return {
       message: "Pet not found.",
