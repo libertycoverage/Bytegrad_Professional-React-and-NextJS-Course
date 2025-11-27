@@ -92,4 +92,5 @@ const config = {
 } satisfies NextAuthConfig;
 
 //V353 signOut
-export const { auth, signIn, signOut } = NextAuth(config);
+//export const { auth, signIn, signOut } = NextAuth(config); //V366
+export const { auth, signIn, signOut, handlers: { POST, GET } } = NextAuth(config); //V366 
