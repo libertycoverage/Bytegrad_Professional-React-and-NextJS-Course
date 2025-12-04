@@ -106,15 +106,15 @@ export default function PetForm({
         if (!result) return; //V323
         onFormSubmission(); // V316
         // V316
-        const petData2 = {
-          name: formData.get("name") as string,
-          ownerName: formData.get("ownerName") as string,
-          imageUrl:
-            (formData.get("imageUrl") as string) ||
-            "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
-          age: Number(formData.get("age")),
-          notes: formData.get("notes") as string,
-        };
+        // const petData2 = {
+        //   name: formData.get("name") as string,
+        //   ownerName: formData.get("ownerName") as string,
+        //   imageUrl:
+        //     (formData.get("imageUrl") as string) ||
+        //     "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
+        //   age: Number(formData.get("age")),
+        //   notes: formData.get("notes") as string,
+        // }; //V367
         // V316
 
         const petData = getValues(); //V326-V327

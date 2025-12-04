@@ -4,13 +4,13 @@ import { auth, signIn, signOut } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
-import { petFormSchema, petIdSchema } from "@/lib/validations";
+import { authFormSchema, petFormSchema, petIdSchema } from "@/lib/validations";
 import { Pet } from "@prisma/client";
 import bcrypt from "bcryptjs"; //V356
 //import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { checkAuth } from "@/lib/server-utils"; //V362-V363
+import { checkAuth, getPetById } from "@/lib/server-utils"; //V362-V363
 // --- pet actions ---
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
@@ -53,7 +53,7 @@ export async function addPet(petData: unknown) {
         ...validatedPet.data,
         User: {
           connect: {
-            id: session.user.id,
+            id: session.user!.id,
           },
         },
       },
@@ -104,7 +104,7 @@ export async function editPet(petId: unknown, newPetData: unknown) {
       message: "Pet not found.",
     };
   }
-  if (pet.userId !== session.user.id) {
+  if (pet.userId !== session.user!.id) {
     return {
       message: "Not authorized."
     };
@@ -175,12 +175,12 @@ export async function deletePet(petId: unknown) {
   if (!pet) {
     return {
       message: "Pet not found.",
-    };
+    }; //
   }
-  if (pet.userId !== session.user.id) {
+  if (pet.userId !== session.user!.id) {
     return {
       message: "Not authorized.",
-    };
+    }; //
   }
   //V360
 
@@ -191,11 +191,11 @@ export async function deletePet(petId: unknown) {
         //id: petId, //V330
         id: validatedPetId.data, //V330
       },
-    });
+    }); //
   } catch (error) {
     return {
       message: "Could not delete pet.",
-    };
+    }; //
   }
 
   revalidatePath("/app", "layout");
@@ -204,9 +204,32 @@ export async function deletePet(petId: unknown) {
 // User actions
 
 //V347
-export async function logIn(formData: FormData) {
+//export async function logIn(formData: FormData) //V367
+export async function logIn(formData: unknown) { //V367
+
+  //let formDataObject; //V367
+  // check if formData is a FormData type
+  if (!(formData instanceof FormData)) {
+    return {
+      message: "There is no form data."
+    }; //V367
+  }
+  // convert formData to an object
+  const formDataObject = Object.fromEntries(formData.entries()); //V367
+  
+
+  // validate
+  const validatedFormDataObject = authFormSchema.safeParse(formDataObject); //V367
+  if(!validatedFormDataObject.success) {
+    return {
+      message: "There is no form data.",
+    }; //V367
+  }
+
   //const authData = Object.fromEntries(formData.entries());
-  await signIn("credentials", formData); //V356
+  // await signIn("credentials", formData); //V356
+  // await signIn("credentials", formDataObject); //V367
+  await signIn("credentials", validatedFormDataObject);
 
   redirect("/app/dashboard"); //V356
 }
@@ -214,23 +237,23 @@ export async function logIn(formData: FormData) {
 
 //V353
 export async function logOut() {
-  await signOut({ redirectTo: "/" });
+  await signOut({ redirectTo: "/" }); //V353
 }
-//V353
+
 
 export async function signUp(formData: FormData) {
   //"use server";
   const hashedPassword = await bcrypt.hash(
     formData.get("password") as string,
     10
-  );
+  ); //
 
   await prisma.user.create({
     data: {
       email: formData.get("email") as string,
       hashedPassword: hashedPassword,
     },
-  });
+  }); //
 
   await signIn("credentials", formData);
 } //V356 moved to actions.ts from auth-form.tsx

@@ -17,14 +17,14 @@ export async function checkAuth() {
 //V362
 
 //V365
-// export async function getPetById(petId: Pet['id']){
-//   const pet = await prisma.pet.findUnique({
-//     where: {
-//       id: petId,
-//     },
-//   });
-//   return pet;
-// }
+export async function getPetById(petId: Pet['id']){
+  const pet = await prisma.pet.findUnique({
+    where: {
+      id: petId,
+    },
+  });
+  return pet;
+}
 //V365
 export async function getPetsByUserId(userId: User['id']){
   const pets = await prisma.pet.findMany({

@@ -28,3 +28,8 @@ export const petFormSchema = z
 export type TPetForm = z.infer<typeof petFormSchema>; // V325
 
 export const petIdSchema = z.string().cuid();
+
+export const authFormSchema = z.object({
+  email: z.string().email().max(170),
+  password: z.string().max(170),
+}); //V367
