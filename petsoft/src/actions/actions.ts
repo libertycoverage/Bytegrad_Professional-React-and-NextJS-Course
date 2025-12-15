@@ -159,8 +159,8 @@ export async function deletePet(petId: unknown) {
   const validatedPetId = petIdSchema.safeParse(petId);
   if (!validatedPetId.success) {
     return {
-      message: "Invalid pet data",
-    };
+      message: "No pet data",
+    }; //V368
   }
   //V330
 
@@ -206,30 +206,40 @@ export async function deletePet(petId: unknown) {
 //V347
 //export async function logIn(formData: FormData) //V367
 export async function logIn(formData: unknown) { //V367
-
+  if (!(formData instanceof FormData)) {
   //let formDataObject; //V367
+
+  //V368
   // check if formData is a FormData type
   if (!(formData instanceof FormData)) {
     return {
       message: "There is no form data."
-    }; //V367
+    }; //V368
+  }
+    // return {
+    //   message: "There is no form data."
+    // }; //V367
   }
   // convert formData to an object
   const formDataObject = Object.fromEntries(formData.entries()); //V367
-  
+  //V368
 
-  // validate
-  const validatedFormDataObject = authFormSchema.safeParse(formDataObject); //V367
-  if(!validatedFormDataObject.success) {
-    return {
-      message: "There is no form data.",
-    }; //V367
-  }
+
+  // validate moved to auth.ts V368
+  // const validatedFormDataObject = authFormSchema.safeParse(formDataObject); //V367
+  // if(!validatedFormDataObject.success) {
+  //   return {
+  //     message: "There is no form data.",
+  //   }; //V367
+  // } //V368
 
   //const authData = Object.fromEntries(formData.entries());
   // await signIn("credentials", formData); //V356
   // await signIn("credentials", formDataObject); //V367
-  await signIn("credentials", validatedFormDataObject);
+//await signIn("credentials", validatedFormDataObject.data); //V368
+await signIn("credentials", formData); //V368
+
+ //  await signIn("credentials", formData); //V368
 
   redirect("/app/dashboard"); //V356
 }

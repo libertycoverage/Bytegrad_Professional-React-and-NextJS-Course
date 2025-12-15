@@ -35,7 +35,7 @@ export async function getPetsByUserId(userId: User['id']){
   return pets;
 } //V365
 
-export async function getUserByEmail() {
+export async function getUserByEmail(email: string) {
   const user = await prisma.user.findUnique({
     where: { email: email },
   });

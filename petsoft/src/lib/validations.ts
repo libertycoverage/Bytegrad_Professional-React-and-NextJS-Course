@@ -6,16 +6,16 @@ export const petFormSchema = z
     name: z
       .string()
       .trim()
-      .min(1, { message: "Name is required " })
-      .max(100, { message: "Name must be below 100 characters" }),
+      .min(3, { message: "" })
+      .max(170, { message: "" }),
     ownerName: z
       .string()
       .trim()
-      .min(1, { message: "Owner name is required" })
-      .max(100),
+      .min(3, { message: "" })
+      .max(170),
     imageUrl: z.union([
       z.literal(""),
-      z.string().trim().url({ message: "Image url must be a valid url" }),
+      z.string().trim().url({ message: "" }),
     ]),
     age: z.coerce.number().int().positive().max(999),
     notes: z.union([z.literal(""), z.string().trim().max(1000)]),
@@ -32,4 +32,8 @@ export const petIdSchema = z.string().cuid();
 export const authFormSchema = z.object({
   email: z.string().email().max(170),
   password: z.string().max(170),
+  subscription: z.union([z.literal("free"), z.literal("propremium")]),
 }); //V367
+
+
+export type EuthForm = z.infer<typeof authFormSchema>; // V368

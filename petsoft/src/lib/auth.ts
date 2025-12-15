@@ -3,6 +3,8 @@ import Credentials from "next-auth/providers/credentials";
 import prisma from "./db";
 import bcrypt from "bcryptjs";
 import { getUserByEmail } from "./server-utils";
+import { EuthForm } from "@/lib/validations";
+import { authFormSchema } from "@/lib/validations";
 
 const config = {
   pages: {
@@ -17,8 +19,20 @@ const config = {
     //V347
     Credentials({
       async authorize(credentials) {
-        // runs on login (every login attempt)
-        const { email, password } = credentials;
+        // runs on login
+
+        // validation
+        const validatedFormDataObject = authFormSchema.safeParse(credentials); //V368
+        if(!validatedFormDataObject.success) {
+          return null //V367 V368
+        }
+
+        const parsed = authFormSchema.safeParse(credentials); //V368
+        if (!parsed.success) return null;
+        //const { email, password, subscription } = parsed.data;
+        // extract values
+        const { email, password, subscription } = validatedFormDataObject.data;
+
         console.log("email: ", email);
 
         // const user = await prisma.user.findUnique({
