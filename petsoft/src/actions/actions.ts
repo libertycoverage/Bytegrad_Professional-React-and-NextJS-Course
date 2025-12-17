@@ -237,9 +237,12 @@ export async function logIn(formData: unknown) { //V367
   // await signIn("credentials", formData); //V356
   // await signIn("credentials", formDataObject); //V367
 //await signIn("credentials", validatedFormDataObject.data); //V368
+console.log('SIGNIN DEBUG formDataObject', formDataObject); // debug
+console.log('SIGNIN DEBUG formData', formData); // debug
+
 await signIn("credentials", formData); //V368
 
- //  await signIn("credentials", formData); //V368
+ //  await signIn("credentials", Object.fromEntries(formData.entries())); //V368
 
   redirect("/app/dashboard"); //V356
 }
@@ -251,19 +254,52 @@ export async function logOut() {
 }
 
 
-export async function signUp(formData: FormData) {
+//export async function signUp(formData: FormData) { //V369
+//export async function signUp(formData: unknown) { //V369
+export async function signUp(formData: unknown) { //V369
+  // check if formData is a FormData type
+  if (!(formData instanceof FormData)) {
+    return {
+      message: "No form data"
+    }; //V369
+  } //V369
+
+  //convert formData to a plain object
+  const formDataEntries = Object.fromEntries(formData.entries()); //V369
+
+  //const validatedFormData = authFormSchema.safeParse(formData); //V369
+  const validatedFormData = authFormSchema.safeParse(formDataEntries); //V369
+
+  if (!validatedFormData.success) {
+    return {
+      message: "No form data."
+    }; //V369
+  } //V369
+
+  const { email, password, subscription } = validatedFormData.data;
+
   //"use server";
+  // const hashedPassword = await bcrypt.hash(
+  //   formData.get("password") as string,
+  //   10
+  // ); //V369
+  // const hashedPassword = await bcrypt.hash(
+  //   validatedFormData.data.password,
+  //   10
+  // ); //V369
   const hashedPassword = await bcrypt.hash(
-    formData.get("password") as string,
+    password,
     10
-  ); //
+  ); //V369
+
 
   await prisma.user.create({
     data: {
-      email: formData.get("email") as string,
+      // email: formData.get("email") as string, //V369
+      email, 
       hashedPassword: hashedPassword,
-    },
-  }); //
+    }, //V369
+  }); //V369
 
-  await signIn("credentials", formData);
+  await signIn("credentials", formData); //V369
 } //V356 moved to actions.ts from auth-form.tsx

@@ -24,7 +24,7 @@ export default function AuthForm({ type }: AuthFormProps) {
   // } //V356 moved to actions.ts
   //V344
   return (
-    <form action={formData => {} type === "logIn" ? logIn : signUp}>
+    <form action={type === "logIn" ? logIn : signUp}>
       {/* //V356 */}
       <div className="space-y-1">
         <Label htmlFor="email">Email</Label>
