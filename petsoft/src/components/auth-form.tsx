@@ -13,7 +13,6 @@ type AuthFormProps = {
 
 //export default function AuthForm() { //V344
 export default function AuthForm({ type }: AuthFormProps) {
-useFormStatus();
 
   // function signUp(formData: FormData) {
   //   "use server";
@@ -44,7 +43,7 @@ useFormStatus();
         {type === "logIn" ? "Log In" : "SignUp"}
       </Button>{" "} //V372 */}
       {/* //V344 */}
-       <AuthFormButton type={type} />  {/* //V372 */}
+       <AuthFormButton type={type} />  {/* //V373 */}
     </form>
   );
 }
