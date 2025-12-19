@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import prisma from "@/lib/db"; //V356
+import AuthFormButton from "./auth-form-button";
 
 //V344
 type AuthFormProps = {
@@ -12,6 +13,8 @@ type AuthFormProps = {
 
 //export default function AuthForm() { //V344
 export default function AuthForm({ type }: AuthFormProps) {
+useFormStatus();
+
   // function signUp(formData: FormData) {
   //   "use server";
 
@@ -37,10 +40,11 @@ export default function AuthForm({ type }: AuthFormProps) {
         <Input id="password" name="password" type="password" required maxLength={170} />
       </div>
       {/* <Button className="mt-4">Log In </Button> //V344 */}
-      <Button className="mt-4">
+      {/* <Button className="mt-4">
         {type === "logIn" ? "Log In" : "SignUp"}
-      </Button>{" "}
-      {/* //V344 */}x
+      </Button>{" "} //V372 */}
+      {/* //V344 */}
+       <AuthFormButton type={type} />  {/* //V372 */}
     </form>
   );
 }

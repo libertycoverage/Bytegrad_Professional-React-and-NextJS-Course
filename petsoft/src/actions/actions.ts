@@ -206,6 +206,9 @@ export async function deletePet(petId: unknown) {
 //V347
 //export async function logIn(formData: FormData) //V367
 export async function logIn(formData: unknown) { //V367
+  await sleep(1000);
+
+
   if (!(formData instanceof FormData)) {
   //let formDataObject; //V367
 
