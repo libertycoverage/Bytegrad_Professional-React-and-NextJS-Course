@@ -6,14 +6,14 @@ import { useFormStatus } from 'react-dom';
 
 type AuthFormButtonProps ={
  type: "logIn" | "signUp"
-} //V372
+} //V373
 
 export default function AuthFormButton({type}: AuthFormButtonProps) {
-  const { pending } = useFormStatus(); //V372
+  const { pending } = useFormStatus(); //V373
 
   return (
     <Button disabled={pending} className="mt-4">
     {type === "logIn" ? "Log In" : "SignUp"}
     </Button>
   )
-} //V372
+} //V373
