@@ -5,7 +5,7 @@ import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
 import { authFormSchema, petFormSchema, petIdSchema } from "@/lib/validations";
-import { Pet } from "@prisma/client";
+import { Pet, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs"; //V356
 //import { Pet } from "@prisma/client"; //V321
 import { revalidatePath } from "next/cache";
@@ -292,7 +292,7 @@ export async function signUp(formData: unknown) { //V369
     10
   ); //V369
 
-
+try {
   await prisma.user.create({
     data: {
       // email: formData.get("email") as string, //V369
@@ -300,6 +300,18 @@ export async function signUp(formData: unknown) { //V369
       hashedPassword: hashedPassword,
     }, //V369
   }); //V369
+} catch (error) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === "P2002") {
+      return {
+        message: "Email already exists.",
+      }; //V372 
+    } //V372
+  } //V372
+  return {
+    message: "Could not create."
+  }; //V372
+} //V372
 
   await signIn("credentials", formData); //V369
 } //V356 moved to actions.ts from auth-form.tsx
