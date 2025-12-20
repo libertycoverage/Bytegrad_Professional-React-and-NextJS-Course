@@ -259,7 +259,7 @@ export async function logOut() {
 
 //export async function signUp(formData: FormData) { //V369
 //export async function signUp(formData: unknown) { //V369
-export async function signUp(formData: unknown) { //V369
+export async function signUp(prevState: unknown, formData: unknown) { //V369
   // check if formData is a FormData type
   if (!(formData instanceof FormData)) {
     return {

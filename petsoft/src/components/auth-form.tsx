@@ -1,9 +1,12 @@
+"use client";
+
 import { logIn, signUp } from "@/actions/actions";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import prisma from "@/lib/db"; //V356
 import AuthFormButton from "./auth-form-button";
+import { useFormState } from "react-dom";
 
 //V344
 type AuthFormProps = {
@@ -25,8 +28,12 @@ export default function AuthForm({ type }: AuthFormProps) {
   //   });
   // } //V356 moved to actions.ts
   //V344
+
+  const [signUpError, dispatchSignUp] = useFormState(signUp, undefined); //V374
   return (
-    <form action={type === "logIn" ? logIn : signUp}>
+    // <form action={type === "logIn" ? logIn : signUp}> //V374
+    <form action={dispatchSignUp}>
+      {/* //V374 */}
       {/* //V356 */}
       <div className="space-y-1">
         <Label htmlFor="email">Email</Label>
@@ -39,11 +46,14 @@ export default function AuthForm({ type }: AuthFormProps) {
         <Input id="password" name="password" type="password" required maxLength={170} />
       </div>
       {/* <Button className="mt-4">Log In </Button> //V344 */}
-      {/* <Button className="mt-4">
+      {/* <Button className="mt-4"> 
         {type === "logIn" ? "Log In" : "SignUp"}
       </Button>{" "} //V372 */}
       {/* //V344 */}
        <AuthFormButton type={type} />  {/* //V373 */}
+
+       {signUpError && <p className="text-red-500 text-sm mt-2">{signUpError.message}</p>}
+       {/* //V374 */}
     </form>
-  );
-}
+  );//
+}//
