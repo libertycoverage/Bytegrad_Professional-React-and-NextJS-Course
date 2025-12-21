@@ -11,6 +11,7 @@ import bcrypt from "bcryptjs"; //V356
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkAuth, getPetById } from "@/lib/server-utils"; //V362-V363
+import { AuthError } from "next-auth";
 // --- pet actions ---
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
@@ -205,7 +206,9 @@ export async function deletePet(petId: unknown) {
 
 //V347
 //export async function logIn(formData: FormData) //V367
-export async function logIn(formData: unknown) { //V367
+// export async function logIn(formData: unknown) { //V367 //V375
+export async function logIn(prevState: unknown, formData: unknown) { //V375
+
   await sleep(1000);
 
 
@@ -243,8 +246,27 @@ export async function logIn(formData: unknown) { //V367
 console.log('SIGNIN DEBUG formDataObject', formDataObject); // debug
 console.log('SIGNIN DEBUG formData', formData); // debug
 
+try {
 await signIn("credentials", formData); //V368
-
+} catch (error) {
+  if (error instanceof AuthError) {
+    switch (error.type) {
+      case 'CredentialsSignin': {
+        return {
+          message: "Credentials could be incorrect",
+        }; //V375
+      }  //V375
+      default: {
+        return {
+          message: "Could not sign in.",
+        };
+      }
+    }  //V375
+  }  //V375
+  return {
+    message: "Could not sign in."
+  }; //V375
+}  //V375
  //  await signIn("credentials", Object.fromEntries(formData.entries())); //V368
 
   redirect("/app/dashboard"); //V356

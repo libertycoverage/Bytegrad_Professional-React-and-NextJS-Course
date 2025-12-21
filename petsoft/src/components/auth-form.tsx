@@ -30,10 +30,11 @@ export default function AuthForm({ type }: AuthFormProps) {
   //V344
 
   const [signUpError, dispatchSignUp] = useFormState(signUp, undefined); //V374
+  const [logInError, dispatchLogIn] = useFormState(logIn, undefined); //V375
   return (
     // <form action={type === "logIn" ? logIn : signUp}> //V374
-    <form action={dispatchSignUp}>
-      {/* //V374 */}
+    <form action={type === "logIn" ? dispatchLogIn : dispatchSignUp}>
+      {/* //V374 V375*/}
       {/* //V356 */}
       <div className="space-y-1">
         <Label htmlFor="email">Email</Label>
@@ -54,6 +55,8 @@ export default function AuthForm({ type }: AuthFormProps) {
 
        {signUpError && <p className="text-red-500 text-sm mt-2">{signUpError.message}</p>}
        {/* //V374 */}
+       {logInError && <p className="text-red-500 text-sm mt-2">{logInError.message}</p>}
+       {/* //V375 */}       
     </form>
   );//
 }//
