@@ -248,6 +248,7 @@ console.log('SIGNIN DEBUG formData', formData); // debug
 
 try {
 await signIn("credentials", formData); //V368
+  //redirect(); //V376
 } catch (error) {
   if (error instanceof AuthError) {
     switch (error.type) {
@@ -258,14 +259,15 @@ await signIn("credentials", formData); //V368
       }  //V375
       default: {
         return {
-          message: "Could not sign in.",
+          message: "Error. Could not sign in.",
         };
       }
     }  //V375
   }  //V375
-  return {
-    message: "Could not sign in."
-  }; //V375
+  // return {
+  //   message: "Could not sign in."
+  // }; //V375
+  throw error; // nextjs redirects throws error, so we need to rethrow it //V376
 }  //V375
  //  await signIn("credentials", Object.fromEntries(formData.entries())); //V368
 
