@@ -277,6 +277,8 @@ await signIn("credentials", formData); //V368
 
 //V353
 export async function logOut() {
+  await sleep(1000);
+
   await signOut({ redirectTo: "/" }); //V353
 }
 
