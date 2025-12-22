@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import React, { useTransition } from 'react'
 
 //export default function Page() { // V382
-export default function Page({ searchParams }) {  // V382
+export default function Page({ searchParams }: {searchParams: { [key: string]: string | string[] | undefined }}) {  // V382
   //console.log(searchParams);  // V382
   const [isPending, startTransition] = useTransition(); //V384
 
