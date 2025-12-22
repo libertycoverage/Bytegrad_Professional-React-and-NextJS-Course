@@ -25,7 +25,7 @@ const config = {
         const validatedFormDataObject = authFormSchema.safeParse(credentials); //V368
         if(!validatedFormDataObject.success) {
           return null //V367 V368
-        }
+        } //
 
         const parsed = authFormSchema.safeParse(credentials); //V368
         if (!parsed.success) return null;
@@ -47,22 +47,22 @@ const config = {
         const passwordsMatch = await bcrypt.compare(
           password as string,
           user.hashedPassword
-        );
+        ); //
         if (!passwordsMatch) {
           console.log("Invalid credentials");
           return null;
-        }
+        } //
 
         return user;
-      },
-    }),
+      }, //
+    }), //
   ], //V347
   callbacks: {
     authorized: ({ auth, request }) => {
       // runs on every request with Middleware
       const isLoggedIn = Boolean(auth?.user);
       const isTryingToAccessSlashApp =
-        request.nextUrl.pathname.includes("/app");
+        request.nextUrl.pathname.includes("/app"); //
 
       //V350
       // if (isTryingToAccessSlashApp) {
@@ -79,12 +79,17 @@ const config = {
       } //V350
 
       if (isLoggedIn && !isTryingToAccessSlashApp) {
-        return Response.redirect(new URL("/app/dashboard", request.nextUrl));
+        if (request.nextUrl.pathname.includes("/login") || request.nextUrl.pathname.includes("/login")) {
+          //return Response.redirect(new URL("/app/dashboard", request.nextUrl)); // V381
+          return Response.redirect(new URL("/app/dashboard", request.nextUrl)); // V381
+        } //V381
+
+        return true; //V381
       } //V350 //V354
 
       if (!isLoggedIn && !isTryingToAccessSlashApp) {
         return true; //V354
-      }
+      } //
 
       return false; //V354
     },
@@ -92,19 +97,19 @@ const config = {
       if (user) {
         //on sign in
         token.userId = user.id as string;
-      }
+      } //
 
       return token;
     }, //V357
     session: ({ session, token }) => {
       if (session.user) {
         session.user.id = token.userId;
-      }
+      } //
 
       return session;
     }, //V357
-  },
-} satisfies NextAuthConfig;
+  }, //
+} satisfies NextAuthConfig; //
 
 //V353 signOut
 //export const { auth, signIn, signOut } = NextAuth(config); //V366

@@ -12,6 +12,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkAuth, getPetById } from "@/lib/server-utils"; //V362-V363
 import { AuthError } from "next-auth";
+
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 // --- pet actions ---
 //export async function addPet(formData) { // V316
 //export async function addPet(petData: Pet) { //V321
@@ -277,7 +280,7 @@ await signIn("credentials", formData); //V368
 
 //V353
 export async function logOut() {
-  await sleep(1000);
+  await sleep(1000); //V377
 
   await signOut({ redirectTo: "/" }); //V353
 }
@@ -344,3 +347,29 @@ try {
 
   await signIn("credentials", formData); //V369
 } //V356 moved to actions.ts from auth-form.tsx
+
+
+// V381
+// payment actions
+
+export async function createCheckoutSession() {
+  // authentication check
+  const session = await checkAuth(); // V381
+
+  // create checkout session
+  const checkoutSession = await stripe.checkout.sessions.create({
+    customer_email: session.user?.email,
+    line_items: [
+      {
+        price: "price_1ShAN8CkBPUNWuR98slil9Xm",
+        quantity: 1,
+      } // V381
+    ], // V381
+    mode: "payment",
+    success_url: `${process.env.CANONICAL_URL}/payment?success=true`,
+    cancel_url: `${process.env.CANONICAL_URL}/payment?cancelled=true`,
+  }); // V381
+
+  // redirect user
+  redirect(checkoutSession.url); // V381
+} // V381
