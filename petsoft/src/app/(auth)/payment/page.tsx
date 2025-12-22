@@ -21,9 +21,16 @@ export default function Page({ searchParams }) {  // V382
         } 
 
         {
-          searchParams.success && <p className="test-sm text-green-700">Payment successful! You now have lifetime access to PetSoft.</p>
+          searchParams.success && (<p className="test-sm text-green-700">Payment successful! You now have lifetime access to PetSoft.</p>)
         } 
         {/* V382 */}
+
+        {
+          searchParams.cancelled && (
+            <p className="test-sm text-red-700">Payment cancelled. You can try again.</p>
+          )
+        }
+        {/* V383 */}
     </main>
   ) 
 } // V379
