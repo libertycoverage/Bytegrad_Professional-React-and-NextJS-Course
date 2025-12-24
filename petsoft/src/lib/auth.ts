@@ -74,14 +74,21 @@ const config = {
         return false;
       } //V350
 
-      if (isLoggedIn && isTryingToAccessSlashApp) {
+      if (isLoggedIn && isTryingToAccessSlashApp && !auth?.user.hasAccess) {
+        return Response.redirect(new URL("/payment", request.nextUrl)); //V388 
+      } //V388    
+
+      if (isLoggedIn && isTryingToAccessSlashApp && auth?.user.hasAccess) {
         return true;
-      } //V350
+      } //V350 //V388    
 
       if (isLoggedIn && !isTryingToAccessSlashApp) {
-        if (request.nextUrl.pathname.includes("/login") || request.nextUrl.pathname.includes("/login")) {
+        if (
+          (request.nextUrl.pathname.includes("/login") || 
+            request.nextUrl.pathname.includes("/signup")) && 
+          !auth?.user.hasAccess) {
           //return Response.redirect(new URL("/app/dashboard", request.nextUrl)); // V381
-          return Response.redirect(new URL("/app/dashboard", request.nextUrl)); // V381
+          return Response.redirect(new URL("/payment", request.nextUrl)); // V381
         } //V381
 
         return true; //V381
@@ -97,6 +104,7 @@ const config = {
       if (user) {
         //on sign in
         token.userId = user.id as string;
+        token.hasAccess = user.hasAccess; // V387
       } //
 
       return token;
@@ -104,6 +112,7 @@ const config = {
     session: ({ session, token }) => {
       if (session.user) {
         session.user.id = token.userId;
+        session.user.hasAccess =  token.hasAccess; // V387
       } //
 
       return session;
