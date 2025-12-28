@@ -100,20 +100,29 @@ const config = {
 
       return false; //V354
     },
-    jwt: ({ token, user }) => {
+    jwt: async ({ token, user, trigger }) => {
       if (user) {
         //on sign in
         token.userId = user.id as string;
+        token.email = user.email!; // V393
         token.hasAccess = user.hasAccess; // V387
       } //
+
+      if (trigger === "update") {
+        // on every request
+        const userFromDb = await getUserByEmail(token.email); // V393
+        if (userFromDb) {
+          token.hasAccess = userFromDb.hasAccess; // V393
+        } // V393
+      } // V393
 
       return token;
     }, //V357
     session: ({ session, token }) => {
-      if (session.user) {
+      //if (session.user) { // V393
         session.user.id = token.userId;
         session.user.hasAccess =  token.hasAccess; // V387
-      } //
+      //} // V393
 
       return session;
     }, //V357

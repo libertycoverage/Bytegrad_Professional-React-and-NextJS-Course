@@ -4,15 +4,28 @@ import { createCheckoutSession } from '@/actions/actions';
 import H1 from '@/components/h1'
 import { Button } from '@/components/ui/button';
 import React, { useTransition } from 'react'
+import { useSession } from "next-auth/react"; 
+import { useRouter } from 'next/navigation';
 
 //export default function Page() { // V382
 export default function Page({ searchParams }: {searchParams: { [key: string]: string | string[] | undefined }}) {  // V382
   //console.log(searchParams);  // V382
   const [isPending, startTransition] = useTransition(); //V384
 
+  const { update } = useSession(); // V393
+  const router = useRouter();
+
   return (
     <main className="flex flex-col items-center space-y-10">
         <H1>PetSoft access requires payment</H1>
+
+        {searchParams.success && (
+          <Button onClick={async() => {
+            await update(true); // V393
+            router.push('/app/dashboard'); // V393
+          }}>Access PetSoft</Button>
+        )} 
+
         {
           !searchParams.success && (
             <Button 
