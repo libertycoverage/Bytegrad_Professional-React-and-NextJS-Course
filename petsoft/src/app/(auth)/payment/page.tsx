@@ -11,9 +11,9 @@ import { useRouter } from 'next/navigation';
 export default function Page({ searchParams }: {searchParams: { [key: string]: string | string[] | undefined }}) {  // V382
   //console.log(searchParams);  // V382
   const [isPending, startTransition] = useTransition(); //V384
-
-  const { update } = useSession(); // V393
-  const router = useRouter();
+  
+  const { data: session, update, status } = useSession(); // V393 // V394
+  const router = useRouter(); //
 
   return (
     <main className="flex flex-col items-center space-y-10">
@@ -23,7 +23,11 @@ export default function Page({ searchParams }: {searchParams: { [key: string]: s
           <Button onClick={async() => {
             await update(true); // V393
             router.push('/app/dashboard'); // V393
-          }}>Access PetSoft</Button>
+          }}
+          disabled={status === "loading" || session?.user.hasAccess} // V394
+          >
+            Access PetSoft
+          </Button>
         )} 
 
         {

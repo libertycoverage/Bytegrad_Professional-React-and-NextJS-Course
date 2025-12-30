@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { getUserByEmail } from "./server-utils";
 import { EuthForm } from "@/lib/validations";
 import { authFormSchema } from "@/lib/validations";
+import { sleep } from "./utils";
 
 const config = {
   pages: {
@@ -109,6 +110,7 @@ const config = {
       } //
 
       if (trigger === "update") {
+        await sleep(1000); //
         // on every request
         const userFromDb = await getUserByEmail(token.email); // V393
         if (userFromDb) {
