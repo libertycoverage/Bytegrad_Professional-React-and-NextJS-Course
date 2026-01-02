@@ -13,7 +13,7 @@ import { redirect } from "next/navigation";
 import { checkAuth, getPetById } from "@/lib/server-utils"; //V362-V363
 import { AuthError } from "next-auth";
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); //
 
 // --- pet actions ---
 //export async function addPet(formData) { // V316
