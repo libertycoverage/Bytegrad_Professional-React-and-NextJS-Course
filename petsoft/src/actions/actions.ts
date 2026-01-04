@@ -25,7 +25,9 @@ export async function addPet(petData: unknown) {
   //V321
   // V316
   //await sleep(2000); //V321
-  await sleep(1000); //V321
+  // if (process.env.NODE_ENV === "development" ) {
+  //   await sleep(1000); //V321
+  // } // V397
 
   const session = await checkAuth(); //V362
 
@@ -81,7 +83,7 @@ export async function editPet(petId: unknown, newPetData: unknown) {
   // V315
 
   //await sleep(2000); //V321
-  await sleep(1000); //V321
+  //await sleep(1000); //V321 // V397
 
   // authentication check
   const session = await checkAuth(); //V363
@@ -149,7 +151,7 @@ export async function deletePet(petId: unknown) {
   //V329
   //V321
   //await sleep(2000); //V321
-  await sleep(1000); //V321
+  //await sleep(1000); //V321 // V397
 
   //authentication check (User own pet) //V360
   // const session = await auth(); //V360
@@ -212,7 +214,7 @@ export async function deletePet(petId: unknown) {
 // export async function logIn(formData: unknown) { //V367 //V375
 export async function logIn(prevState: unknown, formData: unknown) { //V375
 
-  await sleep(1000);
+  //await sleep(1000); // V397
 
 
   if (!(formData instanceof FormData)) {
@@ -280,7 +282,7 @@ await signIn("credentials", formData); //V368
 
 //V353
 export async function logOut() {
-  await sleep(1000); //V377
+  //await sleep(1000); //V377 //V397
 
   await signOut({ redirectTo: "/" }); //V353
 }

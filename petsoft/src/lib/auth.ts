@@ -124,7 +124,7 @@ const config = {
       } //
 
       if (trigger === "update") {
-        await sleep(1000); //
+        //await sleep(1000); //V397
         // on every request
         const userFromDb = await getUserByEmail(token.email); // V393
         if (userFromDb) {
