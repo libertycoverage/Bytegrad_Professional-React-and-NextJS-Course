@@ -65,6 +65,13 @@ const config = {
       const isTryingToAccessSlashApp =
         request.nextUrl.pathname.includes("/app"); //
 
+      console.log(
+        isLoggedIn,
+        isTryingToAccessSlashApp,
+        auth?.user.hasAccess,
+        request.nextUrl.pathname
+      ); // V396
+
       //V350
       // if (isTryingToAccessSlashApp) {
       //   return false;
@@ -83,6 +90,13 @@ const config = {
         return true;
       } //V350 //V388    
 
+      if (isLoggedIn && 
+        (request.nextUrl.pathname.includes("/login") || 
+          request.nextUrl.pathname.includes("/signup")) && auth?.user.hasAccess
+      ) {
+        return Response.redirect(new URL("/app/dashboard", request.nextUrl)); // V396
+      }
+
       if (isLoggedIn && !isTryingToAccessSlashApp) {
         if (
           (request.nextUrl.pathname.includes("/login") || 
@@ -100,7 +114,7 @@ const config = {
       } //
 
       return false; //V354
-    },
+    }, //
     jwt: async ({ token, user, trigger }) => {
       if (user) {
         //on sign in
