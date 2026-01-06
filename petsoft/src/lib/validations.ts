@@ -32,7 +32,7 @@ export const petIdSchema = z.string().cuid();
 export const authFormSchema = z.object({
   email: z.string().email().max(170),
   password: z.string().max(170),
-  //subscription: z.union([z.literal("free"), z.literal("propremium")]), //V369
+ // subscription: z.union([z.literal("free"), z.literal("propremium")]), //V369
 }); //V367
 
 

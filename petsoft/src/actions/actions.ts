@@ -310,7 +310,8 @@ export async function signUp(prevState: unknown, formData: unknown) { //V369
     }; //V369
   } //V369
 
-  const { email, password, subscription } = validatedFormData.data;
+  //const { email, password, subscription } = validatedFormData.data; 
+  const { email, password } = validatedFormData.data;
 
   //"use server";
   // const hashedPassword = await bcrypt.hash(
